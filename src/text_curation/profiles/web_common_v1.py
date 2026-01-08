@@ -1,19 +1,19 @@
-from text_curation.blocks import (
+from text_curation._blocks import (
     NormalizationBlock,
     FilteringBlock,
     FormattingBlock,
-    StrucutureBlock,
+    StructureBlock,
     RedactionBlock,
 )
 
-from text_curation.core.pipeline import Pipeline
+from text_curation._core.pipeline import Pipeline
 
 PIPELINE = Pipeline(
     blocks = [
         RedactionBlock(),
         NormalizationBlock(),
         FormattingBlock(),
-        StrucutureBlock(),
+        StructureBlock(),
         FilteringBlock()
     ]
 )

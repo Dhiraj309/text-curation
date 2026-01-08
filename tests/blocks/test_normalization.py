@@ -1,5 +1,6 @@
-from text_curation.blocks.normalization import NormalizationBlock
-from text_curation.core.document import Document
+from text_curation._core.document import Document
+from text_curation._blocks.normalization import NormalizationBlock
+
 
 def normalize(text):
     doc = Document(text)
