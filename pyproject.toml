@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "text-curation"
-version = "0.1.1"
-description = "Profile-Based Text Curation Pipelines For Hugging Face Datasets"
+version = "0.2.0"
+description = "Profile-based text curation pipelines for Hugging Face Datasets"
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.9"
@@ -19,8 +19,12 @@ keywords = [
     "datasets",
     "nlp",
     "text-preprocessing",
+    "text-cleaning",
     "llm",
-    "data-curation"
+    "data-curation",
+    "cleantext",
+    "textcleaning",
+    "curation"
 ]
 
 classifiers = [
@@ -38,9 +42,6 @@ classifiers = [
 
 dependencies = [
     "datasets>=2.16.0",
-    "ftfy>=6.1.0",
-    "beautifulsoup4>=4.12.0",
-    "lxml>=4.9.0"
 ]
 
 [project.optional-dependencies]
@@ -57,6 +58,11 @@ docs = [
     "mkdocs",
     "mkdocs-material"
 ]
+
+[project.urls]
+Homepage = "https://github.com/Dhiraj309/text-curation"
+Repository = "https://github.com/Dhiraj309/text-curation"
+Issues = "https://github.com/Dhiraj309/text-curation/issues"
 
 [tool.setuptools]
 package-dir = { "" = "src" }

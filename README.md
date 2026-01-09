@@ -22,7 +22,10 @@ limitations under the License.
 
 <p align="center">
   <a href="https://pypi.org/project/text-curation/">
-    <img alt="PyPI" src="https://img.shields.io/pypi/v/text-curation.svg">
+    <img alt="PyPI version" src="https://img.shields.io/pypi/v/text-curation.svg">
+  </a>
+  <a href="https://pypi.org/project/text-curation/">
+    <img alt="PyPI downloads" src="https://img.shields.io/pypi/dm/text-curation">
   </a>
   <a href="https://github.com/Dhiraj309/text-curation/blob/main/LICENSE">
     <img alt="License" src="https://img.shields.io/github/license/Dhiraj309/text-curation.svg">
@@ -42,7 +45,7 @@ limitations under the License.
 **text-curation** is a Python library for building **structured, profile-driven text curation pipelines**
 designed to integrate naturally with **Hugging Face Datasets**.
 
-The library focuses on **deterministic, composable text transformations** for preparing large-scale corpora
+The library focuses on **deterministic, inspectable text transformations** for preparing large-scale corpora
 used in NLP and LLM training workflows.
 
 Rather than providing ad-hoc cleaning scripts, `text-curation` encourages **explicit curation profiles**
@@ -53,13 +56,18 @@ that describe *what transformations are applied and why*.
 ## Design Principles
 
 - **Profile-driven pipelines**  
-  Reusable, declarative profiles define how text is curated for a given domain (e.g. web, wiki, news).
+  Reusable, declarative profiles define how text is curated for a given domain
+  (e.g. web, wiki, news).
 
 - **Composable blocks**  
-  Each transformation is implemented as an isolated block that can be enabled, disabled, or reordered.
+  Each transformation is implemented as an isolated block that can be enabled,
+  disabled, or reordered.
 
 - **Deterministic and non-destructive**  
   Transformations are conservative by default and designed to preserve semantic content.
+
+- **Structure-aware**  
+  Text is treated as structured data (paragraphs, lists, headers), not just strings.
 
 - **Dataset-scale friendly**  
   Built to operate efficiently with Hugging Face Datasets.
@@ -68,30 +76,47 @@ that describe *what transformations are applied and why*.
 
 ## Current Scope (v0.1.x)
 
-This library currently focuses on low-level text normalization and formatting.
-Structural and semantic curation is intentionally staged for later releases.
+`text-curation` currently provides **foundational, structure-aware text curation**
+for real-world, messy text data.
 
-Implemented blocks:
+The focus is on **deterministic preprocessing** rather than semantic classification
+or ML-based filtering.
+
+### Implemented Blocks
 
 - **Normalization**
-  - Unicode normalization
-  - Quote and dash normalization
-  - Encoding cleanup
+  - Unicode normalization (NFKC)
+  - Quote, dash, and ellipsis normalization
+  - Control character and zero-width cleanup
 
 - **Formatting**
   - Whitespace normalization
+  - Paragraph reconstruction
   - Punctuation spacing fixes
-  - Readability-preserving formatting
+  - Code and indentation preservation
 
 - **Redaction**
-  - Structured redaction hooks for sensitive content
-  - Non-destructive by design
+  - Email redaction
+  - API token and credential masking
+  - URL credential stripping
 
-Blocks under active development:
+- **Structure**
+  - Header, bullet, and numbered list detection
+  - Paragraph and line-level signals
+  - Repetition and boilerplate indicators
 
-- Structure-aware filtering
-- Deduplication
-- Semantic filtering
+- **Filtering**
+  - Empty document removal
+  - Boilerplate paragraph filtering
+  - List block suppression (configurable)
+
+- **Deduplication**
+  - Paragraph-level exact deduplication
+  - Conservative, non-destructive defaults
+
+More aggressive semantic filtering and fuzzy deduplication are intentionally
+out of scope for v0.1.x and will be introduced behind explicit opt-in mechanisms
+in later releases.
 
 ---
 
@@ -154,6 +179,9 @@ web_common_v1 = [
     NormalizationBlock(),
     FormattingBlock(),
     RedactionBlock(),
+    StructureBlock(),
+    FilteringBlock(),
+    DeduplicationBlock(),
 ]
 ```
 
@@ -161,14 +189,27 @@ Profiles are versioned to ensure **reproducibility** and **auditability**.
 
 ---
 
+## Designed For
+
+* Web-scale datasets (C4-like, Common Crawl, scraped corpora)
+* OCR and PDF-derived text
+* Forums, blogs, and user-generated content
+* Dataset preprocessing prior to LLM training or evaluation
+
+The library is intentionally **model-agnostic** and does not depend on
+tokenizers, embeddings, or classifiers.
+
+---
+
 ## Why text-curation?
 
-* Cleaning text is **not just normalization**
+* Cleaning text is not just normalization — **structure and repetition matter**
 * Ad-hoc scripts do not scale or reproduce
 * Dataset curation deserves the same rigor as model training
 * Explicit pipelines make data decisions inspectable
 
-`text-curation` is designed to be the **data-side analogue** of model-definition libraries in the HF ecosystem.
+`text-curation` is designed to be the **data-side analogue**
+of model-definition libraries in the Hugging Face ecosystem.
 
 ---
 
@@ -212,4 +253,5 @@ Apache 2.0. See [LICENSE](LICENSE).
 
 ## Acknowledgements
 
-Inspired by large-scale dataset curation practices in the Hugging Face ecosystem.
+Inspired by large-scale dataset curation practices
+in the Hugging Face ecosystem.
