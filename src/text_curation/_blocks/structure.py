@@ -10,7 +10,22 @@ _NUMBERED_RE = re.compile(r"^\s*\d+[.)]\s+")
 _ALL_CAPS_RE = re.compile(r"^[A-Z\s0-9.,!?:;'\"-]+$")
 
 class StructureBlock:
+    """
+    Analyzes document structure and emits inspectable signals
+    without mutating the underlying text.
+
+    This block detects line- and paragraph-level structural
+    patterns such as headers, lists, repetition, and boilerplate
+    candidates. All observations are recorded as signals for
+    downstream blocks to consume explicitly.
+    """
+
     def apply(self, document):
+        """
+        Inspect the document and emit structural signals.
+
+        This method does not modify document.text.
+        """
         lines = document.text.split("\n")
         paragraphs = self._split_paragraphs(lines)
 

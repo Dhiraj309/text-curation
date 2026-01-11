@@ -17,7 +17,7 @@ limitations under the License.
 <h1 align="center">text-curation</h1>
 
 <p align="center">
-  <strong>Profile-based text curation pipelines for Hugging Face Datasets</strong>
+  <strong>Profile-based, deterministic text curation pipelines for Hugging Face Datasets</strong>
 </p>
 
 <p align="center">
@@ -45,11 +45,12 @@ limitations under the License.
 **text-curation** is a Python library for building **structured, profile-driven text curation pipelines**
 designed to integrate naturally with **Hugging Face Datasets**.
 
-The library focuses on **deterministic, inspectable text transformations** for preparing large-scale corpora
-used in NLP and LLM training workflows.
+It focuses on **deterministic, inspectable, and conservative text transformations**
+for preparing large-scale corpora used in NLP and LLM training workflows.
 
-Rather than providing ad-hoc cleaning scripts, `text-curation` encourages **explicit curation profiles**
-that describe *what transformations are applied and why*.
+Rather than relying on ad-hoc cleanup scripts, `text-curation` promotes
+**explicit, versioned curation profiles** that make data decisions
+reproducible, auditable, and stable over time.
 
 ---
 
@@ -57,66 +58,82 @@ that describe *what transformations are applied and why*.
 
 - **Profile-driven pipelines**  
   Reusable, declarative profiles define how text is curated for a given domain
-  (e.g. web, wiki, news).
+  (e.g. web, wiki, forums).
 
 - **Composable blocks**  
-  Each transformation is implemented as an isolated block that can be enabled,
-  disabled, or reordered.
+  Each transformation is implemented as an isolated block with a single,
+  explicit responsibility.
 
 - **Deterministic and non-destructive**  
-  Transformations are conservative by default and designed to preserve semantic content.
+  All transformations are rule-based and conservative by default,
+  prioritizing semantic preservation.
 
 - **Structure-aware**  
-  Text is treated as structured data (paragraphs, lists, headers), not just strings.
+  Text is treated as structured data (paragraphs, lists, headers),
+  not just as raw strings.
 
 - **Dataset-scale friendly**  
-  Built to operate efficiently with Hugging Face Datasets.
+  Designed to run efficiently on large Hugging Face Datasets using `.map`.
 
 ---
 
-## Current Scope (v0.1.x)
+## Scope & Stability (v1.0.0)
 
-`text-curation` currently provides **foundational, structure-aware text curation**
-for real-world, messy text data.
+As of **v1.0.0**, `text-curation` provides a **stable core** for
+structure-aware text curation of real-world, messy data.
 
-The focus is on **deterministic preprocessing** rather than semantic classification
-or ML-based filtering.
+The default behavior and semantics of the core blocks and profiles
+are considered **stable** and will not change without a major version bump.
 
-### Implemented Blocks
+The library intentionally focuses on **deterministic preprocessing**
+rather than semantic classification or machine-learning-based filtering.
 
-- **Normalization**
-  - Unicode normalization (NFKC)
-  - Quote, dash, and ellipsis normalization
-  - Control character and zero-width cleanup
+---
 
-- **Formatting**
-  - Whitespace normalization
-  - Paragraph reconstruction
-  - Punctuation spacing fixes
-  - Code and indentation preservation
+## Core Blocks (Stable)
 
-- **Redaction**
-  - Email redaction
-  - API token and credential masking
-  - URL credential stripping
+The following blocks are part of the **stable core** in v1.0.0.
 
-- **Structure**
-  - Header, bullet, and numbered list detection
-  - Paragraph and line-level signals
-  - Repetition and boilerplate indicators
+- **Normalization**  
+  Canonicalizes Unicode and typography (quotes, dashes, ellipses),
+  removes control and zero-width characters, and normalizes whitespace.
 
-- **Filtering**
-  - Empty document removal
-  - Boilerplate paragraph filtering
-  - List block suppression (configurable)
+- **Formatting**  
+  Reconstructs paragraphs, normalizes whitespace and punctuation spacing,
+  and preserves relative indentation for structured content such as code blocks.
 
-- **Deduplication**
-  - Paragraph-level exact deduplication
-  - Conservative, non-destructive defaults
+- **Redaction**  
+  Masks sensitive content such as emails, API tokens, and embedded credentials
+  using explicit, non-destructive placeholders.
 
-More aggressive semantic filtering and fuzzy deduplication are intentionally
-out of scope for v0.1.x and will be introduced behind explicit opt-in mechanisms
-in later releases.
+- **Structure**  
+  Detects headers, lists, repetition, and boilerplate indicators,
+  emitting inspectable signals without mutating text.
+
+- **Filtering**  
+  Applies conservative, signal-based removal of empty or low-value paragraphs.
+
+- **Deduplication**  
+  Performs exact, paragraph-level deduplication using normalization-safe keys.
+
+More aggressive semantic filtering, fuzzy deduplication, or heuristic cleanup
+are intentionally **not enabled by default** and may be introduced only via
+explicit opt-in profiles in future releases.
+
+---
+
+## Non-Goals
+
+`text-curation` intentionally does **not** attempt to:
+
+- Perform semantic or topical classification
+- Use machine learning or probabilistic heuristics
+- Infer document quality or intent
+- Preserve exact visual formatting of source text
+- Aggressively remove all boilerplate or repetition by default
+
+These constraints are **by design** and are critical to ensuring
+predictable, reproducible dataset preprocessing.
 
 ---
 
@@ -163,8 +180,8 @@ cleaned = dataset.map(
 )
 ```
 
-The curator is a pure function that takes a batch dictionary and returns
-a dictionary with the same schema.
+The curator is a **pure function**: it takes a batch dictionary and
+returns a dictionary with the same schema.
 
 ---
 
@@ -172,7 +189,7 @@ a dictionary with the same schema.
 
 Profiles define **which blocks are applied and in what order**.
 
-Example (conceptual, simplified):
+Example (conceptual):
 
 ```python
 web_common_v1 = [
@@ -185,14 +202,15 @@ web_common_v1 = [
 ]
 ```
 
-Profiles are versioned to ensure **reproducibility** and **auditability**.
+Profiles are explicitly versioned to ensure **reproducibility** and
+long-term auditability of dataset preprocessing.
 
 ---
 
 ## Designed For
 
 * Web-scale datasets (C4-like, Common Crawl, scraped corpora)
-* OCR and PDF-derived text
+* OCR- and PDF-derived text
 * Forums, blogs, and user-generated content
 * Dataset preprocessing prior to LLM training or evaluation
 
@@ -206,7 +224,7 @@ tokenizers, embeddings, or classifiers.
 * Cleaning text is not just normalization — **structure and repetition matter**
 * Ad-hoc scripts do not scale or reproduce
 * Dataset curation deserves the same rigor as model training
-* Explicit pipelines make data decisions inspectable
+* Explicit pipelines make data decisions inspectable and debuggable
 
 `text-curation` is designed to be the **data-side analogue**
 of model-definition libraries in the Hugging Face ecosystem.
@@ -217,17 +235,18 @@ of model-definition libraries in the Hugging Face ecosystem.
 
 * If you only need a one-off regex cleanup
 * If your data is already fully curated
-* If you require ML-based content classification (not in scope)
+* If you require ML-based content classification or scoring
 
 ---
 
-## Versioning & Stability
+## Versioning & Compatibility
 
 This project follows **semantic versioning**.
 
-* `0.x` releases may introduce breaking changes
+* `1.x` releases guarantee stable default behavior
+* Breaking changes require a major version bump
 * Profiles are versioned explicitly (e.g. `web_common_v1`)
-* Stable APIs will be formalized before `1.0.0`
+  to preserve reproducibility across releases
 
 ---
 
@@ -235,11 +254,11 @@ This project follows **semantic versioning**.
 
 Contributions are welcome.
 
-If you plan to add new blocks or profiles, please:
+When adding new blocks or profiles:
 
 * Keep transformations deterministic
 * Avoid destructive defaults
-* Include before/after examples
+* Include clear before/after examples
 
 See `CONTRIBUTING.md` for details.
 

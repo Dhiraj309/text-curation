@@ -1,7 +1,20 @@
 from collections import defaultdict
 
 class FilteringBlock:
+    """
+    Removes content based on explicit structure signals.
+
+    Filtering is conservative by default and limited to clearly
+    defined cases such as repeated short boilerplate paragraphs.
+    """
+        
     def apply(self, document):
+        """
+        Filter paragraphs based on structure signals.
+
+        This block mutates document.text and does not emit signals.
+        """
+                
         text = document.text
         if not text.strip():
             document.set_text("")
@@ -26,21 +39,20 @@ class FilteringBlock:
 
     def _should_drop_paragraph(self, paragraph: str, sigs: dict) -> bool:
         stripped = paragraph.strip()
+
         if not stripped:
             return True
-        
+
+        if sigs.get("starts_with_header"):
+            return False
+
         if (
             sigs.get("is_boilerplate_candidate")
-            and sigs.get("repetition_count", 0) >=2
+            and sigs.get("repetition_count", 0) >= 2
             and len(stripped) < 200
         ):
             return True
-        
-        if sigs.get("is_list_blocks"):
-            avg_line_len = sum(len(l) for l in stripped.split("\n")) / max(1, len(stripped.split("\n")))
-            if avg_line_len < 40:
-                return True
-            
+
         return False
     
 

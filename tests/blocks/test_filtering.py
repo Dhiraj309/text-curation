@@ -1,7 +1,17 @@
+"""
+Tests for paragraph-level filtering behavior.
+
+FilteringBlock:
+- Drops empty documents
+- Drops short repeated boilerplate paragraphs
+- Never drops header-led structural sections
+"""
+
 from text_curation._core.document import Document
 from text_curation._blocks.filtering import FilteringBlock
 
 def run_filter(text, signals):
+    """Apply filtering with pre-attached signals."""
     doc = Document(text)
     doc.signals = signals
     FilteringBlock().apply(doc)

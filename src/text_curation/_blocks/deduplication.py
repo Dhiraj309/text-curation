@@ -1,5 +1,19 @@
+import re
+
 class DeduplicationBlock:
+    """
+    Removes exact duplicate paragraphs within a document.
+
+    Deduplication is local, order-preserving, and based on
+    conservative normalization rules.
+    """
+        
     def apply(self, document):
+        """
+        Deduplicate repeated paragraphs in-place.
+
+        This block mutates document.text and does not emit signals.
+        """
         text = document.text
 
         if not text.strip():
@@ -25,4 +39,4 @@ class DeduplicationBlock:
         return document
 
     def _normalize_key(self, paragraph: str) -> str:
-        return "".join(paragraph.split()).lower()
+        return re.sub(r"\s+", " ", paragraph.strip()).lower()

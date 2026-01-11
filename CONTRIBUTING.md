@@ -1,9 +1,11 @@
 # Contributing to text-curation
 
-First off, thank you for considering contributing to **text-curation** 🙌
-This project aims to provide **production-grade text cleaning, normalization, redaction, structure detection, filtering, and deduplication** for real-world, messy text data.
+First off, thank you for considering contributing to **text-curation** 🙌  
+This project aims to provide **deterministic, structure-aware, production-grade text curation**
+for real-world, messy text data.
 
-Contributions of all kinds are welcome — bug fixes, new blocks, tests, documentation, or performance improvements.
+Contributions of all kinds are welcome — bug fixes, new blocks, tests, documentation,
+performance improvements, and new profiles.
 
 ---
 
@@ -11,26 +13,48 @@ Contributions of all kinds are welcome — bug fixes, new blocks, tests, documen
 
 This library is built with the following principles in mind:
 
-* **Conservative by default**
+* **Conservative by default**  
   Avoid destructive transformations unless explicitly requested.
 
-* **Structure-aware**
-  Text is not just strings — paragraphs, lists, headers, and boilerplate matter.
+* **Deterministic behavior**  
+  Given the same input and profile, output must be stable and reproducible.
 
-* **Pipeline-first design**
-  Each block should do one thing well and be composable.
+* **Structure-aware**  
+  Text is not just strings — paragraphs, lists, headers, repetition, and boilerplate matter.
 
-* **Real-world robustness**
-  Code should handle OCR junk, web boilerplate, emails, scanned text, forums, and scraped content.
+* **Pipeline-first design**  
+  Each block should do one thing well and remain composable.
 
-* **Test-driven evolution**
-  Every new behavior should be covered by tests.
+* **Real-world robustness**  
+  Code should handle OCR junk, web boilerplate, emails, scanned text, forums,
+  and scraped content without semantic assumptions.
+
+* **Test-driven evolution**  
+  Every new behavior must be covered by tests.
+
+---
+
+## 🔒 Stability Contract (Important)
+
+As of **v1.0.0**, `text-curation` provides **stable default behavior**.
+
+Contributors must assume that:
+
+* Default block behavior is **part of the public contract**
+* Changing outputs for existing inputs is a **breaking change**
+* Breaking changes require explicit discussion and a major version bump
+
+If a proposed change alters behavior, it should usually be introduced as:
+- a new block
+- a new profile
+- an opt-in flag (not default)
 
 ---
 
 ## 📦 Project Structure
 
 ```
+
 src/text_curation/
 ├── _blocks/
 │   ├── normalization.py
@@ -49,7 +73,8 @@ src/text_curation/
 tests/
 ├── blocks/
 ├── test_datasets_map.py
-```
+
+````
 
 ---
 
@@ -60,7 +85,7 @@ tests/
 ```bash
 git clone https://github.com/Dhiraj309/text-curation.git
 cd text-curation
-```
+````
 
 ### 2️⃣ Create a virtual environment
 
@@ -88,7 +113,8 @@ python -m pytest
 Before submitting a PR:
 
 * ✅ All tests must pass
-* ✅ New functionality must include tests
+* ✅ New behavior must include tests
+* ✅ Existing tests must not change unless behavior is intentionally revised
 
 ---
 
@@ -99,13 +125,14 @@ To add a new block:
 1. Create a file in `src/text_curation/_blocks/`
 2. Implement an `apply(self, document)` method
 3. Add tests under `tests/blocks/`
-4. (Optional) Add it to a pipeline profile
+4. Optionally add it to a profile
 
 ### Block guidelines
 
 * Blocks **must not mutate text silently**
 * Prefer **signals over hard deletions**
-* Keep transformations explainable and reversible where possible
+* Avoid semantic inference or heuristics
+* Keep transformations explainable and inspectable
 
 ---
 
@@ -113,7 +140,7 @@ To add a new block:
 
 * Python ≥ 3.9
 * Type hints encouraged
-* Avoid unnecessary regex complexity
+* Avoid unbounded or overly complex regexes
 * Prefer readability over cleverness
 * Keep functions small and testable
 
@@ -125,7 +152,7 @@ When working on redaction:
 
 * Always err on the side of **over-redacting**
 * Never log or print raw secrets
-* Ensure regexes are safe and bounded
+* Ensure regexes are safe, bounded, and deterministic
 
 ---
 
@@ -140,6 +167,7 @@ When contributing, consider adding tests for:
 * Emails, URLs, tokens, and IDs
 * Paragraph and list detection
 * Deduplication behavior
+* Regression cases for known bugs
 
 ---
 
@@ -154,47 +182,50 @@ block: short description
 Examples:
 
 * `normalization: improve unicode dash handling`
-* `filtering: drop repeated boilerplate paragraphs`
+* `filtering: refine boilerplate threshold`
 * `dedupe: add paragraph-level exact deduplication`
 
 ---
 
-## 🔖 Versioning
+## 🔖 Versioning Policy
 
 This project follows **Semantic Versioning**:
 
-* `0.1.x` — bug fixes, conservative improvements
-* `0.2.x` — new blocks or opt-in behavior
-* `1.0.0` — stable API guarantees
+* **1.x** — bug fixes, performance improvements, new opt-in behavior
+* **2.0** — breaking changes to default behavior
+* Profiles are versioned explicitly (e.g. `web_common_v1`)
+  to preserve reproducibility
 
 ---
 
 ## 🤝 Pull Request Process
 
-1. Fork the repo
+1. Fork the repository
 2. Create a feature branch
 3. Add tests
 4. Ensure all tests pass
 5. Open a PR with:
 
    * Clear description
+   * Rationale for changes
    * Before/after examples if applicable
 
 ---
 
-## 📬 Questions & Ideas
+## 📬 Questions & Design Discussions
 
-If you’re unsure about an approach:
+If you are unsure about an approach:
 
 * Open an **issue**
-* Or start a **discussion**
+* Start a **discussion**
 
-Thoughtful questions and design discussions are welcome.
+Design discussions are encouraged — especially for changes that may
+affect default behavior.
 
 ---
 
 ## 🙏 Thank You
 
-Text data is messy — your contribution helps make it usable.
+Text data is messy — thoughtful contributions help make it usable.
 
 Thanks for helping improve **text-curation** ❤️

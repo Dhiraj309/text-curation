@@ -17,7 +17,21 @@ _DASHES = {
 }
 
 class NormalizationBlock:
+    """
+    Performs low-level, non-semantic text normalization.
+
+    This block standardizes Unicode representations and removes
+    invisible or control characters commonly found in scraped or
+    copied text. All transformations are deterministic and
+    conservative.
+    """
+
     def apply(self, document):
+        """
+        Normalize document text in-place.
+
+        This block mutates document.text but does not emit signals.
+        """
         text = document.text
 
         text = self._normalize_unicode(text)

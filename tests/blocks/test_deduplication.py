@@ -1,3 +1,12 @@
+"""
+Tests for paragraph-level exact deduplication.
+
+These tests define the contract for DeduplicationBlock:
+- Deduplication is paragraph-based
+- Whitespace-normalized and case-insensitive
+- First occurrence is preserved verbatim
+"""
+
 from text_curation._core.document import Document
 from text_curation._blocks.deduplication import DeduplicationBlock
 

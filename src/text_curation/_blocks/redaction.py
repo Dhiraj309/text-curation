@@ -10,15 +10,11 @@ _EMAIL = re.compile(
 _API_TOKEN = re.compile(
     r"""
     \b(
-        # Common known prefixes
         sk-[A-Za-z0-9_-]{16,} |
         hf_[A-Za-z0-9_-]{16,} |
         ghp_[A-Za-z0-9_-]{16,} |
         api_[A-Za-z0-9_-]{16,} |
-        key_[A-Za-z0-9_-]{16,} |
-
-        # Generic high-entropy tokens (fallback)
-        [A-Za-z0-9_-]{32,}
+        key_[A-Za-z0-9_-]{16,}
     )\b
     """,
     re.VERBOSE
@@ -27,15 +23,28 @@ _API_TOKEN = re.compile(
 
 _URL_CREDENTIAL = re.compile(
     r"(https?://)"
-    r"[^/\s:@]+"
+    r"[^/\s@]+"
     r":"
-    r"[^@\s]+"
+    r"[^@\s]*"
     r"@"
 )
 
 
 class RedactionBlock:
+    """
+    Masks sensitive information using deterministic pattern matching.
+
+    This block redacts known secret formats such as email addresses,
+    API tokens, and credentials embedded in URLs. Redaction is
+    non-destructive and replaces content with explicit placeholders.
+    """
+
     def apply(self, document):
+        """
+        Redact sensitive content in-place.
+
+        This block mutates document.text and does not emit signals.
+        """
         text = document.text
 
         text = self._redact_url_credentials(text)

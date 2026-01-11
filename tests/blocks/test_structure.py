@@ -1,6 +1,11 @@
+"""
+Tests for structure and repetition signal emission.
+
+StructureBlock emits signals only — it never mutates text.
+"""
+
 from text_curation._core.document import Document
 from text_curation._blocks.structure import StructureBlock
-
 
 def get_signal(doc, name):
     return [s.value for s in doc.signals if s.name == name]

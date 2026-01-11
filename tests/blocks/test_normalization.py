@@ -1,6 +1,14 @@
+"""
+Tests for Unicode and whitespace normalization.
+
+NormalizationBlock must:
+- Normalize Unicode
+- Remove zero-width and control chars
+- Preserve semantic content
+"""
+
 from text_curation._core.document import Document
 from text_curation._blocks.normalization import NormalizationBlock
-
 
 def normalize(text):
     doc = Document(text)

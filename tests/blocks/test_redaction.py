@@ -1,3 +1,13 @@
+"""
+Tests for sensitive information redaction.
+
+RedactionBlock must:
+- Redact emails
+- Redact API tokens
+- Strip URL credentials
+- Avoid false positives
+"""
+
 from text_curation._blocks.redaction import RedactionBlock
 from text_curation._core.document import Document
 

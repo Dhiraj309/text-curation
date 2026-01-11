@@ -1,6 +1,15 @@
+"""
+Tests for formatting normalization and structure preservation.
+
+FormattingBlock must:
+- Normalize whitespace
+- Reconstruct paragraphs
+- Preserve code indentation
+- Fix punctuation spacing safely
+"""
+
 from text_curation._core.document import Document
 from text_curation._blocks.formatting import FormattingBlock
-
 
 def format_text(text):
     doc = Document(text)

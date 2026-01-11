@@ -4,9 +4,26 @@ _CODE_INDENT = re.compile(r"^[ \t]+")
 _URL = re.compile(r"https?://\S+")
 _EMAIL = re.compile(r"\b\S+@\S+\b")
 _IP = re.compile(r"\b(?:\d{1,3}\.){3}\d{1,3}\b")
+_TIME = re.compile(r"\b\d{1,2}:\d{2}\b")
+_NUMBER = re.compile(r"\b\d{1,3}(?:,\d{3})+\b")
+_NUMERIC_COLON = re.compile(r"\b\d+:\d+\b")
 
 class FormattingBlock:
+    """
+    Reconstructs readable paragraph and line structure from
+    inconsistently formatted text.
+
+    This block merges wrapped lines into paragraphs, preserves
+    indented blocks (e.g. code), and normalizes punctuation spacing
+    while protecting structured tokens.
+    """
+        
     def apply(self, document):
+        """
+        Normalize formatting and paragraph boundaries.
+
+        This block mutates document.text and does not emit signals.
+        """
         text = document.text
 
         text = self._normalize_line_endings(text)
@@ -33,43 +50,31 @@ class FormattingBlock:
         buffer = []
 
         for line in lines:
-            # Code / indented lines: flush buffer, preserve exactly
             if _CODE_INDENT.match(line):
                 if buffer:
-                    out.extend(buffer)   # ❌ do NOT merge
+                    out.extend(buffer)
                     buffer = []
                 out.append(line)
                 continue
 
-            # Blank line: paragraph terminator → merge
             if not line.strip():
                 if buffer:
-                    out.append(" ".join(buffer))  # ✅ merge ONLY here
+                    out.append(" ".join(buffer))
                     buffer = []
                 out.append("")
                 continue
 
-            # Normal line → buffer it
             buffer.append(line.strip())
 
-        # EOF: no blank line → do NOT merge
         if buffer:
             out.extend(buffer)
 
         return "\n".join(out)
-    
-    # def _normalize_punctuation_spacing(self, text):
-    #     text = re.sub(r"\s+([,;:!?])", r"\1", text)
-    #     text = re.sub(r"([,;:!?])([^\s])", r"\1 \2", text)
-
-    #     return text
 
     def _normalize_punctuation_spacing(self, text):
-        # 1️⃣ Collapse repeated punctuation
         text = re.sub(r"([!?]){2,}", r"\1", text)
         text = re.sub(r"\.{4,}", "...", text)
 
-        # 2️⃣ Protect structured tokens
         placeholders = {}
 
         def stash(match):
@@ -80,12 +85,12 @@ class FormattingBlock:
         text = _URL.sub(stash, text)
         text = _EMAIL.sub(stash, text)
         text = _IP.sub(stash, text)
+        text = _NUMBER.sub(stash, text)
+        text = _NUMERIC_COLON.sub(stash, text)
 
-        # 3️⃣ Safe spacing (NO DOTS!)
         text = re.sub(r"\s+([,!?;:])", r"\1", text)
         text = re.sub(r"([,!?;:])([^\s])", r"\1 \2", text)
 
-        # 4️⃣ Restore tokens
         for k, v in placeholders.items():
             text = text.replace(k, v)
 
