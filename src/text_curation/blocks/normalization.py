@@ -1,9 +1,14 @@
+from text_curation.blocks.base import Block
 import re
 import unicodedata
 
+# Invisible characters commonly introduced by copy/paste or OCR
 _ZERO_WIDTH = re.compile(r"[\u200B\u200C\u200D\uFEFF]")
+
+# Non-printable ASCII control characters
 _CONTROL_CHARS = re.compile(r"[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]")
 
+# Canonical quote replacements
 _QUOTES = {
     "“": '"', "”": '"',
     "‘": "'", "’": "'",
@@ -12,11 +17,13 @@ _QUOTES = {
     "`": "'",
 }
 
+# Canonical dash replacements
 _DASHES = {
     "–": "-", "—": "-", "―": "-", "−": "-"
 }
 
-class NormalizationBlock:
+
+class NormalizationBlock(Block):
     """
     Performs low-level, non-semantic text normalization.
 
@@ -25,6 +32,9 @@ class NormalizationBlock:
     copied text. All transformations are deterministic and
     conservative.
     """
+
+    def __init__(self, policy=None):
+        super().__init__(policy)
 
     def apply(self, document):
         """
@@ -44,7 +54,7 @@ class NormalizationBlock:
         text = self._collapse_whitespaces(text)
         text = self._normalize_newlines(text)
         text = text.strip()
-
+        
         document.set_text(text)
 
     def _normalize_unicode(self, text):

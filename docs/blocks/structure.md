@@ -29,7 +29,7 @@ The `StructureBlock` analyzes text structure and emits
 
 - Regex-based pattern matching
 - Frequency-based repetition analysis
-- Conservative heuristics
+- Conservative structural heuristics
 
 ---
 
@@ -43,7 +43,9 @@ The `StructureBlock` analyzes text structure and emits
 
 ## Design rationale
 
-Structure signals separate **observation from decision**.
-They allow downstream blocks to make explicit, auditable choices.
+Structure signals intentionally separate **observation from decision**.
+
+They allow downstream blocks to make explicit,
+auditable choices without hidden logic.
 
 This block is central to the library’s inspectability.

@@ -12,4 +12,5 @@ These documents describe:
 
 These docs are intentionally **specification-oriented**, not tutorials.
 
-For installation, examples, and high-level usage, see the main README.
+For installation instructions, examples, and high-level usage,
+see the main [README](../README.md).

@@ -7,8 +7,8 @@ These tests define the contract for DeduplicationBlock:
 - First occurrence is preserved verbatim
 """
 
-from text_curation._core.document import Document
-from text_curation._blocks.deduplication import DeduplicationBlock
+from text_curation.core.document import Document
+from text_curation.blocks.deduplication import DeduplicationBlock
 
 def dedupe(text):
     doc = Document(text)

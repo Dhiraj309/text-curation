@@ -18,10 +18,10 @@ conservative, and reproducible** design principles.
 
 ## Near-Term (1.x)
 
-Focus: **Strengthening general-purpose web text curation**
+**Focus:** Strengthening general-purpose web text curation
 
-Work in the 1.x series is intended to improve signal quality
-and profile coverage **without changing default behavior**.
+Work in the `1.x` series is intended to improve signal quality,
+profile coverage, and documentation **without changing default behavior**.
 
 Potential areas include:
 
@@ -48,10 +48,10 @@ Potential areas include:
 
 ## Medium-Term (2.x candidates)
 
-Focus: **Richer structure awareness and extensibility**
+**Focus:** Richer structure awareness and extensibility
 
-The following areas may be explored in future major releases
-and are expected to remain opt-in or profile-specific.
+The following areas may be explored in future major releases.
+All such behavior is expected to remain **opt-in or profile-specific**.
 
 - **HTML-aware preprocessing**
   - Tag-aware text extraction
@@ -72,7 +72,7 @@ and are expected to remain opt-in or profile-specific.
 
 ## Long-Term Direction
 
-Focus: **Dataset preparation across granularity levels**
+**Focus:** Dataset preparation across multiple granularity levels
 
 Longer-term exploration may focus on clearer separation of
 responsibilities across different levels of text curation:
@@ -93,6 +93,7 @@ responsibilities across different levels of text curation:
   - Profile-specific cleanup strategies
 
 These directions are intended to support different dataset needs, such as:
+
 - large-scale pretraining corpora
 - domain-adapted fine-tuning datasets
 - evaluation and benchmark preparation

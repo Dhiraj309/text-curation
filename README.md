@@ -43,7 +43,7 @@ limitations under the License.
 ## Overview
 
 **text-curation** is a Python library for building **structured, profile-driven text curation pipelines**
-designed to integrate naturally with **Hugging Face Datasets**.
+that integrate naturally with **Hugging Face Datasets**.
 
 It focuses on **deterministic, inspectable, and conservative text transformations**
 for preparing large-scale corpora used in NLP and LLM training workflows.
@@ -64,25 +64,25 @@ reproducible, auditable, and stable over time.
   Each transformation is implemented as an isolated block with a single,
   explicit responsibility.
 
-- **Deterministic and non-destructive**  
-  All transformations are rule-based and conservative by default,
+- **Deterministic and conservative**  
+  All transformations are rule-based and non-destructive by default,
   prioritizing semantic preservation.
 
-- **Structure-aware**  
-  Text is treated as structured data (paragraphs, lists, headers),
-  not just as raw strings.
+- **Structure-aware processing**  
+  Text is treated as structured content (paragraphs, lists, headers),
+  not just raw strings.
 
 - **Dataset-scale friendly**  
   Designed to run efficiently on large Hugging Face Datasets using `.map`.
 
 ---
 
-## Scope & Stability (v1.0.0)
+## Scope & Stability (v1.1.0)
 
-As of **v1.0.0**, `text-curation` provides a **stable core** for
-structure-aware text curation of real-world, messy data.
+As of **v1.1.0**, `text-curation` provides a **stable and extensible core**
+for structure-aware text curation of real-world, messy data.
 
-The default behavior and semantics of the core blocks and profiles
+The default behavior and semantics of the core blocks and built-in profiles
 are considered **stable** and will not change without a major version bump.
 
 The library intentionally focuses on **deterministic preprocessing**
@@ -92,7 +92,7 @@ rather than semantic classification or machine-learning-based filtering.
 
 ## Core Blocks (Stable)
 
-The following blocks are part of the **stable core** in v1.0.0.
+The following blocks are part of the **stable core** in v1.1.0.
 
 - **Normalization**  
   Canonicalizes Unicode and typography (quotes, dashes, ellipses),
@@ -171,7 +171,7 @@ dataset = load_dataset(
     split="train",
 )
 
-curator = TextCurator.from_profiles(profile_name="web_common_v1")
+curator = TextCurator.from_profile("web_common:v1")
 
 cleaned = dataset.map(
     curator,
@@ -189,21 +189,27 @@ returns a dictionary with the same schema.
 
 Profiles define **which blocks are applied and in what order**.
 
-Example (conceptual):
+Profiles are:
+
+* Explicitly versioned
+* Registered at import time
+* Resolved via a global registry
+
+Conceptual example:
 
 ```python
 web_common_v1 = [
+    RedactionBlock(),
     NormalizationBlock(),
     FormattingBlock(),
-    RedactionBlock(),
     StructureBlock(),
     FilteringBlock(),
     DeduplicationBlock(),
 ]
 ```
 
-Profiles are explicitly versioned to ensure **reproducibility** and
-long-term auditability of dataset preprocessing.
+Profiles are versioned explicitly (e.g. `web_common:v1`)
+to ensure **reproducibility and auditability** across releases.
 
 ---
 
@@ -245,8 +251,8 @@ This project follows **semantic versioning**.
 
 * `1.x` releases guarantee stable default behavior
 * Breaking changes require a major version bump
-* Profiles are versioned explicitly (e.g. `web_common_v1`)
-  to preserve reproducibility across releases
+* Profiles are versioned independently of library versions
+  to preserve long-term reproducibility
 
 ---
 

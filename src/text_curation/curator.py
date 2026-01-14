@@ -1,4 +1,6 @@
-from text_curation.profiles.web_common_v1 import PIPELINE
+from text_curation.core.pipeline import Pipeline
+from text_curation.registry import get_profile
+
 
 class TextCurator:
     """
@@ -8,33 +10,35 @@ class TextCurator:
     provides a stateless, pure-function interface suitable for
     `dataset.map(batched=True)` workflows.
     """
-        
-    def __init__(self, pipeline):
+
+    def __init__(self, profile):
         """
-        Initialize a curator with a specific pipeline.
+        Create a curator from a resolved Profile.
+
+        Args:
+            profile: A registered Profile instance
         """
-        self.pipeline = pipeline
+        self.pipeline = Pipeline(profile.blocks)
 
     @classmethod
-    def from_profiles(cls, profile_name: str, dataset: str | None = None):
+    def from_profile(cls, profile_id):
         """
-        Construct a curator from a named built-in profile.
+        Construct a curator from a registered profile identifier.
 
-        Profiles define a fixed, versioned pipeline contract.
+        Args:
+            profile_id: Canonical profile ID (e.g. "web_common_v1")
         """
-                
-        if profile_name != "web_common_v1":
-            raise ValueError(f"Unknown Profile: {profile_name}")
-        return cls(PIPELINE)
-    
+        return cls(get_profile(profile_id))
+
     def __call__(self, batch):
         """
         Apply the curation pipeline to a batch of examples.
 
         Expects a dictionary containing a `text` field with a list of
         strings. Returns a dictionary with the same schema.
+
+        This method is intentionally pure and side-effect free.
         """
-         
         texts = batch["text"]
         cleaned = [self.pipeline.run(t) for t in texts]
 

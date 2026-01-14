@@ -1,9 +1,9 @@
 # FilteringBlock
 
 The `FilteringBlock` removes content **only when explicitly justified**
-by structure signals.
+by structure-derived signals.
 
-It is intentionally conservative in `web_common_v1`.
+It is intentionally conservative in the `web_common:v1` profile.
 
 ---
 
@@ -12,11 +12,11 @@ It is intentionally conservative in `web_common_v1`.
 - Drops empty paragraphs
 - Drops repeated short boilerplate paragraphs
 - Preserves header-led sections
-- Operates at paragraph granularity
+- Operates strictly at paragraph granularity
 
 ---
 
-## Filtering rules (web_common_v1)
+## Filtering rules (`web_common:v1`)
 
 A paragraph is dropped only if:
 
@@ -25,6 +25,8 @@ A paragraph is dropped only if:
 - It is a repeated boilerplate candidate  
   **AND**
 - It is short (less than 200 characters)
+
+All conditions must be satisfied exactly.
 
 ---
 
@@ -39,8 +41,10 @@ A paragraph is dropped only if:
 ## Design rationale
 
 Filtering decisions must be:
+
 - explainable
 - reproducible
 - conservative by default
 
-Aggressive filtering is intentionally out of scope.
+Aggressive filtering is intentionally out of scope and must
+be introduced via explicit opt-in profiles.

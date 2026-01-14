@@ -1,5 +1,7 @@
+from text_curation.blocks.base import Block
 import re
 
+# Email pattern (conservative, RFC-inspired)
 _EMAIL = re.compile(
     r"\b[a-zA-Z0-9._%+-]+"
     r"@"
@@ -7,6 +9,7 @@ _EMAIL = re.compile(
     r"\.[a-zA-Z]{2,}\b"
 )
 
+# Explicit token formats only (no entropy-based detection)
 _API_TOKEN = re.compile(
     r"""
     \b(
@@ -20,7 +23,7 @@ _API_TOKEN = re.compile(
     re.VERBOSE
 )
 
-
+# Credentials embedded in URLs (user:pass@host)
 _URL_CREDENTIAL = re.compile(
     r"(https?://)"
     r"[^/\s@]+"
@@ -30,7 +33,7 @@ _URL_CREDENTIAL = re.compile(
 )
 
 
-class RedactionBlock:
+class RedactionBlock(Block):
     """
     Masks sensitive information using deterministic pattern matching.
 
@@ -38,6 +41,9 @@ class RedactionBlock:
     API tokens, and credentials embedded in URLs. Redaction is
     non-destructive and replaces content with explicit placeholders.
     """
+
+    def __init__(self, policy=None):
+        super().__init__(policy)
 
     def apply(self, document):
         """

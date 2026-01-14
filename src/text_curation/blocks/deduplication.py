@@ -1,13 +1,27 @@
+from text_curation.blocks.base import Block
 import re
 
-class DeduplicationBlock:
+
+class DeduplicationBlock(Block):
     """
     Removes exact duplicate paragraphs within a document.
 
     Deduplication is local, order-preserving, and based on
-    conservative normalization rules.
+    conservative normalization rules to avoid false positives.
     """
-        
+
+    DEFAULT_POLICY = {
+        "scope": "paragraph",
+        "normalize_case": True,
+        "collapse_whitespace": True,
+        "drop_empty": True,
+    }
+
+    def __init__(self, policy=None):
+        # Merge caller policy with stable defaults
+        merged = {**self.DEFAULT_POLICY, **(policy or {})}
+        super().__init__(merged)
+
     def apply(self, document):
         """
         Deduplicate repeated paragraphs in-place.
@@ -16,9 +30,10 @@ class DeduplicationBlock:
         """
         text = document.text
 
+        # Fast exit for empty documents
         if not text.strip():
             return document
-        
+
         paragraphs = text.split("\n\n")
 
         seen = set()
@@ -27,9 +42,8 @@ class DeduplicationBlock:
         for para in paragraphs:
             key = self._normalize_key(para)
 
-            if not key:
-                continue
-            if key in seen:
+            # Skip empty or already-seen paragraphs
+            if not key or key in seen:
                 continue
 
             seen.add(key)
@@ -39,4 +53,9 @@ class DeduplicationBlock:
         return document
 
     def _normalize_key(self, paragraph: str) -> str:
+        """
+        Generate a comparison key for deduplication.
+
+        Normalization is intentionally minimal and non-semantic.
+        """
         return re.sub(r"\s+", " ", paragraph.strip()).lower()

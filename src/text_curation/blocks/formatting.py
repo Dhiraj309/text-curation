@@ -1,6 +1,10 @@
+from text_curation.blocks.base import Block
 import re
+
+# Heuristic to detect indented blocks (e.g. code, quoted text)
 _CODE_INDENT = re.compile(r"^[ \t]+")
 
+# Patterns that must not be altered by punctuation normalization
 _URL = re.compile(r"https?://\S+")
 _EMAIL = re.compile(r"\b\S+@\S+\b")
 _IP = re.compile(r"\b(?:\d{1,3}\.){3}\d{1,3}\b")
@@ -8,7 +12,8 @@ _TIME = re.compile(r"\b\d{1,2}:\d{2}\b")
 _NUMBER = re.compile(r"\b\d{1,3}(?:,\d{3})+\b")
 _NUMERIC_COLON = re.compile(r"\b\d+:\d+\b")
 
-class FormattingBlock:
+
+class FormattingBlock(Block):
     """
     Reconstructs readable paragraph and line structure from
     inconsistently formatted text.
@@ -17,7 +22,20 @@ class FormattingBlock:
     indented blocks (e.g. code), and normalizes punctuation spacing
     while protecting structured tokens.
     """
-        
+
+    DEFAULT_POLICY = {
+        "merge_wrapped_lines": True,
+        "preserve_headers": False,   # reserved for future use
+        "preserve_lists": False,     # reserved for future use
+        "preserve_code_blocks": True,
+        "normalize_punctuation": True,
+    }
+
+    def __init__(self, policy=None):
+        # Merge caller policy with stable defaults
+        merged = {**self.DEFAULT_POLICY, **(policy or {})}
+        super().__init__(merged)
+
     def apply(self, document):
         """
         Normalize formatting and paragraph boundaries.

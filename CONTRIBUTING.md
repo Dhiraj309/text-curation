@@ -13,41 +13,42 @@ performance improvements, and new profiles.
 
 This library is built with the following principles in mind:
 
-* **Conservative by default**  
+- **Conservative by default**  
   Avoid destructive transformations unless explicitly requested.
 
-* **Deterministic behavior**  
+- **Deterministic behavior**  
   Given the same input and profile, output must be stable and reproducible.
 
-* **Structure-aware**  
+- **Structure-aware**  
   Text is not just strings — paragraphs, lists, headers, repetition, and boilerplate matter.
 
-* **Pipeline-first design**  
+- **Pipeline-first design**  
   Each block should do one thing well and remain composable.
 
-* **Real-world robustness**  
+- **Real-world robustness**  
   Code should handle OCR junk, web boilerplate, emails, scanned text, forums,
   and scraped content without semantic assumptions.
 
-* **Test-driven evolution**  
+- **Test-driven evolution**  
   Every new behavior must be covered by tests.
 
 ---
 
 ## 🔒 Stability Contract (Important)
 
-As of **v1.0.0**, `text-curation` provides **stable default behavior**.
+As of **v1.1.0**, `text-curation` provides **stable default behavior**.
 
 Contributors must assume that:
 
-* Default block behavior is **part of the public contract**
-* Changing outputs for existing inputs is a **breaking change**
-* Breaking changes require explicit discussion and a major version bump
+- Default block behavior is **part of the public contract**
+- Changing outputs for existing inputs is a **breaking change**
+- Breaking changes require explicit discussion and a major version bump
 
 If a proposed change alters behavior, it should usually be introduced as:
+
 - a new block
 - a new profile
-- an opt-in flag (not default)
+- an opt-in policy flag (not enabled by default)
 
 ---
 
@@ -56,23 +57,36 @@ If a proposed change alters behavior, it should usually be introduced as:
 ```
 
 src/text_curation/
-├── _blocks/
+├── blocks/
+│   ├── base.py
 │   ├── normalization.py
 │   ├── formatting.py
 │   ├── redaction.py
 │   ├── structure.py
 │   ├── filtering.py
-│   └── dedupe.py
-├── _core/
+│   └── deduplication.py
+├── core/
+│   ├── annotations.py
 │   ├── document.py
-│   └── pipeline.py
+│   ├── pipeline.py
+│   └── signals.py
 ├── profiles/
+│   ├── base.py
 │   └── web_common_v1.py
-└── curator.py
+├── registry.py
+├── curator.py
+└── **init**.py
 
 tests/
 ├── blocks/
-├── test_datasets_map.py
+│   ├── test_normalization.py
+│   ├── test_formatting.py
+│   ├── test_redaction.py
+│   ├── test_structure.py
+│   ├── test_filtering.py
+│   └── test_deduplication.py
+└── profiles/
+└── test_web_common_v1_golden.py
 
 ````
 
@@ -122,17 +136,34 @@ Before submitting a PR:
 
 To add a new block:
 
-1. Create a file in `src/text_curation/_blocks/`
-2. Implement an `apply(self, document)` method
-3. Add tests under `tests/blocks/`
-4. Optionally add it to a profile
+1. Create a file in `src/text_curation/blocks/`
+2. Subclass `Block` from `blocks.base`
+3. Implement `apply(self, document)`
+4. Add tests under `tests/blocks/`
+5. Optionally include the block in a new or existing profile
 
 ### Block guidelines
 
 * Blocks **must not mutate text silently**
 * Prefer **signals over hard deletions**
-* Avoid semantic inference or heuristics
+* Avoid semantic inference or probabilistic heuristics
 * Keep transformations explainable and inspectable
+
+---
+
+## 🧩 Adding or Updating a Profile
+
+Profiles define **ordered block pipelines** and are registered at import time.
+
+To add a profile:
+
+1. Create a file in `src/text_curation/profiles/`
+2. Construct a `Profile` instance
+3. Call `register(PROFILE)`
+4. Add golden tests under `tests/profiles/`
+
+Profiles **must be versioned explicitly** (e.g. `web_common:v1`)
+to ensure long-term reproducibility.
 
 ---
 
@@ -148,11 +179,12 @@ To add a new block:
 
 ## 🔒 Redaction & Safety
 
-When working on redaction:
+When working on redaction logic:
 
 * Always err on the side of **over-redacting**
 * Never log or print raw secrets
-* Ensure regexes are safe, bounded, and deterministic
+* Ensure regexes are bounded, deterministic, and safe
+* Use explicit placeholders rather than deletions
 
 ---
 
@@ -169,6 +201,8 @@ When contributing, consider adding tests for:
 * Deduplication behavior
 * Regression cases for known bugs
 
+Golden tests are preferred for profile-level validation.
+
 ---
 
 ## 📄 Commit Messages
@@ -176,14 +210,14 @@ When contributing, consider adding tests for:
 Follow a simple convention:
 
 ```
-block: short description
+<area>: short description
 ```
 
 Examples:
 
 * `normalization: improve unicode dash handling`
 * `filtering: refine boilerplate threshold`
-* `dedupe: add paragraph-level exact deduplication`
+* `profiles: add web_common_v2 profile`
 
 ---
 
@@ -193,8 +227,8 @@ This project follows **Semantic Versioning**:
 
 * **1.x** — bug fixes, performance improvements, new opt-in behavior
 * **2.0** — breaking changes to default behavior
-* Profiles are versioned explicitly (e.g. `web_common_v1`)
-  to preserve reproducibility
+* Profiles are versioned independently (e.g. `web_common:v1`)
+  to preserve reproducibility across releases
 
 ---
 

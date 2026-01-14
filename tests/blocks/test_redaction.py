@@ -8,8 +8,8 @@ RedactionBlock must:
 - Avoid false positives
 """
 
-from text_curation._blocks.redaction import RedactionBlock
-from text_curation._core.document import Document
+from text_curation.blocks.redaction import RedactionBlock
+from text_curation.core.document import Document
 
 def redact(text):
     doc = Document(text)

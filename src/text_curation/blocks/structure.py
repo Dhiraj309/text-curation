@@ -1,24 +1,39 @@
+from text_curation.blocks.base import Block
 import re
 from collections import Counter
 
+# Header-like lines (Markdown-style or ALL CAPS titles)
 _HEADER_RE = re.compile(r"^(#{1,6}\s+.+|[A-Z][A-Z\s0-9:]{5,})$")
 
 _BULLET_RE = re.compile(r"^\s*[-*.]\s+")
-
 _NUMBERED_RE = re.compile(r"^\s*\d+[.)]\s+")
-
 _ALL_CAPS_RE = re.compile(r"^[A-Z\s0-9.,!?:;'\"-]+$")
 
-class StructureBlock:
+
+class StructureBlock(Block):
     """
     Analyzes document structure and emits inspectable signals
     without mutating the underlying text.
 
     This block detects line- and paragraph-level structural
     patterns such as headers, lists, repetition, and boilerplate
-    candidates. All observations are recorded as signals for
+    candidates. Observations are recorded as signals for
     downstream blocks to consume explicitly.
     """
+
+    DEFAULT_POLICY = {
+        "detect_headers": True,
+        "detect_lists": True,
+        "detect_all_caps": True,
+        "short_line_threshold": 20,
+        "list_block_threshold": 0.5,
+        "min_repetition_for_boilerplate": 2,
+    }
+
+    def __init__(self, policy=None):
+        # Merge caller policy with stable defaults
+        merged = {**self.DEFAULT_POLICY, **(policy or {})}
+        super().__init__(merged)
 
     def apply(self, document):
         """
@@ -29,14 +44,14 @@ class StructureBlock:
         lines = document.text.split("\n")
         paragraphs = self._split_paragraphs(lines)
 
+        # Frequency counts for repetition detection
         line_counts = Counter(l.strip() for l in lines if l.strip())
-
         para_counts = Counter(p.strip() for p in paragraphs if p.strip())
 
         for i, line in enumerate(lines):
             self._emit_line_signals(document, i, line, line_counts)
 
-        for i, para, in enumerate(paragraphs):
+        for i, para in enumerate(paragraphs):
             self._emit_paragraph_signals(document, i, para, para_counts)
 
         return document

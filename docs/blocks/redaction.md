@@ -1,7 +1,7 @@
 # RedactionBlock
 
-The `RedactionBlock` removes **sensitive information**
-from text using deterministic pattern matching.
+The `RedactionBlock` masks **sensitive information**
+using deterministic, pattern-based matching.
 
 All redaction is **non-destructive masking**.
 
@@ -36,9 +36,9 @@ All redaction is **non-destructive masking**.
 ## Design rationale
 
 Redaction prioritizes **safety and predictability**.
-Only well-defined patterns are masked.
 
-This avoids accidental removal of non-sensitive identifiers.
+Only well-defined patterns are masked to avoid accidental
+removal of non-sensitive identifiers.
 
 ---
 

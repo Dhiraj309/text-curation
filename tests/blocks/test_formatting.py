@@ -8,8 +8,8 @@ FormattingBlock must:
 - Fix punctuation spacing safely
 """
 
-from text_curation._core.document import Document
-from text_curation._blocks.formatting import FormattingBlock
+from text_curation.core.document import Document
+from text_curation.blocks.formatting import FormattingBlock
 
 def format_text(text):
     doc = Document(text)

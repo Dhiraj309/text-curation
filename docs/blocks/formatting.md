@@ -1,7 +1,7 @@
 # FormattingBlock
 
 The `FormattingBlock` reconstructs **human-readable structure**
-from text that has been hard-wrapped, inconsistently spaced,
+from text that is hard-wrapped, inconsistently spaced,
 or poorly formatted.
 
 It operates at the **paragraph and line level**.
@@ -22,13 +22,13 @@ It operates at the **paragraph and line level**.
 
 ## Paragraph reconstruction rules
 
-- Lines are merged **only when separated by blank lines**
+- Lines are merged only when separated by blank lines
 - Indented lines are preserved exactly
 - Relative indentation inside blocks is preserved
 - Absolute indentation is normalized
 
-This ensures code blocks remain readable without assuming
-language or syntax.
+This ensures code and quoted blocks remain readable
+without assuming language or syntax.
 
 ---
 
@@ -37,7 +37,7 @@ language or syntax.
 - Fixes spacing around `, ! ? : ;`
 - Does **not** modify:
   - URLs
-  - emails
+  - email addresses
   - IP addresses
   - numeric separators
   - time formats
@@ -55,5 +55,5 @@ language or syntax.
 
 ## Design rationale
 
-Formatting aims to improve **readability and consistency**
+Formatting improves **readability and consistency**
 without making assumptions about document semantics.
