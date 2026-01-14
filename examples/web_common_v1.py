@@ -22,7 +22,7 @@ FOOTER
 FOOTER
 """
 
-curator = TextCurator.from_profile(profile_name="web_common_v1")
+curator = TextCurator.from_profile("web_common_v1")
 
 cleaned = curator({
     "text": [RAW_TEXT]
