@@ -26,28 +26,23 @@ FOOTER
 """
 
 
-def main():
-    # Create a curator using the stable web_common_v1 profile
-    # and enable report collection.
-    curator = TextCurator.from_profile(
-        "web_common_v1",
-        collect_reports=True,
-    )
+# Create a curator using the stable web_common_v1 profile
+# and enable report collection.
+curator = TextCurator.from_profile(
+    "web_common_v1",
+    collect_reports=True,
+)
 
-    # Apply the curator to a small in-memory batch
-    cleaned = curator({
-        "text": [RAW_TEXT]
-    })
+# Apply the curator to a small in-memory batch
+cleaned = curator({
+    "text": [RAW_TEXT]
+})
 
-    print("=== RAW ===")
-    print(RAW_TEXT)
+print("=== RAW ===")
+print(RAW_TEXT)
 
-    print("\n=== CLEANED ===")
-    print(cleaned["text"][0])
+print("\n=== CLEANED ===")
+print(cleaned["text"][0])
 
-    print("\n=== CURATION SUMMARY ===")
-    summary(cleaned)
-
-
-if __name__ == "__main__":
-    main()
+print("\n=== CURATION SUMMARY ===")
+summary(cleaned)
