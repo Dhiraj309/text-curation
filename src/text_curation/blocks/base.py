@@ -18,6 +18,7 @@ class Block:
         Defaults are defined by concrete block implementations.
         """
         self.policy = policy or {}
+        self._stats = {}
 
     def apply(self, document):
         """
@@ -26,3 +27,9 @@ class Block:
         Subclasses must implement this method.
         """
         raise NotImplementedError
+    
+    def reset_stats(self):
+        self._stats = {}
+
+    def get_stats(self) -> dict:
+        return dict(self._stats)

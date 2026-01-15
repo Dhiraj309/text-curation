@@ -5,7 +5,8 @@ This example is intenionally small and ugly.
 It demonstrates what is removed and what is preserved.
 """
 
-from text_curation import TextCurator
+from text_curation import TextCurator, reports
+from datasets import Dataset
 
 RAW_TEXT = """
 MENU | ABOUT | CONTACT
@@ -22,13 +23,17 @@ FOOTER
 FOOTER
 """
 
-curator = TextCurator.from_profile(profile_name="web_common_v1")
-
-cleaned = curator({
+dataset = Dataset.from_dict({
     "text": [RAW_TEXT]
-})["text"][0]
+})
+
+curator = TextCurator.from_profile(profile_id="web_common_v1", collect_reports=True)
+
+cleaned = dataset.map(curator, batched=True)
 
 print("=== RAW ===")
 print(RAW_TEXT)
 print("\n=== CLEANED ===")
 print(cleaned)
+
+reports.summary(cleaned)
