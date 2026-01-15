@@ -77,13 +77,17 @@ reproducible, auditable, and stable over time.
 
 ---
 
-## Scope & Stability (v1.1.0)
+## Scope & Stability (v1.2.0)
 
-As of **v1.1.0**, `text-curation` provides a **stable and extensible core**
-for structure-aware text curation of real-world, messy data.
+As of **v1.2.0**, `text-curation` provides a **stable and extensible core**
+for structure-aware text curation of real-world, messy data, with
+**first-class support for inspectable curation reports**.
 
 The default behavior and semantics of the core blocks and built-in profiles
 are considered **stable** and will not change without a major version bump.
+
+All reporting and summary features are **opt-in** and do not alter
+curation behavior.
 
 The library intentionally focuses on **deterministic preprocessing**
 rather than semantic classification or machine-learning-based filtering.
@@ -92,7 +96,7 @@ rather than semantic classification or machine-learning-based filtering.
 
 ## Core Blocks (Stable)
 
-The following blocks are part of the **stable core** in v1.1.0.
+The following blocks are part of the **stable core** in v1.2.0.
 
 - **Normalization**  
   Canonicalizes Unicode and typography (quotes, dashes, ellipses),
@@ -171,7 +175,7 @@ dataset = load_dataset(
     split="train",
 )
 
-curator = TextCurator.from_profile("web_common:v1")
+curator = TextCurator.from_profile("web_common_v1")
 
 cleaned = dataset.map(
     curator,
@@ -182,6 +186,75 @@ cleaned = dataset.map(
 
 The curator is a **pure function**: it takes a batch dictionary and
 returns a dictionary with the same schema.
+
+---
+
+## Reporting & Dataset Summaries (v1.2.0)
+
+Starting with **v1.2.0**, `text-curation` can optionally collect
+**per-sample curation reports** and generate **dataset-level summaries**
+describing how a corpus changed during preprocessing.
+
+These features are:
+
+* Fully deterministic
+* Non-destructive
+* Disabled by default
+* Designed for auditability and inspection
+
+---
+
+### Enabling Curation Reports
+
+```python
+from text_curation import TextCurator
+
+curator = TextCurator.from_profile(
+    "web_common_v1",
+    collect_reports=True,
+)
+```
+
+When enabled, the output dataset includes a new column:
+
+```
+curation_report
+```
+
+Each entry contains structured metadata describing:
+
+* Input vs output text size
+* Blocks executed
+* Aggregated signals (if any)
+
+---
+
+### Generating a Dataset Summary
+
+```python
+from text_curation.reports import summary
+
+summary(cleaned)
+```
+
+Example output:
+
+```
+Curation Summary
+===========================
+Samples Processed: 60
+
+┌─────────────┬────────┬────────┬────────────┬───────────┐
+│ Metric      │ Input  │ Output │ Δ (Change) │ % Change  │
+├─────────────┼────────┼────────┼────────────┼───────────┤
+│ Chars       │  6,910 │  4,820 │   -2,090   │  -30.2%   │
+│ Lines       │    460 │    200 │     -260   │  -56.5%   │
+│ Paragraphs  │    120 │    100 │      -20   │  -16.7%   │
+└─────────────┴────────┴────────┴────────────┴───────────┘
+```
+
+The summary aggregates **structural statistics only** and performs
+no semantic inference or quality scoring.
 
 ---
 
@@ -208,7 +281,7 @@ web_common_v1 = [
 ]
 ```
 
-Profiles are versioned explicitly (e.g. `web_common:v1`)
+Profiles are versioned explicitly (e.g. `web_common_v1`)
 to ensure **reproducibility and auditability** across releases.
 
 ---
@@ -250,6 +323,7 @@ of model-definition libraries in the Hugging Face ecosystem.
 This project follows **semantic versioning**.
 
 * `1.x` releases guarantee stable default behavior
+* Minor versions may add opt-in functionality
 * Breaking changes require a major version bump
 * Profiles are versioned independently of library versions
   to preserve long-term reproducibility
