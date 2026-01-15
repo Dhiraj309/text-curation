@@ -37,3 +37,31 @@ class Document:
         Signals are append-only and are never mutated once emitted.
         """
         self.signals.append(Signal(name, value))
+
+        
+
+def compute_basic_stats(text: str) -> dict:
+    if not text:
+        return {
+            "chars": 0,
+            "lines": 0,
+            "paragraphs": 0
+        }
+    
+    lines = text.split("\n")
+    paragraphs = [p for p in text.split("\n\n") if p.strip()]
+
+    return {
+        "chars": len(text),
+        "lines": len(lines),
+        "paragraphs": len(paragraphs)
+    }
+
+def summarize_signals(self) -> dict:
+    summary = {}
+
+    for sig in self.signals:
+        key = sig.name.split(".", 1)[-1]
+        summary[key] = summary.get(key, 0) + 1
+
+    return summary 
