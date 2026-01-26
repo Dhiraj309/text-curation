@@ -8,13 +8,13 @@ FilteringBlock:
 """
 
 from text_curation.core.document import Document
-from text_curation.blocks.filtering import FilteringBlock
+from text_curation.blocks.filtering import SignalBasedBoilerplateFilteringBlock
 
 def run_filter(text, signals):
     """Apply filtering with pre-attached signals."""
     doc = Document(text)
     doc.signals = signals
-    FilteringBlock().apply(doc)
+    SignalBasedBoilerplateFilteringBlock().apply(doc)
 
     return doc.text
 

@@ -2,7 +2,7 @@ from collections import defaultdict
 from text_curation.blocks.base import Block
 
 
-class FilteringBlock(Block):
+class SignalBasedBoilerplateFilteringBlock(Block):
     """
     Removes content based on explicit structure-derived signals.
 

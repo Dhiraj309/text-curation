@@ -1,10 +1,11 @@
 from text_curation.blocks import (
     NormalizationBlock,
-    FormattingBlock,
+    CodeSafeFormmatingBlock,
+    ParagraphFormattingBlock,
     RedactionBlock,
-    StructureBlock,
-    FilteringBlock,
-    DeduplicationBlock,
+    BasicStructureBlock,
+    ExactParagraphDeduplicationBlock,
+    ExactParagraphDeduplicationBlock,
 )
 from text_curation.profiles.base import Profile
 from text_curation.registry import register
@@ -23,10 +24,11 @@ PROFILE = Profile(
         NormalizationBlock(),
 
         # Reconstruct readable paragraph and line structure
-        FormattingBlock(),   # uses its own DEFAULT_POLICY
+        CodeSafeFormmatingBlock(),   # uses its own DEFAULT_POLICY
+        ParagraphFormattingBlock(),
 
         # Emit structural signals without mutating text
-        StructureBlock(
+        BasicStructureBlock(
             policy={
                 "detect_headers": True,
                 "detect_lists": True,
@@ -38,7 +40,7 @@ PROFILE = Profile(
         ),
 
         # Conservatively drop empty or repeated short boilerplate paragraphs
-        FilteringBlock(
+        ExactParagraphDeduplicationBlock(
             policy={
                 "drop_empty": True,
                 "preserve_headers": True,
@@ -49,7 +51,7 @@ PROFILE = Profile(
         ),
 
         # Remove exact duplicate paragraphs while preserving order
-        DeduplicationBlock(
+        ExactParagraphDeduplicationBlock(
             policy={
                 "scope": "paragraph",
                 "normalize_case": True,

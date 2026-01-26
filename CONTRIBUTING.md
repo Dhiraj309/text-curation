@@ -1,8 +1,8 @@
 # Contributing to text-curation
 
 First off, thank you for considering contributing to **text-curation** 🙌  
-This project aims to provide **deterministic, structure-aware, production-grade text curation**
-for real-world, messy text data.
+This project exists to provide **deterministic, structure-aware, production-grade text curation**
+for real-world, messy text data at dataset scale.
 
 Contributions of all kinds are welcome — bug fixes, new blocks, tests, documentation,
 performance improvements, and new profiles.
@@ -19,28 +19,28 @@ This library is built with the following principles in mind:
 - **Deterministic behavior**  
   Given the same input and profile, output must be stable and reproducible.
 
-- **Structure-aware**  
+- **Structure-aware processing**  
   Text is not just strings — paragraphs, lists, headers, repetition, and boilerplate matter.
 
 - **Pipeline-first design**  
   Each block should do one thing well and remain composable.
 
 - **Real-world robustness**  
-  Code should handle OCR junk, web boilerplate, emails, scanned text, forums,
+  Code should handle OCR artifacts, web boilerplate, emails, scanned text, forums,
   and scraped content without semantic assumptions.
 
-- **Test-driven evolution**  
-  Every new behavior must be covered by tests.
+- **Tests as specifications**  
+  Tests define and lock in behavior; they are not optional.
 
 ---
 
 ## 🔒 Stability Contract (Important)
 
-As of **v1.1.0**, `text-curation` provides **stable default behavior**.
+As of **v1.3.0**, `text-curation` provides **stable default behavior**.
 
 Contributors must assume that:
 
-- Default block behavior is **part of the public contract**
+- Default block behavior is **part of the public API**
 - Changing outputs for existing inputs is a **breaking change**
 - Breaking changes require explicit discussion and a major version bump
 
@@ -48,7 +48,9 @@ If a proposed change alters behavior, it should usually be introduced as:
 
 - a new block
 - a new profile
-- an opt-in policy flag (not enabled by default)
+- an opt-in policy flag (disabled by default)
+
+Profiles may be deprecated, but must never be silently changed.
 
 ---
 
@@ -60,11 +62,14 @@ src/text_curation/
 ├── blocks/
 │   ├── base.py
 │   ├── normalization.py
-│   ├── formatting.py
 │   ├── redaction.py
-│   ├── structure.py
-│   ├── filtering.py
-│   └── deduplication.py
+│   ├── temp.py
+│   ├── deduplication/
+│   ├── filtering/
+│   ├── formatting/
+│   │   ├── code_safe.py
+│   │   └── paragraph.py
+│   └── structure/
 ├── core/
 │   ├── annotations.py
 │   ├── document.py
@@ -73,8 +78,8 @@ src/text_curation/
 ├── profiles/
 │   ├── base.py
 │   └── web_common_v1.py
-├── registry.py
 ├── curator.py
+├── registry.py
 └── **init**.py
 
 tests/
@@ -89,6 +94,8 @@ tests/
 └── test_web_common_v1_golden.py
 
 ````
+
+Documentation lives under `docs/` and mirrors this structure.
 
 ---
 
@@ -130,13 +137,15 @@ Before submitting a PR:
 * ✅ New behavior must include tests
 * ✅ Existing tests must not change unless behavior is intentionally revised
 
+Golden tests are used to lock in profile-level behavior.
+
 ---
 
 ## 🧩 Adding a New Block
 
 To add a new block:
 
-1. Create a file in `src/text_curation/blocks/`
+1. Create a file under `src/text_curation/blocks/`
 2. Subclass `Block` from `blocks.base`
 3. Implement `apply(self, document)`
 4. Add tests under `tests/blocks/`
@@ -144,10 +153,33 @@ To add a new block:
 
 ### Block guidelines
 
-* Blocks **must not mutate text silently**
+* Blocks **must not silently change semantics**
 * Prefer **signals over hard deletions**
 * Avoid semantic inference or probabilistic heuristics
 * Keep transformations explainable and inspectable
+* Do not rely on global state
+
+---
+
+## 🧩 Formatting Blocks (Special Note)
+
+Formatting is intentionally split into multiple blocks:
+
+* `CodeSafeFormattingBlock`
+  Handles structural normalization without altering semantics
+  (indentation, blank lines, trailing whitespace).
+
+* `ParagraphFormattingBlock`
+  Reconstructs paragraph structure and normalizes punctuation
+  without merging unrelated lines.
+
+When modifying formatting behavior:
+
+* Preserve existing paragraph semantics
+* Never merge lines implicitly
+* Add regression tests for every edge case
+
+Formatting regressions are considered **high risk**.
 
 ---
 
@@ -159,7 +191,7 @@ To add a profile:
 
 1. Create a file in `src/text_curation/profiles/`
 2. Construct a `Profile` instance
-3. Call `register(PROFILE)`
+3. Register it explicitly
 4. Add golden tests under `tests/profiles/`
 
 Profiles **must be versioned explicitly** (e.g. `web_common:v1`)
@@ -171,8 +203,8 @@ to ensure long-term reproducibility.
 
 * Python ≥ 3.9
 * Type hints encouraged
-* Avoid unbounded or overly complex regexes
-* Prefer readability over cleverness
+* Avoid unbounded or catastrophic regexes
+* Prefer clarity over cleverness
 * Keep functions small and testable
 
 ---
@@ -236,7 +268,7 @@ This project follows **Semantic Versioning**:
 
 1. Fork the repository
 2. Create a feature branch
-3. Add tests
+3. Add or update tests
 4. Ensure all tests pass
 5. Open a PR with:
 
@@ -254,12 +286,12 @@ If you are unsure about an approach:
 * Start a **discussion**
 
 Design discussions are encouraged — especially for changes that may
-affect default behavior.
+affect default behavior or profile semantics.
 
 ---
 
 ## 🙏 Thank You
 
-Text data is messy — thoughtful contributions help make it usable.
+Text data is messy — thoughtful, conservative contributions help make it usable.
 
 Thanks for helping improve **text-curation** ❤️

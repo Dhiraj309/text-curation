@@ -8,11 +8,11 @@ These tests define the contract for DeduplicationBlock:
 """
 
 from text_curation.core.document import Document
-from text_curation.blocks.deduplication import DeduplicationBlock
+from text_curation.blocks.deduplication import ExactParagraphDeduplicationBlock
 
 def dedupe(text):
     doc = Document(text)
-    DeduplicationBlock().apply(doc)
+    ExactParagraphDeduplicationBlock().apply(doc)
     return doc.text
 
 def text_exact_duplicate_paragraph_removed():

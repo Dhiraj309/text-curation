@@ -9,11 +9,13 @@ FormattingBlock must:
 """
 
 from text_curation.core.document import Document
-from text_curation.blocks.formatting import FormattingBlock
+from text_curation.blocks.formatting import CodeSafeFormmatingBlock, ParagraphFormattingBlock
 
 def format_text(text):
     doc = Document(text)
-    FormattingBlock().apply(doc)
+
+    CodeSafeFormmatingBlock().apply(doc)
+    ParagraphFormattingBlock().apply(doc)
     return doc.text
 
 def test_trailing_whitespace():

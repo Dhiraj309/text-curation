@@ -1,34 +1,66 @@
-# FormattingBlock
+# Formatting Blocks
 
-The `FormattingBlock` reconstructs **human-readable structure**
-from text that is hard-wrapped, inconsistently spaced,
-or poorly formatted.
+Formatting is implemented as **two distinct, ordered blocks**
+to preserve structure while improving readability.
 
-It operates at the **paragraph and line level**.
+Formatting operates at the **line and paragraph level**
+and is intentionally conservative.
 
 ---
 
-## What it does
+## Formatting pipeline
+
+Formatting is composed of:
+
+1. **CodeSafeFormattingBlock**
+2. **ParagraphFormattingBlock**
+
+Both blocks are required to achieve correct behavior.
+
+---
+
+## CodeSafeFormattingBlock
+
+This block performs **structural normalization only**.
+
+### What it does
 
 - Normalizes line endings
 - Trims trailing whitespace
 - Collapses excessive blank lines
-- Reconstructs paragraphs from wrapped lines
+- Preserves indentation-sensitive content verbatim
+
+### Guarantees
+
+- Leading indentation is never removed
+- No lines are merged
+- No semantics are altered
+
+---
+
+## ParagraphFormattingBlock
+
+This block reconstructs **human-readable paragraph structure**
+and normalizes punctuation.
+
+### What it does
+
+- Reconstructs paragraphs from wrapped text
 - Preserves indented blocks (e.g. code, quoted text)
 - Normalizes punctuation spacing
 - Preserves URLs, emails, IPs, and numeric formats
 
 ---
 
-## Paragraph reconstruction rules
+## Paragraph reconstruction rules (stable)
 
-- Lines are merged only when separated by blank lines
+- Paragraphs are reconstructed **only at explicit boundaries**
+- Adjacent non-empty lines are **never merged implicitly**
+- Blank lines flush paragraph buffers
 - Indented lines are preserved exactly
 - Relative indentation inside blocks is preserved
-- Absolute indentation is normalized
 
-This ensures code and quoted blocks remain readable
-without assuming language or syntax.
+These rules are enforced by tests and considered stable.
 
 ---
 
@@ -44,7 +76,7 @@ without assuming language or syntax.
 
 ---
 
-## What it does NOT do
+## What formatting does NOT do
 
 - ❌ No sentence splitting
 - ❌ No Markdown parsing
@@ -57,3 +89,5 @@ without assuming language or syntax.
 
 Formatting improves **readability and consistency**
 without making assumptions about document semantics.
+
+Preserving paragraph meaning is prioritized over visual uniformity.

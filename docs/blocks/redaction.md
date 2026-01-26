@@ -3,7 +3,7 @@
 The `RedactionBlock` masks **sensitive information**
 using deterministic, pattern-based matching.
 
-All redaction is **non-destructive masking**.
+All redaction is performed via **non-destructive masking**.
 
 ---
 

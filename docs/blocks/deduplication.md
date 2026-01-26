@@ -3,29 +3,32 @@
 The `DeduplicationBlock` removes **exact duplicate paragraphs**
 within a single document.
 
-Deduplication is **local, deterministic, and conservative**.
+Deduplication is **local, deterministic, and conservative** by design.
 
 ---
 
 ## What it does
 
 - Splits text into paragraphs
-- Normalizes paragraphs for comparison
+- Normalizes paragraphs for comparison only
 - Removes repeated paragraphs
 - Preserves first-occurrence order
 
+Deduplication is performed **after normalization and formatting**
+to ensure stable comparisons.
+
 ---
 
-## Normalization rules
+## Normalization rules (comparison only)
 
-For comparison only:
+For deduplication keys:
 
 - Collapses whitespace
 - Lowercases text
-- Does **not** remove punctuation
-- Does **not** perform fuzzy matching
+- Preserves punctuation
+- Uses exact string equality
 
-The original paragraph text is preserved for output.
+The **original paragraph text is preserved** in output.
 
 ---
 
@@ -33,14 +36,14 @@ The original paragraph text is preserved for output.
 
 - ❌ No cross-document deduplication
 - ❌ No fuzzy or similarity-based matching
-- ❌ No semantic deduplication
+- ❌ No semantic or embedding-based comparison
 
 ---
 
 ## Design rationale
 
 Deduplication is intentionally limited to **exact, local repetition**
-to avoid false positives in narrative or technical text.
+to avoid false positives in narrative, legal, or technical text.
 
-More aggressive deduplication strategies are reserved for
-explicit opt-in profiles.
+More aggressive deduplication strategies must be introduced
+via explicit, opt-in profiles.

@@ -2,7 +2,7 @@ from text_curation.blocks.base import Block
 import re
 
 
-class DeduplicationBlock(Block):
+class ExactParagraphDeduplicationBlock(Block):
     """
     Removes exact duplicate paragraphs within a document.
 

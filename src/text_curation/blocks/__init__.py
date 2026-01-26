@@ -7,19 +7,19 @@ the canonical import surface for block composition in profiles.
 
 from .base import Block
 from .normalization import NormalizationBlock
-from .formatting import FormattingBlock
+from .formatting import (CodeSafeFormmatingBlock, ParagraphFormattingBlock)
 from .redaction import RedactionBlock
-from .structure import StructureBlock
-from .filtering import FilteringBlock
-from .deduplication import DeduplicationBlock
+from .structure.basic import BasicStructureBlock
+from .filtering.signal_based import SignalBasedBoilerplateFilteringBlock
+from .deduplication import ExactParagraphDeduplicationBlock
 
 # Explicit export list to keep the public API stable
 __all__ = [
     "Block",
     "NormalizationBlock",
-    "FormattingBlock",
+    "CodeSafeFormmatingBlock", "ParagraphFormattingBlock",
     "RedactionBlock",
-    "StructureBlock",
-    "FilteringBlock",
-    "DeduplicationBlock",
+    "BasicStructureBlock",
+    "SignalBasedBoilerplateFilteringBlock",
+    "ExactParagraphDeduplicationBlock",
 ]

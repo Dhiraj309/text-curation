@@ -10,7 +10,7 @@ _NUMBERED_RE = re.compile(r"^\s*\d+[.)]\s+")
 _ALL_CAPS_RE = re.compile(r"^[A-Z\s0-9.,!?:;'\"-]+$")
 
 
-class StructureBlock(Block):
+class BasicStructureBlock(Block):
     """
     Analyzes document structure and emits inspectable signals
     without mutating the underlying text.

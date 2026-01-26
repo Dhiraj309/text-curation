@@ -3,7 +3,7 @@
 The `FilteringBlock` removes content **only when explicitly justified**
 by structure-derived signals.
 
-It is intentionally conservative in the `web_common:v1` profile.
+Filtering is intentionally conservative in the `web_common:v1` profile.
 
 ---
 
@@ -14,6 +14,8 @@ It is intentionally conservative in the `web_common:v1` profile.
 - Preserves header-led sections
 - Operates strictly at paragraph granularity
 
+Filtering decisions are **signal-driven and inspectable**.
+
 ---
 
 ## Filtering rules (`web_common:v1`)
@@ -22,7 +24,9 @@ A paragraph is dropped only if:
 
 - It is empty  
   **OR**
-- It is a repeated boilerplate candidate  
+- It is a boilerplate candidate  
+  **AND**
+- It is repeated  
   **AND**
 - It is short (less than 200 characters)
 

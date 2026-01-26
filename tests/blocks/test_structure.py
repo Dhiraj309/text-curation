@@ -5,14 +5,14 @@ StructureBlock emits signals only — it never mutates text.
 """
 
 from text_curation.core.document import Document
-from text_curation.blocks.structure import StructureBlock
+from text_curation.blocks.structure.basic import BasicStructureBlock
 
 def get_signal(doc, name):
     return [s.value for s in doc.signals if s.name == name]
 
 def analyze(text):
     doc = Document(text)
-    StructureBlock().apply(doc)
+    BasicStructureBlock().apply(doc)
     return doc
 
 def test_header_detection():

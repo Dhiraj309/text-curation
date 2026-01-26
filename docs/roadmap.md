@@ -11,24 +11,30 @@ of large-scale dataset preparation, including:
 - pretraining corpora
 - fine-tuning and evaluation datasets
 
-All future work is expected to preserve the library’s **deterministic,
-conservative, and reproducible** design principles.
+All future work is expected to preserve the library’s
+**deterministic, conservative, and reproducible** design principles.
 
 ---
 
-## Near-Term (1.x)
+## Near-Term (1.x series)
 
 **Focus:** Strengthening general-purpose web text curation
 
-Work in the `1.x` series is intended to improve signal quality,
-profile coverage, and documentation **without changing default behavior**.
+Work in the `1.x` series is limited to:
+
+- improving signal quality
+- expanding profile coverage
+- refining documentation and tests
+
+Default behavior of existing blocks and profiles
+**must not change**.
 
 Potential areas include:
 
-- **Enhanced deduplication (opt-in)**
+- **Enhanced deduplication (opt-in only)**
   - Paragraph-level and sliding-window deduplication
-  - Conservative, exact or near-exact matching
-  - No fuzzy or semantic deduplication by default
+  - Conservative exact or near-exact matching
+  - Never enabled by default
 
 - **Boilerplate scoring (non-destructive)**
   - Continuous boilerplate likelihood signals
@@ -36,11 +42,11 @@ Potential areas include:
   - Filtering decisions remain explicit and opt-in
 
 - **Expanded built-in profiles**
-  - Additional web-derived profiles (e.g. wiki- or forum-style text)
-  - Clearly defined profile contracts and scope
+  - Additional web-derived profiles (e.g. wiki-style, forum-style)
+  - Clearly scoped profile contracts and guarantees
 
 - **Improved documentation**
-  - Block-level behavior references
+  - Block-level behavioral specifications
   - Profile contracts with before/after examples
   - Dataset-oriented usage guidance
 
@@ -51,7 +57,7 @@ Potential areas include:
 **Focus:** Richer structure awareness and extensibility
 
 The following areas may be explored in future major releases.
-All such behavior is expected to remain **opt-in or profile-specific**.
+All such behavior must remain **opt-in or profile-specific**.
 
 - **HTML-aware preprocessing**
   - Tag-aware text extraction
@@ -60,19 +66,19 @@ All such behavior is expected to remain **opt-in or profile-specific**.
 
 - **Advanced deduplication strategies**
   - Optional fuzzy or similarity-based deduplication
-  - Clearly scoped to specific profiles or use cases
+  - Strictly scoped to specific profiles or use cases
   - Never enabled implicitly
 
 - **Profile composition and reuse**
   - Shared profile components
-  - Clear composition or inheritance semantics
+  - Explicit composition or inheritance semantics
   - Improved auditability of profile changes
 
 ---
 
 ## Long-Term Direction
 
-**Focus:** Dataset preparation across multiple granularity levels
+**Focus:** Dataset preparation across multiple levels of granularity
 
 Longer-term exploration may focus on clearer separation of
 responsibilities across different levels of text curation:
@@ -119,9 +125,9 @@ or explicitly opt-in tooling.
 
 Future changes are expected to be introduced in a way that:
 
-- Preserves existing profile behavior
-- Maintains reproducibility guarantees
-- Avoids silent changes to defaults
+- preserves existing profile behavior
+- maintains reproducibility guarantees
+- avoids silent changes to defaults
 
 Breaking changes will require a major version bump
 and explicit communication.
