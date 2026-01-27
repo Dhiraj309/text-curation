@@ -78,9 +78,9 @@ Rather than relying on ad-hoc cleanup scripts, `text-curation` promotes
 
 ---
 
-## Scope & Stability (v1.3.0)
+## Scope & Stability (v1.3.1)
 
-As of **v1.3.0**, `text-curation` provides a **stable and extensible core**
+As of **v1.3.1**, `text-curation` provides a **stable and extensible core**
 for structure-aware text curation of real-world, messy data.
 
 The default behavior and semantics of the core blocks and built-in profiles
@@ -96,7 +96,7 @@ rather than semantic classification or machine-learning-based filtering.
 
 ## Core Blocks (Stable)
 
-The following blocks are part of the **stable core** in v1.3.0.
+The following blocks are part of the **stable core** in v1.3.1.
 
 - **Normalization**  
   Canonicalizes Unicode and typography (quotes, dashes, ellipses),

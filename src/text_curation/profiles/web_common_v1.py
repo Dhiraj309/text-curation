@@ -5,7 +5,6 @@ from text_curation.blocks import (
     RedactionBlock,
     BasicStructureBlock,
     ExactParagraphDeduplicationBlock,
-    ExactParagraphDeduplicationBlock,
 )
 from text_curation.profiles.base import Profile
 from text_curation.registry import register
@@ -42,22 +41,11 @@ PROFILE = Profile(
         # Conservatively drop empty or repeated short boilerplate paragraphs
         ExactParagraphDeduplicationBlock(
             policy={
-                "drop_empty": True,
-                "preserve_headers": True,
-                "drop_repeated_boilerplate": True,
-                "min_repetition": 2,
-                "max_boilerplate_length": 200,
-            }
-        ),
-
-        # Remove exact duplicate paragraphs while preserving order
-        ExactParagraphDeduplicationBlock(
-            policy={
-                "scope": "paragraph",
-                "normalize_case": True,
-                "collapse_whitespace": True,
-                "drop_empty": True,
-            }
+        "scope": "paragraph",
+        "normalize_case": True,
+        "collapse_whitespace": True,
+        "drop_empty": True,
+    }
         ),
     ],
     guarantees={
