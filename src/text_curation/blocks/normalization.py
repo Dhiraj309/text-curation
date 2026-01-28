@@ -54,36 +54,50 @@ class NormalizationBlock(Block):
         text = self._collapse_whitespaces(text)
         text = self._normalize_newlines(text)
         text = text.strip()
-        
+
         document.set_text(text)
 
     def _normalize_unicode(self, text):
         return unicodedata.normalize("NFKC", text)
-    
+
     def _remove_zero_width(self, text):
         return _ZERO_WIDTH.sub("", text)
-    
+
     def _remove_control_char(self, text):
         return _CONTROL_CHARS.sub("", text)
-    
+
     def _normalize_line_endings(self, text):
         return text.replace("\r\n", "\n").replace("\r", "\n")
-    
+
     def _normalize_quotes(self, text):
         for k, v in _QUOTES.items():
             text = text.replace(k, v)
         return text
-    
+
     def _normalize_dashes(self, text):
         for k, v in _DASHES.items():
             text = text.replace(k, v)
         return text
-    
+
     def _normalize_ellipses(self, text):
         return text.replace("…", "...")
-    
+
     def _collapse_whitespaces(self, text):
-        return re.sub(r"[ \t]+", " ", text)
-    
+        lines = text.split("\n")
+        out = []
+
+        for line in lines:
+            # Preserve leading indentation exactly
+            prefix = len(line) - len(line.lstrip(" \t"))
+            indent = line[:prefix]
+            rest = line[prefix:]
+
+            # Collapse internal whitespace only
+            rest = re.sub(r"[ \t]+", " ", rest)
+
+            out.append(indent + rest)
+
+        return "\n".join(out)
+
     def _normalize_newlines(self, text):
         return re.sub(r"\n{3,}", "\n\n", text)
