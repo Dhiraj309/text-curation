@@ -2,7 +2,7 @@ import re
 from text_curation.blocks.base import Block
 
 
-class CodeSafeFormmatingBlock(Block):
+class CodeSafeFormattingBlock(Block):
     """
     Structural safety layer: whitespace + blank lines only.
     """

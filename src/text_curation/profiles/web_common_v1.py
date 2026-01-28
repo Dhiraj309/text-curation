@@ -1,6 +1,6 @@
 from text_curation.blocks import (
     NormalizationBlock,
-    CodeSafeFormmatingBlock,
+    CodeSafeFormattingBlock,
     ParagraphFormattingBlock,
     RedactionBlock,
     BasicStructureBlock,
@@ -23,7 +23,7 @@ PROFILE = Profile(
         NormalizationBlock(),
 
         # Reconstruct readable paragraph and line structure
-        CodeSafeFormmatingBlock(),   # uses its own DEFAULT_POLICY
+        CodeSafeFormattingBlock(),   # uses its own DEFAULT_POLICY
         ParagraphFormattingBlock(),
 
         # Emit structural signals without mutating text
