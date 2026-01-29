@@ -150,7 +150,7 @@ Install from PyPI:
 
 ```bash
 pip install text-curation
-````
+```
 
 Or install from source for development:
 
@@ -292,4 +292,5 @@ in the Hugging Face ecosystem.t e s t 
  
  
  
+
  
