@@ -44,15 +44,18 @@ def compute_basic_stats(text: str) -> dict:
     if not text:
         return {
             "chars": 0,
+            "words": 0,
             "lines": 0,
             "paragraphs": 0
         }
     
+    words = text.split()
     lines = text.split("\n")
     paragraphs = [p for p in text.split("\n\n") if p.strip()]
 
     return {
         "chars": len(text),
+        "words": len(words),
         "lines": len(lines),
         "paragraphs": len(paragraphs)
     }
