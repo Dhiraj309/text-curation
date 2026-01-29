@@ -1,5 +1,11 @@
 from .aggregate import aggregate_reports
 
+PREFFERED_METRICS_ORDER = [
+    "chars",
+    "words",
+    "lines",
+    "paragraphs"
+]
 
 def summary(dataset):
     """
@@ -44,7 +50,10 @@ def summary(dataset):
     #
     # Metrics are aggregated totals (not per-sample averages).
     rows = []
-    for metric in sorted(agg["input_stats"]):
+    metrics = list(agg["input_stats"].keys())
+    ordered = [m for m in PREFFERED_METRICS_ORDER if m in metrics]
+    remaining = sorted(m for m in metrics if m not in ordered)
+    for metric in ordered+remaining:
         inp = agg["input_stats"][metric]
         out = agg["output_stats"].get(metric, 0)
 
