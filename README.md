@@ -78,9 +78,9 @@ Rather than relying on ad-hoc cleanup scripts, `text-curation` promotes
 
 ---
 
-## Scope & Stability (v1.3.3)
+## Scope & Stability (v1.3.4)
 
-As of **v1.3.3**, `text-curation` provides a **stable and extensible core**
+As of **v1.3.4**, `text-curation` provides a **stable and extensible core**
 for structure-aware text curation of real-world, messy data.
 
 The default behavior and semantics of the core blocks and built-in profiles
@@ -96,7 +96,7 @@ rather than semantic classification or machine-learning-based filtering.
 
 ## Core Blocks (Stable)
 
-The following blocks are part of the **stable core** in v1.3.3.
+The following blocks are part of the **stable core** in v1.3.4.
 
 - **Normalization**  
   Canonicalizes Unicode and typography (quotes, dashes, ellipses),
@@ -209,9 +209,8 @@ web_common_v1 = [
     NormalizationBlock(),
     CodeSafeFormattingBlock(),
     ParagraphFormattingBlock(),
-    StructureBlock(),
-    FilteringBlock(),
-    DeduplicationBlock(),
+    BasicStructureBlock(),
+    ExactParagraphDeduplicationBlock(),
 ]
 ```
 
@@ -289,4 +288,6 @@ Apache 2.0. See [LICENSE](LICENSE).
 ## Acknowledgements
 
 Inspired by large-scale dataset curation practices
-in the Hugging Face ecosystem.
+in the Hugging Face ecosystem.t e s t  
+  
+ 
