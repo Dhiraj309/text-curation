@@ -6,18 +6,25 @@ you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
 -->
 
-<h1 align="center">text-curation</h1>
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)"
+            srcset="https://dummyimage.com/720x140/0d1117/ffffff&text=text-curation">
+    <source media="(prefers-color-scheme: light)"
+            srcset="https://dummyimage.com/720x140/ffffff/000000&text=text-curation">
+    <img alt="text-curation logo"
+         src="https://dummyimage.com/720x140/ffffff/000000&text=text-curation"
+         width="360"
+         style="max-width: 100%">
+  </picture>
+  <br/>
+  <br/>
+</p>
 
 <p align="center">
-  <strong>Profile-based, deterministic text curation pipelines for large-scale NLP datasets</strong>
+  <i>Profile-based, deterministic text curation pipelines for large-scale NLP datasets</i>
 </p>
 
 <p align="center">
@@ -27,16 +34,21 @@ limitations under the License.
   <a href="https://pypi.org/project/text-curation/">
     <img alt="PyPI downloads" src="https://img.shields.io/pypi/dm/text-curation">
   </a>
-  <a href="https://github.com/Dhiraj309/text-curation/blob/main/LICENSE">
-    <img alt="License" src="https://img.shields.io/github/license/Dhiraj309/text-curation.svg">
-  </a>
   <a href="https://github.com/Dhiraj309/text-curation/releases">
     <img alt="GitHub release" src="https://img.shields.io/github/release/Dhiraj309/text-curation.svg">
   </a>
   <a href="https://pypi.org/project/text-curation/">
     <img alt="Python versions" src="https://img.shields.io/pypi/pyversions/text-curation.svg">
   </a>
+  <a href="https://github.com/Dhiraj309/text-curation/blob/main/LICENSE">
+    <img alt="License" src="https://img.shields.io/github/license/Dhiraj309/text-curation.svg">
+  </a>
 </p>
+
+---
+
+**Documentation**: https://github.com/Dhiraj309/text-curation  
+**Source Code**: https://github.com/Dhiraj309/text-curation
 
 ---
 
@@ -150,7 +162,7 @@ Install from PyPI:
 
 ```bash
 pip install text-curation
-```
+````
 
 Or install from source for development:
 
@@ -171,8 +183,7 @@ from datasets import load_dataset
 from text_curation import TextCurator
 
 dataset = load_dataset(
-    "allenai/c4",
-    "en.noclean",
+    "HuggingFaceFW/fineweb-edu",
     split="train",
 )
 
@@ -288,4 +299,4 @@ Apache 2.0. See [LICENSE](LICENSE).
 ## Acknowledgements
 
 Inspired by large-scale dataset curation practices
-in the Hugging Face ecosystem.t
+in the Hugging Face ecosystem.
