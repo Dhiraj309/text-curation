@@ -48,13 +48,25 @@ PROFILE = Profile(
     }
         ),
     ],
-    guarantees={
-        # Behavioral guarantees exposed to users
+    guarantees = {
         "deterministic": True,
+        "order_independent": True,
+
         "secrets_redacted": True,
-        "layout_preserved": False,
-        "code_safe": False,
+        "pii_removed": False,
+
+        "structure_preserved": True,
+        "layout_preserved": False,   # Paragraph reflow allowed
+        "code_safe": True,
+
+        "content_removed": True,     # Filtering, dedup
+        "content_rewritten": False,
+
+        "deduplication": True,
+        "repetition_preserved": False,
+
         "semantic_filtering": False,
+        "heuristic_scoring": True,   # Signal-based heuristics
     },
 )
 
