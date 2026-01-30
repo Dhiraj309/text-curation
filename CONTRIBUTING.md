@@ -36,7 +36,7 @@ This library is built with the following principles in mind:
 
 ## 🔒 Stability Contract (Important)
 
-As of **v1.3.4**, `text-curation` provides **stable default behavior**.
+As of **v1.4.0**, `text-curation` provides **stable default behavior**.
 
 Contributors must assume that:
 

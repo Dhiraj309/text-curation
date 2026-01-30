@@ -22,8 +22,10 @@ PROFILE = Profile(
         # Normalize Unicode and remove low-level encoding artifacts
         NormalizationBlock(),
 
+        # Maintains the code indenatation format
+        CodeSafeFormattingBlock(),
+        
         # Reconstruct readable paragraph and line structure
-        CodeSafeFormattingBlock(),   # uses its own DEFAULT_POLICY
         ParagraphFormattingBlock(),
 
         # Emit structural signals without mutating text
@@ -49,24 +51,30 @@ PROFILE = Profile(
         ),
     ],
     guarantees = {
+        # Reproducibility
         "deterministic": True,
         "order_independent": True,
 
+        # Safety
         "secrets_redacted": True,
         "pii_removed": False,
 
+        # Structure
         "structure_preserved": True,
-        "layout_preserved": False,   # Paragraph reflow allowed
+        "layout_preserved": False,
         "code_safe": True,
 
-        "content_removed": True,     # Filtering, dedup
+        # Content policy
+        "content_removed": True,
         "content_rewritten": False,
 
+        # Repetition & dedup
         "deduplication": True,
         "repetition_preserved": False,
 
+        # Semantics
         "semantic_filtering": False,
-        "heuristic_scoring": True,   # Signal-based heuristics
+        "heuristic_scoring": True,
     },
 )
 

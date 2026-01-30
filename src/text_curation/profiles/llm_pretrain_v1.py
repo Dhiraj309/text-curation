@@ -6,21 +6,13 @@ from text_curation.blocks import (
 from text_curation.profiles.base import Profile
 from text_curation.registry import register
 
-
-# Stable, general-purpose profile for heterogeneous web-derived text.
-# This profile prioritizes determinism, safety, and semantic preservation.
 PROFILE = Profile(
     name="llm_pretrain",
     version="v1",
     blocks=[
-        # Redact sensitive information early to avoid downstream leakage
         RedactionBlock(),
-
-        # Normalize Unicode and remove low-level encoding artifacts
         NormalizationBlock(),
-
-        # Reconstruct readable paragraph and line structure
-        CodeSafeFormattingBlock(),   # uses its own DEFAULT_POLICY
+        CodeSafeFormattingBlock(),
     ],
     guarantees = {
         # Reproducibility
