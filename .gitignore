@@ -54,4 +54,5 @@ Thumbs.db
 # =====================
 *.log
 test.py
+tests.py
 test_datasets_map.py

@@ -70,7 +70,7 @@ def summary(dataset):
                 f"{inp:,}",
                 f"{out:,}",
                 f"{diff:+,}",
-                f"{percent:+.1f}%",
+                f"{percent:+.4f}%",
             )
         )
 
