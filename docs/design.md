@@ -1,102 +1,218 @@
-# Design Philosophy
+# Design Invariants
 
-`text-curation` is designed as a **deterministic, structure-aware text curation system**
-for large-scale dataset preprocessing.
+`text-curation` is a **deterministic, structure-aware text curation system**
+designed for large-scale dataset preprocessing.
 
-This document explains the core design decisions and constraints
-that intentionally shape the library’s behavior and evolution.
+This document defines the **non-negotiable invariants** that govern
+the behavior, evolution, and contribution rules of the system.
 
----
-
-## Determinism First
-
-All transformations in `text-curation` are **rule-based and deterministic**.
-
-Given the same input text and the same profile:
-
-- Output is guaranteed to be identical across runs
-- No randomness or probabilistic behavior is introduced
-
-This property is essential for:
-
-- dataset reproducibility
-- long-running preprocessing pipelines
-- auditing and debugging data decisions
-
-Determinism is treated as a **hard requirement**, not an optimization.
+These invariants are treated as architectural law.
+Violations are considered bugs or breaking changes.
 
 ---
 
-## Why No Machine Learning
+## 1. Determinism Is Mandatory
 
-Machine learning introduces:
+All behavior in `text-curation` **must be deterministic**.
 
-- non-deterministic behavior
-- opaque or hard-to-debug failure modes
-- dataset-dependent drift over time
+Given:
+- the same input text
+- the same profile identifier
 
-For dataset curation, these properties are unacceptable.
+The output **must be identical** across:
+- runs
+- machines
+- environments
 
-Accordingly, `text-curation` deliberately avoids:
+The system **must not** introduce:
+
+- randomness
+- probabilistic thresholds
+- data-dependent drift
+- time-dependent behavior
+
+Determinism is a **hard requirement**, not an optimization.
+
+---
+
+## 2. No Machine Learning in the Core
+
+The core system **must not** depend on machine learning.
+
+This includes (but is not limited to):
 
 - classifiers
 - learned heuristics
-- scoring or ranking models
+- embedding-based similarity
+- probabilistic scoring
+- model-dependent behavior
 
-All semantic decisions must remain **explicit, inspectable, and stable**.
+All decisions must be:
 
----
+- rule-based
+- explicit
+- inspectable
+- reproducible
 
-## Profiles as Behavioral Contracts
-
-A profile defines:
-
-- which blocks are applied
-- in what order
-- with which default policies
-
-Profiles are **versioned** and treated as **behavioral contracts**, not suggestions.
-
-If a profile is named `web_common:v1`, its behavior is guaranteed
-not to change within the `1.x` series.
-
-Any behavior change requires:
-
-- a new profile version, or
-- a major library version bump
-
-This contract is enforced by profile-level golden tests.
+ML-based analysis may exist **outside** the core,
+but must never affect default or profile-defined behavior.
 
 ---
 
-## Conservative Defaults
+## 3. Profiles Are Behavioral Contracts
 
-The library consistently prioritizes:
+A profile defines a **complete behavioral contract**.
+
+A profile specifies:
+
+- the exact blocks applied
+- the exact order of execution
+- the default policies of each block
+- the guarantees exposed to users
+
+Once released, a profile’s behavior **must not change**.
+
+If a profile is named `web_common_v1`:
+
+- its behavior is frozen
+- its output is stable across all `1.x` releases
+- any change requires a new profile version
+
+Profiles may be deprecated.
+Profiles may never be silently modified.
+
+Golden tests enforce this contract.
+
+---
+
+## 4. Blocks Are Semantic Primitives
+
+Each block represents a **single, well-defined responsibility**.
+
+Blocks must:
+
+- be stateless
+- operate deterministically
+- avoid semantic inference
+- avoid hidden coupling with other blocks
+
+Blocks may:
+- mutate text
+- emit signals
+- do both
+
+Blocks must **not**:
+
+- depend on execution context
+- inspect downstream behavior
+- implicitly coordinate with other blocks
+
+If new behavior is required, it must be introduced as:
+- a new block
+- or a new profile
+
+---
+
+## 5. Conservative Defaults Are Required
+
+The system prioritizes:
 
 - semantic preservation over cleanliness
 - false negatives over false positives
 - stability over aggressiveness
 
 Text that appears “messy” after processing is often left that way
-intentionally.
+**intentionally**.
 
-This conservatism ensures that:
+Aggressive cleanup is always opt-in and profile-scoped.
 
-- meaning is not silently altered
-- downstream consumers retain control
-- preprocessing decisions remain reversible and auditable
+This is required to prevent:
+- silent meaning changes
+- irreproducible datasets
+- downstream data drift
 
 ---
 
-## Explicit Non-Goals
+## 6. Observation Is Separate From Decision
+
+Structural analysis and content modification are **strictly separated**.
+
+Blocks that observe structure must:
+- emit signals
+- never mutate text
+
+Blocks that mutate text must:
+- act only on explicit rules
+- avoid implicit interpretation of signals
+
+This separation ensures:
+- auditability
+- explainability
+- composability
+
+Hidden logic is forbidden.
+
+---
+
+## 7. Explicit Non-Goals
 
 By design, `text-curation` does **not** attempt to:
 
-- infer document quality or author intent
-- aggressively remove all boilerplate or repetition
-- preserve exact visual formatting
-- perform language-specific transformations
-- apply semantic or topical filtering
+- infer document quality or usefulness
+- classify text semantically or topically
+- perform language detection or language-specific rules
+- aggressively remove repetition or boilerplate by default
+- preserve exact visual layout of source documents
+- integrate with tokenizers or models
 
-These constraints are essential to maintaining predictable,
-reproducible behavior at dataset scale.
+These constraints are intentional and permanent.
+
+---
+
+## 8. Extension Rules
+
+New functionality must follow these rules:
+
+- New behavior must be opt-in
+- Default behavior must not change
+- Profiles evolve; existing contracts do not
+- Breaking changes require a major version bump
+- Tests define and lock behavior
+
+If a change cannot be expressed as:
+- a new block
+- a new profile
+- or an explicitly versioned contract
+
+It does not belong in the core system.
+
+---
+
+## 9. Authority Order
+
+When sources disagree, authority is resolved as follows:
+
+1. **Tests** (final authority)
+2. **Profile documentation**
+3. **Block documentation**
+4. **Design invariants (this document)**
+
+Implementation details are not authoritative.
+
+---
+
+## Summary
+
+`text-curation` is intentionally boring.
+
+Predictability, reproducibility, and auditability
+are valued over flexibility or cleverness.
+
+The system exists to make dataset preprocessing:
+
+- explicit
+- inspectable
+- stable over time
+
+Anything that compromises these goals
+is out of scope.

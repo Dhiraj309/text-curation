@@ -1,43 +1,43 @@
 # web_common_v1
 
-The `web_common_v1` profile defines a **stable, conservative text curation pipeline**
+`web_common_v1` defines a **stable, conservative text curation profile**
 for heterogeneous, web-derived content.
 
-It is designed for large-scale datasets where **predictability, reproducibility,
-and semantic preservation** are critical, while still allowing **light structural cleanup**
-and **conservative boilerplate removal**.
+This profile is intended to serve as a **general-purpose baseline**
+for large-scale web text curation where **predictability, reproducibility,
+and semantic preservation** are required.
 
-This profile is treated as a **long-term behavioral contract**.
+`web_common_v1` is a **frozen behavioral contract**.
 
 ---
 
 ## Intended Use
 
-This profile is suitable for:
+This profile is intended for:
 
-* Common Crawl–like datasets
-* Blog posts, forums, and scraped articles
-* OCR- or PDF-derived web content
-* Mixed-quality, user-generated text
+- Common Crawl–like datasets
+- Blog posts, forums, and scraped articles
+- OCR- or PDF-derived web content
+- Mixed-quality, user-generated text
 
-It is intended to serve as a **general-purpose baseline**
-for web text curation in the Hugging Face ecosystem, balancing
-safety, cleanliness, and semantic fidelity.
+It is suitable for datasets that require **light structural cleanup**
+and **explicit, conservative boilerplate removal**
+without semantic inference.
 
 ---
 
-## Pipeline Overview
+## Pipeline Definition
 
-At a high level, `web_common_v1` applies the following stages:
+`web_common_v1` applies the following blocks, in order:
 
-1. Redaction of sensitive tokens
-2. Unicode and whitespace normalization
-3. Code-safe formatting preservation
-4. Paragraph and line structure reconstruction
-5. Structural signal extraction (headers, lists, repetition)
-6. Conservative paragraph-level deduplication
+1. `RedactionBlock`
+2. `NormalizationBlock`
+3. `CodeSafeFormattingBlock`
+4. `ParagraphFormattingBlock`
+5. `BasicStructureBlock`
+6. `ExactParagraphDeduplicationBlock`
 
-Each stage is deterministic and independently testable.
+Block ordering is part of the contract.
 
 ---
 
@@ -45,62 +45,68 @@ Each stage is deterministic and independently testable.
 
 When using `web_common_v1`, the following guarantees hold:
 
-* Output is fully deterministic for a given input
-* Processing order does not affect the result
-* No machine learning models are used
-* No semantic inference or rewriting is applied
-* Sensitive tokens (e.g. emails, credentials) are redacted
-* Paragraph-level structure is preserved
-* Indentation-sensitive content (e.g. code blocks) is preserved
-* Numeric formats, timestamps, and identifiers are not modified
-* Structural signals are extracted without mutating text
-* Content removal is conservative and rule-based
-* Deduplication is exact and paragraph-scoped
+- Output is fully deterministic for a given input
+- Block execution order is fixed and reproducible
+- No machine learning models are used
+- No semantic inference or rewriting is applied
+- Explicit secret patterns are redacted
+- Unicode and whitespace artifacts are normalized
+- Paragraph structure is reconstructed conservatively
+- Indentation-sensitive content (e.g. code) is preserved
+- Structural signals are emitted without mutating text
+- Deduplication is exact and paragraph-scoped only
+- Content removal is rule-based and conservative
 
-These guarantees are enforced by **golden tests**
-and are considered part of the profile’s public contract.
+These guarantees are enforced by **golden tests**.
 
 ---
 
-## Known Limitations (Intentional)
+## Explicit Non-Guarantees
 
-The following behaviors are expected and intentional:
+The following are **not guaranteed** and must not be assumed:
 
-* Some boilerplate repetition may remain
-* Deduplication may remove short or repeated boilerplate paragraphs
-* Headers and footers are not aggressively stripped
-* Low-density or marginal text may persist
-* Visual layout is normalized rather than preserved exactly
+- Complete boilerplate removal
+- Removal of all headers, footers, or navigation text
+- Cross-document or dataset-level deduplication
+- Language-specific or domain-specific cleanup
+- Quality scoring or semantic filtering
+- Exact visual layout preservation
 
-These trade-offs are required to avoid semantic damage
-and over-filtering in large-scale, heterogeneous web corpora.
+---
+
+## Known and Intentional Outcomes
+
+Users should expect that:
+
+- Some boilerplate repetition may remain
+- Some low-density or marginal content may persist
+- Layout is normalized rather than preserved verbatim
+- Cleanup favors semantic safety over aggressiveness
+
+These outcomes are intentional and required
+to preserve reproducibility at scale.
 
 ---
 
 ## When Not to Use
 
-This profile may not be appropriate if you require:
+This profile must **not** be used when:
 
-* Pretraining-safe, non-destructive text preservation
-* Full preservation of repetition and boilerplate
-* Aggressive quality or semantic filtering
-* Language-specific or domain-specific cleanup
-* Exact visual layout preservation
+- Full preservation of repetition and boilerplate is required
+- Text is intended for direct LLM pretraining
+- Aggressive filtering or quality heuristics are desired
+- Language- or domain-specific rules are required
 
-Such behavior should be implemented via
-**custom or explicitly opt-in profiles** (e.g. `llm_pretrain_v1`).
+Such use cases require a **different, explicitly scoped profile**
+(e.g. `llm_pretrain_v1`).
 
 ---
 
 ## Versioning & Stability
 
-* `web_common_v1` is stable across all `1.x` releases
-* Behavior will not change without a major version bump
-* The profile may be deprecated in the future, but
-  **will never be silently changed**
-* Any behavioral changes require a new profile version
-  (e.g. `web_common_v2`)
-
-This reflects the library’s guiding principle:
+- `web_common_v1` is stable across all `1.x` releases
+- Its behavior will not change without a major version bump
+- It may be deprecated, but will never be silently modified
+- Any behavioral change requires a new profile version
 
 **Profiles evolve. Contracts do not.**

@@ -1,49 +1,95 @@
-# DeduplicationBlock
+# ExactParagraphDeduplicationBlock
 
-The `DeduplicationBlock` removes **exact duplicate paragraphs**
+The `ExactParagraphDeduplicationBlock` removes **exact duplicate paragraphs**
 within a single document.
 
-Deduplication is **local, deterministic, and conservative** by design.
+Deduplication is **local, deterministic, order-preserving, and conservative**.
+
+This block is part of the **stable core**.
 
 ---
 
-## What it does
+## Scope
 
-- Splits text into paragraphs
-- Normalizes paragraphs for comparison only
-- Removes repeated paragraphs
-- Preserves first-occurrence order
+Deduplication is applied:
 
-Deduplication is performed **after normalization and formatting**
-to ensure stable comparisons.
+- **Within a single document only**
+- **At paragraph granularity**
+- **After normalization and formatting**
 
----
-
-## Normalization rules (comparison only)
-
-For deduplication keys:
-
-- Collapses whitespace
-- Lowercases text
-- Preserves punctuation
-- Uses exact string equality
-
-The **original paragraph text is preserved** in output.
+No cross-document or dataset-level deduplication is performed.
 
 ---
 
-## What it does NOT do
+## Behavior
 
-- ❌ No cross-document deduplication
-- ❌ No fuzzy or similarity-based matching
-- ❌ No semantic or embedding-based comparison
+The block performs the following steps:
+
+1. Split the document into paragraphs using blank-line boundaries
+2. Generate a comparison key for each paragraph
+3. Remove paragraphs whose comparison key has already been seen
+4. Preserve the first occurrence of each paragraph
+5. Preserve original paragraph text in output
+
+Paragraph order is preserved.
 
 ---
 
-## Design rationale
+## Comparison Key (Stable)
 
-Deduplication is intentionally limited to **exact, local repetition**
-to avoid false positives in narrative, legal, or technical text.
+Paragraphs are compared using a **non-semantic normalization key**:
 
-More aggressive deduplication strategies must be introduced
-via explicit, opt-in profiles.
+- Leading and trailing whitespace is stripped
+- Internal whitespace is collapsed
+- Text is lowercased
+- Punctuation is preserved
+- Exact string equality is used
+
+The normalized key is used **only for comparison**.
+The original paragraph content is retained.
+
+---
+
+## Guarantees
+
+When this block is applied:
+
+- Deduplication is deterministic
+- Only exact duplicates are removed
+- Paragraph order is preserved
+- Paragraph content is not rewritten
+- No semantic inference is performed
+
+---
+
+## Explicit Non-Behavior
+
+This block does **not**:
+
+- Perform fuzzy or similarity-based matching
+- Use embeddings or hashing
+- Deduplicate across documents
+- Deduplicate across datasets
+- Remove near-duplicates
+- Perform semantic comparison
+
+---
+
+## Stability
+
+- Behavior is stable as of `v1.x`
+- Any change requires:
+  - a new block, or
+  - a major version bump
+
+---
+
+## Notes on Use
+
+This block is intentionally conservative.
+
+More aggressive or cross-document deduplication must be implemented as:
+
+- a separate block
+- a dataset-level utility
+- or a profile-specific opt-in pipeline

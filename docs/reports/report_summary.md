@@ -1,48 +1,53 @@
 # report.summary
 
-The `report.summary()` utility provides a **deterministic, dataset-level overview**
-of how a text curation pipeline transformed a corpus.
+`report.summary()` is a **deterministic, dataset-level auditing utility**
+for text curation pipelines.
 
-It aggregates **per-sample curation reports** into a single,
-human-readable summary describing **structural changes** across the dataset.
+It provides a consolidated, human-readable view of how a curation
+profile transformed a corpus, without affecting curation behavior.
+
+This utility is part of the **stable reporting surface**.
 
 ---
 
-## Overview
+## Purpose
 
-`report.summary()` is designed to answer questions such as:
+`report.summary()` exists to make preprocessing **observable**.
 
-* How much text was removed or normalized?
-* How did corpus size change after curation?
-* What was the net effect of a profile at scale?
+It answers questions such as:
 
-The summary is **purely observational** and does **not**
-affect curation behavior.
+- How much text changed after curation?
+- What was removed, preserved, or normalized at scale?
+- Did a preprocessing run materially alter dataset structure?
+- Are two curation runs behaviorally equivalent?
+
+The summary is **descriptive only**.
+It does not modify data and does not influence curation decisions.
 
 ---
 
 ## Intended Use
 
-`report.summary()` is suitable for:
+`report.summary()` is intended for:
 
-* Auditing preprocessing runs
-* Comparing corpus size before and after curation
-* Monitoring large-scale dataset cleanup
-* Debugging and validating profile behavior
-* Producing reproducible preprocessing logs
+- Auditing preprocessing runs
+- Validating profile behavior at dataset scale
+- Comparing datasets before and after curation
+- Detecting unintended data drift
+- Producing reproducible preprocessing logs
 
-It is intended to be used **after** applying a curator
-with report collection enabled.
+It is designed to complement **profile guarantees**
+and **golden tests** with dataset-level visibility.
 
 ---
 
-## Usage
+## Enabling Reports During Curation
 
-### Enabling reports during curation
+To generate summaries, per-sample reports must be collected
+during curation.
 
 ```python
 from text_curation import TextCurator
-from datasets import Dataset
 
 curator = TextCurator.from_profile(
     "web_common_v1",
@@ -50,25 +55,21 @@ curator = TextCurator.from_profile(
 )
 
 cleaned = dataset.map(curator, batched=True)
-```
 
-This adds a `curation_report` column to the dataset.
+This adds a curation_report column to the dataset.
+No reports are generated unless explicitly enabled.
 
----
 
-### Generating a summary
-
-```python
+Generating a Summary
 from text_curation.reports import summary
 
 summary(cleaned)
-```
 
----
+The summary aggregates all per-sample reports
+into a single corpus-level view.
 
-## Example Output
 
-```
+Example Output
 Curation Summary
 ===========================
 Samples Processed: 60
@@ -80,117 +81,108 @@ Samples Processed: 60
 │ Lines       │    460 │    200 │     -260   │  -56.5%   │
 │ Paragraphs  │    120 │    100 │      -20   │  -16.7%   │
 └─────────────┴────────┴────────┴────────────┴───────────┘
-```
 
----
 
-## What the Summary Measures
+Metrics Reported
+The summary aggregates structural text statistics only.
 
-The summary aggregates **structural text statistics** only:
 
-| Metric       | Description                             |
-| ------------ | --------------------------------------- |
-| `chars`      | Total number of characters              |
-| `lines`      | Total number of newline-delimited lines |
-| `paragraphs` | Paragraphs separated by blank lines     |
 
-For each metric, the summary shows:
 
-* **Input**: Total before any blocks run
-* **Output**: Total after all blocks complete
-* **Δ (Change)**: Net difference (`output − input`)
-* **% Change**: Relative change compared to input
+Metric
+Description
 
----
 
-## Guarantees
 
-When using `report.summary()`, the following guarantees hold:
 
-* Aggregation is fully deterministic
-* No additional transformations are applied
-* Results are reproducible across runs
-* Statistics reflect actual document state
-* Output is independent of dataset ordering
+chars
+Total number of characters
 
-These guarantees are treated as part of the
-**reporting contract**.
 
----
+words
+Total number of whitespace-delimited words
 
-## What report.summary() Does *Not* Do
 
-By design, `report.summary()` does **not**:
+lines
+Total number of newline-delimited lines
 
-* Perform semantic or quality scoring
-* Rank or filter samples
-* Modify dataset contents
-* Infer document usefulness
-* Apply heuristics beyond existing blocks
 
-The summary is **descriptive, not prescriptive**.
+paragraphs
+Paragraphs separated by blank lines
 
----
 
-## Relationship to Profiles
 
-`report.summary()` is **profile-agnostic**.
 
-It works with any profile that emits curation reports, including:
+Guarantees
+When using report.summary():
 
-* `web_common_v1`
-* Custom user-defined profiles
-* Future opt-in profiles
 
-The summary reflects the **net effect of whatever profile was used**.
+Aggregation is fully deterministic
+Results are independent of dataset ordering
+No additional transformations are applied
+Statistics reflect actual post-curation document state
+Output format is stable and machine-inspectable
 
----
+These guarantees are part of the reporting contract.
 
-## Known Limitations (Intentional)
 
+What report.summary() Does Not Do
+By design, report.summary() does not:
+
+
+Perform semantic or quality scoring
+Rank or filter samples
+Modify dataset contents
+Infer document usefulness
+Apply heuristics beyond existing block behavior
+
+It is an observability tool, not a decision engine.
+
+
+Relationship to Profiles
+report.summary() is profile-agnostic.
+
+It reports the net effect of whatever profile was applied,
+including:
+
+
+web_common_v1
+llm_pretrain_v1
+Custom user-defined profiles
+
+The summary does not interpret whether the outcome is “good” or “bad”.
+It reports what happened.
+
+
+Known Limitations (Intentional)
 The following limitations are expected:
 
-* Only aggregate statistics are shown
-* Per-sample detail is not displayed
-* Semantic meaning is not evaluated
-* Block-level stats are shown only if blocks emit them
 
-For detailed inspection, individual `curation_report`
-entries should be examined directly.
+Only aggregate statistics are shown
+Per-sample details are not expanded
+Semantic meaning is not evaluated
+Block-level stats appear only if blocks emit them
 
----
+For deeper inspection, individual curation_report entries
+should be examined directly.
 
-## When Not to Use
 
-`report.summary()` may not be appropriate if you require:
+Versioning & Stability
 
-* Sample-level inspection
-* Semantic quality evaluation
-* ML-based scoring or ranking
-* Real-time streaming metrics
+report.summary() is stable in the 1.x series
+Output format is part of the public API
+Any format change requires an explicit version bump
 
-Such use cases should be handled by
-custom analysis pipelines.
 
----
+Summary
+report.summary() provides visibility without interference.
 
-## Versioning & Stability
+It allows preprocessing to be:
 
-* `report.summary()` is **stable as of v1.1.0**
-* Output format is considered part of the public API
-* Breaking changes require a minor or major version bump
 
----
+inspectable
+auditable
+reproducible
 
-## Summary
-
-`report.summary()` provides **visibility without interference**.
-
-It makes preprocessing runs:
-
-* Inspectable
-* Auditable
-* Reproducible
-
-— while preserving the conservative, deterministic
-design principles of `text-curation`.
+without compromising the conservative,
+deterministic design of text-curation.
