@@ -1,9 +1,19 @@
 # Roadmap
 
-This document outlines **planned and potential areas of future work**
+⚠️ **Non-binding roadmap**
+
+This document describes areas of exploration and possible future
+directions for `text-curation`.  
+It is **not a commitment** to implement specific features or timelines.
+
+Inclusion here does **not** guarantee implementation.
+
+---
+
+This document outlines **exploratory and potential areas of future work**
 for `text-curation`.
 
-The guiding direction of the project is to explore **well-defined,
+The guiding direction of the project is to support **well-defined,
 profile-based text curation pipelines** suitable for different stages
 of large-scale dataset preparation, including:
 
@@ -11,53 +21,59 @@ of large-scale dataset preparation, including:
 - pretraining corpora
 - fine-tuning and evaluation datasets
 
-All future work is expected to preserve the library’s
-**deterministic, conservative, and reproducible** design principles.
+All future work must preserve the library’s core principles:
+
+- determinism
+- conservative defaults
+- explicit behavior
+- long-term reproducibility
 
 ---
 
 ## Near-Term (1.x series)
 
-**Focus:** Strengthening general-purpose web text curation
+**Focus:** Strengthening general-purpose, conservative text curation
 
-Work in the `1.x` series is limited to:
+Work in the `1.x` series is intentionally constrained.
 
-- improving signal quality
-- expanding profile coverage
-- refining documentation and tests
+The following rules apply:
 
-Default behavior of existing blocks and profiles
-**must not change**.
+- Default behavior of existing blocks **must not change**
+- Existing profiles **must not change**
+- All new behavior must be **opt-in**
+- Stability takes priority over feature velocity
 
-Potential areas include:
+Exploratory areas may include:
 
 - **Enhanced deduplication (opt-in only)**
-  - Paragraph-level and sliding-window deduplication
-  - Conservative exact or near-exact matching
+  - Paragraph-level or windowed deduplication
+  - Exact or near-exact matching
   - Never enabled by default
+  - Always profile-scoped
 
-- **Boilerplate scoring (non-destructive)**
-  - Continuous boilerplate likelihood signals
+- **Non-destructive boilerplate signals**
+  - Continuous boilerplate likelihood indicators
   - Paragraph- and document-level aggregation
-  - Filtering decisions remain explicit and opt-in
+  - Signals only; no implicit filtering
 
 - **Expanded built-in profiles**
   - Additional web-derived profiles (e.g. wiki-style, forum-style)
-  - Clearly scoped profile contracts and guarantees
+  - Clearly scoped behavior and guarantees
+  - Explicit versioning and golden tests
 
-- **Improved documentation**
+- **Documentation hardening**
   - Block-level behavioral specifications
   - Profile contracts with before/after examples
   - Dataset-oriented usage guidance
 
 ---
 
-## Medium-Term (2.x candidates)
+## Possible 2.x Directions
 
 **Focus:** Richer structure awareness and extensibility
 
-The following areas may be explored in future major releases.
-All such behavior must remain **opt-in or profile-specific**.
+The following areas may be explored in future **major** releases.
+All such behavior must remain **explicit, opt-in, and profile-scoped**.
 
 - **HTML-aware preprocessing**
   - Tag-aware text extraction
@@ -66,37 +82,36 @@ All such behavior must remain **opt-in or profile-specific**.
 
 - **Advanced deduplication strategies**
   - Optional fuzzy or similarity-based deduplication
-  - Strictly scoped to specific profiles or use cases
+  - Strictly limited to specific profiles
   - Never enabled implicitly
 
 - **Profile composition and reuse**
   - Shared profile components
-  - Explicit composition or inheritance semantics
-  - Improved auditability of profile changes
+  - Explicit composition semantics
+  - Full auditability of derived profiles
 
 ---
 
-## Long-Term Direction
+## Exploratory Directions (Longer Term)
 
-**Focus:** Dataset preparation across multiple levels of granularity
+**Focus:** Clear separation of curation responsibilities by granularity
 
-Longer-term exploration may focus on clearer separation of
-responsibilities across different levels of text curation:
+Longer-term exploration may focus on clearer boundaries between:
 
 - **Paragraph-level curation**
   - Structure detection
-  - Boilerplate scoring
+  - Boilerplate signaling
   - Local deduplication
 
 - **Sample-level curation**
   - Document consistency checks
   - Aggregate signal thresholds
-  - Conservative sample filtering
+  - Explicit, opt-in sample filtering
 
-- **Document-level curation**
-  - Repetition and template detection
-  - Metadata-aware filtering hooks
-  - Profile-specific cleanup strategies
+- **Corpus-level curation**
+  - Template and repetition detection
+  - Dataset-wide deduplication utilities
+  - Metadata-aware hooks
 
 These directions are intended to support different dataset needs, such as:
 
@@ -108,13 +123,13 @@ These directions are intended to support different dataset needs, such as:
 
 ## Explicitly Out of Scope
 
-The following are **intentionally not planned**:
+The following are intentionally **not planned**:
 
 - ML-based quality scoring or ranking
 - Automatic semantic classification
 - Language-specific default rules
 - Aggressive or opaque content pruning
-- Model-dependent preprocessing logic
+- Model- or tokenizer-dependent preprocessing
 
 Such behavior is better handled by downstream systems
 or explicitly opt-in tooling.
@@ -123,11 +138,14 @@ or explicitly opt-in tooling.
 
 ## Stability Commitment
 
-Future changes are expected to be introduced in a way that:
+All future changes must adhere to the following rules:
 
-- preserves existing profile behavior
-- maintains reproducibility guarantees
-- avoids silent changes to defaults
+- Existing profile behavior is preserved
+- Default block behavior is stable
+- Silent behavior changes are forbidden
 
-Breaking changes will require a major version bump
-and explicit communication.
+Breaking changes require:
+
+- a major version bump
+- explicit documentation
+- updated golden tests

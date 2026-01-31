@@ -1,93 +1,165 @@
 # Formatting Blocks
 
-Formatting is implemented as **two distinct, ordered blocks**
-to preserve structure while improving readability.
+Formatting in `text-curation` is implemented as a **two-stage pipeline**
+with strict ordering and stability guarantees.
 
-Formatting operates at the **line and paragraph level**
-and is intentionally conservative.
+Formatting is **structural**, not semantic.
+
+These blocks are part of the **stable core**.
 
 ---
 
-## Formatting pipeline
+## Formatting Pipeline (Mandatory Order)
 
-Formatting is composed of:
+Formatting consists of the following blocks, applied **in order**:
 
-1. **CodeSafeFormattingBlock**
-2. **ParagraphFormattingBlock**
+1. `CodeSafeFormattingBlock`
+2. `ParagraphFormattingBlock`
 
-Both blocks are required to achieve correct behavior.
+This ordering is **required**.
+
+Reordering or omitting blocks may result in undefined behavior
+and is not supported by any built-in profile.
 
 ---
 
 ## CodeSafeFormattingBlock
 
-This block performs **structural normalization only**.
+The `CodeSafeFormattingBlock` performs **structural hygiene only**.
 
-### What it does
+It exists to normalize low-risk whitespace artifacts
+without altering content meaning or structure.
 
-- Normalizes line endings
-- Trims trailing whitespace
-- Collapses excessive blank lines
-- Preserves indentation-sensitive content verbatim
+---
+
+### Behavior
+
+This block performs the following operations:
+
+- Normalize line endings to `\n`
+- Trim trailing whitespace on each line
+- Collapse runs of more than two blank lines
+
+---
 
 ### Guarantees
 
-- Leading indentation is never removed
+When this block is applied:
+
+- Leading indentation is preserved exactly
+- Relative indentation is preserved
 - No lines are merged
-- No semantics are altered
+- No lines are split
+- No content is rewritten
+
+This block is safe for indentation-sensitive content,
+including code blocks and configuration files.
+
+---
+
+### Explicit Non-Behavior
+
+This block does **not**:
+
+- Normalize indentation width
+- Align indentation
+- Reflow text
+- Modify punctuation
+- Interpret language or syntax
 
 ---
 
 ## ParagraphFormattingBlock
 
-This block reconstructs **human-readable paragraph structure**
-and normalizes punctuation.
+The `ParagraphFormattingBlock` reconstructs **human-readable paragraph structure**
+from wrapped or line-broken prose.
 
-### What it does
-
-- Reconstructs paragraphs from wrapped text
-- Preserves indented blocks (e.g. code, quoted text)
-- Normalizes punctuation spacing
-- Preserves URLs, emails, IPs, and numeric formats
+It operates only at **explicit structural boundaries**.
 
 ---
 
-## Paragraph reconstruction rules (stable)
+### Behavior
 
-- Paragraphs are reconstructed **only at explicit boundaries**
-- Adjacent non-empty lines are **never merged implicitly**
-- Blank lines flush paragraph buffers
-- Indented lines are preserved exactly
-- Relative indentation inside blocks is preserved
+This block performs the following operations:
 
-These rules are enforced by tests and considered stable.
+- Reconstruct paragraphs from wrapped prose
+- Preserve indented lines verbatim
+- Respect explicit blank-line boundaries
+- Normalize punctuation spacing (when enabled)
+
+Paragraph reconstruction is applied **only** when paragraph intent
+can be determined conservatively.
 
 ---
 
-## Punctuation handling
+### Paragraph Reconstruction Rules (Stable)
+
+Paragraph reconstruction follows these rules exactly:
+
+- Blank lines always terminate a paragraph buffer
+- Indented lines are never merged with surrounding text
+- Adjacent lines are merged **only** when:
+  - The paragraph is identified as prose
+  - The previous line does not terminate a sentence
+- Non-prose blocks flush the buffer immediately
+- Original line order is preserved
+
+These rules are enforced by tests and are considered stable.
+
+---
+
+### Punctuation Normalization
+
+When enabled, punctuation normalization:
 
 - Fixes spacing around `, ! ? : ;`
-- Does **not** modify:
+- Reduces excessive punctuation runs (e.g. `!!!!` → `!`)
+- Preserves:
   - URLs
   - email addresses
   - IP addresses
-  - numeric separators
-  - time formats
+  - numeric formats
+  - timestamps
 
 ---
 
-## What formatting does NOT do
+### Guarantees
 
-- ❌ No sentence splitting
-- ❌ No Markdown parsing
-- ❌ No HTML awareness
-- ❌ No aggressive reflowing
+When this block is applied:
+
+- Paragraph semantics are preserved
+- Indentation-sensitive content is preserved
+- No implicit sentence splitting occurs
+- No semantic rewriting occurs
 
 ---
 
-## Design rationale
+### Explicit Non-Behavior
 
-Formatting improves **readability and consistency**
-without making assumptions about document semantics.
+This block does **not**:
 
-Preserving paragraph meaning is prioritized over visual uniformity.
+- Perform sentence tokenization
+- Parse Markdown or HTML
+- Infer document structure semantically
+- Merge unrelated lines
+- Normalize stylistic formatting
+
+---
+
+## Stability
+
+- Formatting behavior is stable as of `v1.x`
+- Formatting regressions are considered **high-risk**
+- Any behavioral change requires:
+  - new tests
+  - a new block, or
+  - a major version bump
+
+---
+
+## Notes on Use
+
+Formatting exists to improve **readability and consistency**
+without sacrificing semantic integrity.
+
+When in doubt, formatting **does less**, not more.
