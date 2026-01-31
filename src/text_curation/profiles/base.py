@@ -17,6 +17,7 @@ class Profile:
         version: str,
         blocks: list,
         guarantees: dict | None = None,
+        behavior: dict | None = None,
     ):
         """
         Create a new profile definition.
@@ -30,7 +31,12 @@ class Profile:
         self.name = name
         self.version = version
         self.blocks = blocks
+
+        # Hard, encoded properties
         self.guarantees = guarantees or {}
+
+        # Descriptive, non-contractual properties
+        self.behavior = behavior or {}
 
     @property
     def id(self) -> str:

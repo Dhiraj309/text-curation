@@ -14,31 +14,21 @@ PROFILE = Profile(
         NormalizationBlock(),
         CodeSafeFormattingBlock(),
     ],
-    guarantees = {
-        # Reproducibility
+    guarantees={
         "deterministic": True,
-        "order_independent": True,
-
-        # Safety
+        "explicit_block_order": True,
+        "profile_id_fully_specifies_behavior": True,
+        "no_hidden_global_state": True,
+        "document_local_transforms_only": True,
+    },
+    behavior = {
         "secrets_redacted": True,
-        "pii_removed": False,
-
-        # Structure
         "structure_preserved": True,
         "layout_preserved": True,
         "code_safe": True,
-
-        # Content policy
-        "content_removed": False,
-        "content_rewritten": False,
-
-        # Repetition & dedup
-        "deduplication": False,
+        "content_filtering_applied": False,
         "repetition_preserved": True,
-
-        # Semantics
         "semantic_filtering": False,
-        "heuristic_scoring": False,
     },
 )
 

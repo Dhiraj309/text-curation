@@ -4,7 +4,7 @@ This directory contains **specification-level documentation**
 for the `text-curation` library.
 
 These documents define **behavioral contracts**, **design invariants**,
-and **stability guarantees** for the system.
+and **documented behavior** for the system.
 
 They are intentionally **not tutorials**.
 
@@ -19,8 +19,11 @@ The documentation in this directory exists to:
 - Make preprocessing behavior **auditable and reproducible**
 - Prevent silent semantic or structural drift over time
 
+**Hard guarantees are explicitly identified and mechanically enforced.**  
+All other documented behavior describes **intended outcomes**, not enforceable guarantees.
+
 If something is documented here, it is treated as part of the
-library’s **public contract**.
+library’s **public contract** within those constraints.
 
 ---
 
@@ -31,11 +34,16 @@ library’s **public contract**.
 Block documentation defines:
 
 - What each block does
-- What each block guarantees
+- Which behaviors are **guaranteed**
+- Which behaviors are **explicitly not performed**
 - What must **never change** without a breaking release
 
 Block docs describe **local, isolated behavior** only.
 They do not define end-to-end pipelines.
+
+Blocks are **low-level deterministic primitives** intended for
+profile authors and library extension.
+Most users should rely on **profiles**, not compose blocks directly.
 
 ---
 
@@ -45,11 +53,13 @@ Profile documentation defines:
 
 - End-to-end pipeline behavior
 - Ordering and interaction of blocks
-- User-facing guarantees and limitations
+- **Hard guarantees** (enforced)
+- **Intended behavior** (not guaranteed)
+- Explicit limitations and non-goals
 - Intended and non-intended use cases
 
 Profiles are treated as **versioned artifacts**.
-Once released, their documented behavior must not change.
+Once released, their documented behavior **must not change**.
 
 ---
 
@@ -86,7 +96,8 @@ Reporting documentation defines:
 - Aggregation semantics
 - Stability guarantees for reporting outputs
 
-Reporting utilities are descriptive and **never affect curation behavior**.
+Reporting utilities are **descriptive only** and
+**never affect curation behavior**.
 
 ---
 
@@ -107,7 +118,7 @@ Implementation details are not authoritative.
 
 ## Relationship to Tests
 
-All documented behavior is enforced by:
+All **hard guarantees** are enforced by:
 
 - Block-level unit tests
 - Profile-level golden tests
@@ -138,10 +149,10 @@ Documentation updates are required when:
 
 - A new block is added
 - A new profile or profile version is introduced
-- A stability guarantee changes
+- A hard guarantee changes
 - A non-goal is clarified or added
 
-Documentation should describe **behavioral contracts**,
+Documentation must describe **behavioral contracts** and **intentional limits**,
 not implementation details or future intentions.
 
 ---
@@ -155,5 +166,5 @@ This documentation exists to make text curation:
 - reproducible
 - stable over time
 
-If a behavior is not documented or tested,
-it must be treated as undefined.
+If a behavior is not documented **or not enforced by tests**,
+it must be treated as **undefined**.
