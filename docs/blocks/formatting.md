@@ -1,93 +1,52 @@
 # Formatting Blocks
 
-Formatting is implemented as **two distinct, ordered blocks**
-to preserve structure while improving readability.
+Formatting in `text-curation` is implemented as a **two-stage pipeline**
+with strict ordering and stability guarantees.
 
-Formatting operates at the **line and paragraph level**
-and is intentionally conservative.
+Formatting is **structural**, not semantic.
+
+These blocks are part of the **stable core**.
+
+These blocks are **low-level deterministic primitives** intended for
+profile authors and library extension.
+Most users should rely on profiles rather than composing blocks directly.
 
 ---
 
-## Formatting pipeline
+## Formatting Pipeline (Mandatory Order)
 
-Formatting is composed of:
+1. `CodeSafeFormattingBlock`
+2. `ParagraphFormattingBlock`
 
-1. **CodeSafeFormattingBlock**
-2. **ParagraphFormattingBlock**
-
-Both blocks are required to achieve correct behavior.
+This ordering is **required**.
 
 ---
 
 ## CodeSafeFormattingBlock
 
-This block performs **structural normalization only**.
-
-### What it does
-
-- Normalizes line endings
-- Trims trailing whitespace
-- Collapses excessive blank lines
-- Preserves indentation-sensitive content verbatim
+Performs structural whitespace hygiene only.
 
 ### Guarantees
 
-- Leading indentation is never removed
-- No lines are merged
-- No semantics are altered
+- Leading indentation preserved
+- No line merging or splitting
+- Safe for code and config files
 
 ---
 
 ## ParagraphFormattingBlock
 
-This block reconstructs **human-readable paragraph structure**
-and normalizes punctuation.
+Reconstructs readable paragraph structure conservatively.
 
-### What it does
+### Guarantees
 
-- Reconstructs paragraphs from wrapped text
-- Preserves indented blocks (e.g. code, quoted text)
-- Normalizes punctuation spacing
-- Preserves URLs, emails, IPs, and numeric formats
+- Paragraph semantics preserved
+- Indentation-sensitive content preserved
+- No semantic rewriting
 
 ---
 
-## Paragraph reconstruction rules (stable)
+## Stability
 
-- Paragraphs are reconstructed **only at explicit boundaries**
-- Adjacent non-empty lines are **never merged implicitly**
-- Blank lines flush paragraph buffers
-- Indented lines are preserved exactly
-- Relative indentation inside blocks is preserved
-
-These rules are enforced by tests and considered stable.
-
----
-
-## Punctuation handling
-
-- Fixes spacing around `, ! ? : ;`
-- Does **not** modify:
-  - URLs
-  - email addresses
-  - IP addresses
-  - numeric separators
-  - time formats
-
----
-
-## What formatting does NOT do
-
-- ❌ No sentence splitting
-- ❌ No Markdown parsing
-- ❌ No HTML awareness
-- ❌ No aggressive reflowing
-
----
-
-## Design rationale
-
-Formatting improves **readability and consistency**
-without making assumptions about document semantics.
-
-Preserving paragraph meaning is prioritized over visual uniformity.
+Formatting behavior is stable as of `v1.x`.
+Any behavioral change requires a major version bump.

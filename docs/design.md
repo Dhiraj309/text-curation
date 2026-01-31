@@ -1,102 +1,49 @@
-# Design Philosophy
+# Design Invariants
 
-`text-curation` is designed as a **deterministic, structure-aware text curation system**
-for large-scale dataset preprocessing.
+`text-curation` is a **deterministic, structure-aware text curation system**
+designed for large-scale dataset preprocessing.
 
-This document explains the core design decisions and constraints
-that intentionally shape the library’s behavior and evolution.
+This document defines the **non-negotiable invariants** that govern
+the behavior, evolution, and contribution rules of the system.
 
----
-
-## Determinism First
-
-All transformations in `text-curation` are **rule-based and deterministic**.
-
-Given the same input text and the same profile:
-
-- Output is guaranteed to be identical across runs
-- No randomness or probabilistic behavior is introduced
-
-This property is essential for:
-
-- dataset reproducibility
-- long-running preprocessing pipelines
-- auditing and debugging data decisions
-
-Determinism is treated as a **hard requirement**, not an optimization.
+These invariants are treated as architectural law.
+Violations are considered bugs or breaking changes.
 
 ---
 
-## Why No Machine Learning
+## Guarantees vs Behavioral Descriptions
 
-Machine learning introduces:
+text-curation distinguishes between **hard guarantees** and
+**behavioral descriptions**.
 
-- non-deterministic behavior
-- opaque or hard-to-debug failure modes
-- dataset-dependent drift over time
+**Guarantees** are mechanically enforced by the execution model
+(e.g. determinism, explicit block order, absence of hidden state).
 
-For dataset curation, these properties are unacceptable.
+**Behavioral descriptions** document intended effects of profiles
+and blocks, but may vary depending on input data.
 
-Accordingly, `text-curation` deliberately avoids:
-
-- classifiers
-- learned heuristics
-- scoring or ranking models
-
-All semantic decisions must remain **explicit, inspectable, and stable**.
+Only guarantees are relied upon for reproducibility claims.
 
 ---
 
-## Profiles as Behavioral Contracts
+## 1. Determinism Is Mandatory
 
-A profile defines:
+All behavior in `text-curation` **must be deterministic**.
 
-- which blocks are applied
-- in what order
-- with which default policies
+Given:
+- the same input text
+- the same profile identifier
 
-Profiles are **versioned** and treated as **behavioral contracts**, not suggestions.
+The output **must be identical** across:
+- runs
+- machines
+- environments
 
-If a profile is named `web_common:v1`, its behavior is guaranteed
-not to change within the `1.x` series.
+The system **must not** introduce:
 
-Any behavior change requires:
+- randomness
+- probabilistic thresholds
+- data-dependent drift
+- time-dependent behavior
 
-- a new profile version, or
-- a major library version bump
-
-This contract is enforced by profile-level golden tests.
-
----
-
-## Conservative Defaults
-
-The library consistently prioritizes:
-
-- semantic preservation over cleanliness
-- false negatives over false positives
-- stability over aggressiveness
-
-Text that appears “messy” after processing is often left that way
-intentionally.
-
-This conservatism ensures that:
-
-- meaning is not silently altered
-- downstream consumers retain control
-- preprocessing decisions remain reversible and auditable
-
----
-
-## Explicit Non-Goals
-
-By design, `text-curation` does **not** attempt to:
-
-- infer document quality or author intent
-- aggressively remove all boilerplate or repetition
-- preserve exact visual formatting
-- perform language-specific transformations
-- apply semantic or topical filtering
-
-These constraints are essential to maintaining predictable,
-reproducible behavior at dataset scale.
+Determinism is a **hard requirement**, not an optimization.

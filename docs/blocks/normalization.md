@@ -1,52 +1,45 @@
 # NormalizationBlock
 
-The `NormalizationBlock` performs **low-level, non-semantic text normalization**
-to remove encoding artifacts and standardize common Unicode variations.
+The `NormalizationBlock` performs **low-level, non-semantic normalization**
+to remove encoding artifacts and standardize Unicode variants.
 
-This block is intentionally conservative.
+This block is part of the **stable core**.
 
----
-
-## What it does
-
-- Applies Unicode normalization (`NFKC`)
-- Removes zero-width characters
-- Removes control characters
-- Normalizes line endings
-- Normalizes quotation marks
-- Normalizes dash variants
-- Normalizes ellipses (`… → ...`)
-- Collapses runs of spaces and tabs
-- Limits excessive consecutive newlines
+This block is a **low-level deterministic primitive** intended for
+profile authors and library extension.
+Most users should rely on profiles rather than composing blocks directly.
 
 ---
 
-## What it does NOT do
+## Behavior (Stable)
 
-- ❌ No spelling correction
-- ❌ No OCR error correction
-- ❌ No language-specific rules
-- ❌ No sentence rewriting
+Normalization includes:
 
----
-
-## Design rationale
-
-Normalization is limited to **encoding and formatting artifacts**
-commonly found in scraped or copied text.
-
-All transformations are deterministic and reversible in principle.
+- Unicode normalization (NFKC)
+- Removal of zero-width and control characters
+- Canonicalization of quotes, dashes, ellipses
+- Conservative whitespace normalization
 
 ---
 
-## Typical use cases
+## Guarantees
 
-- Web-scraped text
-- OCR / PDF-derived text
-- Mixed-encoding corpora
+- Deterministic behavior
+- No semantic rewriting
+- Indentation preserved
+- Safe for code and logs
 
 ---
 
-## Signals
+## Explicit Non-Behavior
 
-This block does **not emit signals** and only mutates text.
+- No casing normalization
+- No spelling or grammar fixes
+- No paragraph restructuring
+
+---
+
+## Stability
+
+Stable as of `v1.x`.
+Changes require a major version bump.

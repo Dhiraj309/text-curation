@@ -1,5 +1,4 @@
-<!--
-Copyright 2026 The text-curation Authors.
+<!--Copyright 2026 The text-curation Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -24,7 +23,7 @@ You may obtain a copy of the License at
 </p>
 
 <p align="center">
-  <i>Profile-based, deterministic text curation pipelines for large-scale NLP datasets</i>
+  <i>Reproducible, auditable text preprocessing as a first-class artifact</i>
 </p>
 
 <p align="center">
@@ -54,131 +53,164 @@ You may obtain a copy of the License at
 
 ## Overview
 
-**text-curation** is a Python library for building **structured, profile-driven text curation pipelines**
-designed for **large-scale NLP datasets**, with first-class integration into the
+**text-curation** is a Python library for building **profile-driven, deterministic text curation pipelines**
+for **large-scale NLP datasets**, with first-class integration into the
 **Hugging Face Datasets** ecosystem.
 
-It focuses on **deterministic, inspectable, and conservative text transformations**
-for preparing corpora used in LLM training, evaluation, and analysis.
+It treats text preprocessing as a **versioned, inspectable artifact** rather than
+an ad-hoc collection of cleanup scripts.
 
-Rather than relying on ad-hoc cleanup scripts, `text-curation` promotes
-**explicit, versioned curation profiles** that make data preprocessing
-**reproducible, auditable, and stable over time**.
+All transformations are **explicit, deterministic, and conservative by default**,
+making dataset preparation **reproducible, auditable, and stable over time**.
 
 ---
 
-## Design Principles
+## Why text-curation exists
+
+Text preprocessing is one of the least reproducible stages of modern ML pipelines.
+
+In practice, it is often implemented as:
+- evolving regex scripts
+- undocumented heuristics
+- silent cleanup steps
+
+Small changes can significantly alter data distributions, yet are rarely tracked,
+audited, or reproducible.
+
+**text-curation** enforces the same rigor on data preprocessing that modern ML
+systems apply to models, tokenizers, and datasets.
+
+---
+
+## Canonical workflow
+
+The intended workflow is explicit and intentional:
+
+1. **Select a curation profile**  
+   A versioned, immutable description of preprocessing behavior.
+
+2. **Apply it to a dataset**  
+   Using Hugging Face Datasets at scale.
+
+3. **Inspect what changed**  
+   Via structured, dataset-level curation reports.
+
+4. **Freeze and publish the artifact**  
+   With the profile version as part of the dataset identity.
+
+This workflow is designed to prevent silent data drift and make preprocessing
+decisions inspectable.
+
+> **Profiles are the unit of behavior in text-curation.**  
+> Blocks are implementation details and are not part of the stability or
+> compatibility contract.
+
+---
+
+## Design principles
 
 - **Profile-driven pipelines**  
-  Reusable, declarative profiles define how text is curated for a given domain
-  (e.g. web, wiki, forums).
-
-- **Composable blocks**  
-  Each transformation is implemented as an isolated block with a single,
-  explicit responsibility.
+  Reusable, declarative profiles define *what* happens, not hidden heuristics.
 
 - **Deterministic and conservative**  
-  All transformations are rule-based and non-destructive by default,
-  prioritizing semantic preservation.
+  Given the same input and profile, output is identical across runs.
 
 - **Structure-aware processing**  
-  Text is treated as structured content (paragraphs, lists, headers),
-  not just raw strings.
+  Text is treated as structured content (paragraphs, lists, headers), not raw strings.
 
 - **Dataset-scale friendly**  
-  Designed to run efficiently on large Hugging Face Datasets using `.map`.
+  Designed for efficient use with large Hugging Face Datasets.
+
+- **Explicit over clever**  
+  No probabilistic inference, no semantic guessing, no silent behavior.
 
 ---
 
-## Scope & Stability (v1.3.4)
+## Stability & scope
 
-As of **v1.3.4**, `text-curation` provides a **stable and extensible core**
-for structure-aware text curation of real-world, messy data.
+Only features **explicitly documented as stable** are guaranteed not to change
+across minor releases.
 
-The default behavior and semantics of the core blocks and built-in profiles
-are considered **stable** and will not change without a major version bump.
+### Stable
+- Built-in profiles and their behavior
+- `TextCurator` public API
+- Curation report formats
 
-Stability is enforced through **block-level unit tests and golden profile tests**,
-which act as executable specifications.
+### Experimental
+- New blocks
+- Dataset-level utilities
+- New profiles until documented as stable
 
-The library intentionally focuses on **deterministic preprocessing**
-rather than semantic classification or machine-learning-based filtering.
-
----
-
-## Core Blocks (Stable)
-
-The following blocks are part of the **stable core** in v1.3.4.
-
-- **Normalization**  
-  Canonicalizes Unicode and typography (quotes, dashes, ellipses),
-  removes control and zero-width characters, and normalizes whitespace.
-
-- **Formatting**  
-  Reconstructs paragraph structure, normalizes punctuation spacing,
-  and preserves indentation-sensitive content such as code blocks.
-  Paragraph semantics are preserved by design.
-
-- **Redaction**  
-  Masks sensitive content such as emails, API tokens, and embedded credentials
-  using explicit, non-destructive placeholders.
-
-- **Structure**  
-  Detects headers, lists, repetition, and boilerplate indicators,
-  emitting inspectable signals without mutating text.
-
-- **Filtering**  
-  Applies conservative, signal-based removal of empty or low-value paragraphs.
-
-- **Deduplication**  
-  Performs exact, paragraph-level deduplication using normalization-safe keys.
-
-More aggressive semantic filtering, fuzzy deduplication, or heuristic cleanup
-are intentionally **not enabled by default** and may be introduced only via
-explicit opt-in profiles in future releases.
+Profiles are treated as **behavioral contracts**.
+Once released, their semantics do not change.
 
 ---
 
-## Non-Goals
+## Profiles
 
-`text-curation` intentionally does **not** attempt to:
+Profiles define **what preprocessing behavior is applied and in what order**.
+
+They are:
+- Explicitly versioned
+- Registered at import time
+- Resolved via a global registry
+
+Conceptually, a profile defines an ordered sequence of deterministic transformations.
+The specific block composition is an implementation detail and not part of the
+public contract.
+
+Profiles may be deprecated, but are never silently modified.
+
+---
+
+## Implementation primitives (advanced)
+
+Blocks are low-level, deterministic primitives intended for profile authors and
+library extension.
+
+End users should consume behavior exclusively via profiles.
+
+Stable primitives include:
+
+- **Normalization** — Unicode, typography, whitespace normalization
+- **Formatting** — Paragraph reconstruction and code-safe formatting
+- **Redaction** — Deterministic masking of emails and explicit tokens
+- **Structure** — Emission of inspectable structural signals
+- **Filtering** — Conservative, signal-based removal
+- **Deduplication** — Exact, normalization-safe paragraph deduplication
+
+More aggressive or semantic behavior is intentionally out of scope by default.
+
+---
+
+## Non-goals
+
+text-curation intentionally does not:
 
 - Perform semantic or topical classification
 - Use machine learning or probabilistic heuristics
 - Infer document quality or intent
-- Preserve exact visual formatting of source text
-- Aggressively remove all boilerplate or repetition by default
+- Apply aggressive, irreversible cleanup by default
 
-These constraints are **by design** and are critical to ensuring
-predictable, reproducible dataset preprocessing.
+These constraints are critical to reproducibility.
 
 ---
 
 ## Installation
 
-`text-curation` supports **Python ≥ 3.9**.
-
-Install from PyPI:
+Python ≥ 3.9 is required.
 
 ```bash
 pip install text-curation
-````
 
-Or install from source for development:
+For development:
 
-```bash
 git clone https://github.com/Dhiraj309/text-curation.git
 cd text-curation
 pip install -e .
-```
 
----
 
-## Quickstart
-
-### Curating a Hugging Face Dataset
-
-```python
+Quickstart
 from datasets import load_dataset
 from text_curation import TextCurator
 
@@ -187,116 +219,67 @@ dataset = load_dataset(
     split="train",
 )
 
-curator = TextCurator.from_profile("web_common:v1")
+curator = TextCurator.from_profile(
+    "web_common_v1",
+    collect_reports=True,
+)
 
-cleaned = dataset.map(
+dataset = dataset.map(
     curator,
     batched=True,
     num_proc=4,
 )
-```
 
-The curator is a **pure function**:
-it takes a batch dictionary and returns a dictionary with the same schema,
-making it fully compatible with Hugging Face Datasets.
 
----
+Reporting
+Curation reports describe what changed, not just what was produced.
 
-## Profiles
+from text_curation.reports import summary
+summary(dataset)
 
-Profiles define **which blocks are applied and in what order**.
+Reports enable:
 
-Profiles are:
 
-* Explicitly versioned
-* Registered at import time
-* Resolved via a global registry
+auditing preprocessing behavior
+detecting dataset drift
+comparing profiles
 
-Conceptual example:
+They never affect curation behavior.
 
-```python
-web_common_v1 = [
-    RedactionBlock(),
-    NormalizationBlock(),
-    CodeSafeFormattingBlock(),
-    ParagraphFormattingBlock(),
-    BasicStructureBlock(),
-    ExactParagraphDeduplicationBlock(),
-]
-```
 
-Profiles are referenced using explicit version identifiers
-(e.g. `web_common:v1`) to ensure **long-term reproducibility and auditability**.
+When not to use text-curation
 
-Profiles may be deprecated, but are never silently changed.
+One-off regex cleanup
+Already-curated datasets
+ML-based content scoring or classification
 
----
 
-## Designed For
+Versioning
+This project follows Semantic Versioning.
 
-* Web-scale datasets (C4-like, Common Crawl, scraped corpora)
-* OCR- and PDF-derived text
-* Forums, blogs, and user-generated content
-* Dataset preprocessing prior to LLM training or evaluation
 
-The library is intentionally **model-agnostic** and does not depend on
-tokenizers, embeddings, or classifiers.
+1.x guarantees stable default behavior
+Breaking changes require a major version bump
+Profiles are versioned independently of library releases
 
----
 
-## Why text-curation?
-
-* Cleaning text is not just normalization — **structure and repetition matter**
-* Ad-hoc scripts do not scale or reproduce
-* Dataset curation deserves the same rigor as model training
-* Explicit pipelines make data decisions inspectable and debuggable
-
-`text-curation` is designed to be the **data-side analogue**
-of model-definition libraries in the Hugging Face ecosystem.
-
----
-
-## When should you *not* use text-curation?
-
-* If you only need a one-off regex cleanup
-* If your data is already fully curated
-* If you require ML-based content classification or scoring
-
----
-
-## Versioning & Compatibility
-
-This project follows **semantic versioning**.
-
-* `1.x` releases guarantee stable default behavior
-* Breaking changes require a major version bump
-* Profiles are versioned independently of library versions
-  to preserve long-term reproducibility
-
----
-
-## Contributing
-
+Contributing
 Contributions are welcome.
 
-When adding new blocks or profiles:
+Please read CONTRIBUTING.md before submitting changes.
 
-* Keep transformations deterministic
-* Avoid destructive defaults
-* Include clear before/after examples
-* Add or update tests to lock in behavior
+Key expectations:
 
-See `CONTRIBUTING.md` for details.
 
----
+Deterministic behavior
+Conservative defaults
+Tests as specifications
+No silent behavior changes
 
-## License
 
-Apache 2.0. See [LICENSE](LICENSE).
+License
+Apache 2.0. See LICENSE.
 
----
 
-## Acknowledgements
-
-Inspired by large-scale dataset curation practices
-in the Hugging Face ecosystem.
+Acknowledgements
+Inspired by large-scale dataset curation practices in the Hugging Face ecosystem.

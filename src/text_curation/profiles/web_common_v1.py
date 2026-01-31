@@ -51,30 +51,21 @@ PROFILE = Profile(
         ),
     ],
     guarantees = {
-        # Reproducibility
         "deterministic": True,
-        "order_independent": True,
+        "explicit_block_order": True,
+        "profile_id_fully_specifies_behavior": True,
+        "no_hidden_global_state": True,
+        "document_local_transforms_only": True,
+    },
 
-        # Safety
+    behavior = {
         "secrets_redacted": True,
-        "pii_removed": False,
-
-        # Structure
         "structure_preserved": True,
         "layout_preserved": False,
         "code_safe": True,
-
-        # Content policy
-        "content_removed": True,
-        "content_rewritten": False,
-
-        # Repetition & dedup
-        "deduplication": True,
+        "content_filtering_applied": True,
         "repetition_preserved": False,
-
-        # Semantics
         "semantic_filtering": False,
-        "heuristic_scoring": True,
     },
 )
 

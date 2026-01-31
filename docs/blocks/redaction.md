@@ -1,47 +1,40 @@
 # RedactionBlock
 
-The `RedactionBlock` masks **sensitive information**
-using deterministic, pattern-based matching.
+The `RedactionBlock` masks **explicitly recognized sensitive tokens**
+using deterministic pattern matching.
 
-All redaction is performed via **non-destructive masking**.
+This block is part of the **stable core**.
 
----
-
-## What it does
-
-- Redacts email addresses → `<EMAIL>`
-- Redacts API tokens → `<TOKEN>`
-- Redacts credentials embedded in URLs → `<REDACTED>`
+This block is a **low-level deterministic primitive** intended for
+profile authors and library extension.
+Most users should rely on profiles rather than composing blocks directly.
 
 ---
 
-## Supported token patterns
+## Behavior (Stable)
 
-- `sk-*` (OpenAI-style keys)
-- `hf_*` (Hugging Face tokens)
-- `ghp_*` (GitHub tokens)
-- `api_*`, `key_*`
-
----
-
-## What it does NOT do
-
-- ❌ No entropy-based secret detection
-- ❌ No hashing or encryption
-- ❌ No logging of secrets
-- ❌ No redaction of generic IDs or checksums
+- Email addresses → `<EMAIL>`
+- Explicit API tokens → `<TOKEN>`
+- URL credentials → `<REDACTED>`
 
 ---
 
-## Design rationale
+## Guarantees
 
-Redaction prioritizes **safety and predictability**.
-
-Only well-defined patterns are masked to avoid accidental
-removal of non-sensitive identifiers.
+- Deterministic redaction
+- Narrow, explicit patterns only
+- Surrounding text preserved exactly
 
 ---
 
-## Signals
+## Explicit Non-Behavior
 
-This block does **not emit signals**.
+- No heuristic PII detection
+- No entropy-based matching
+- No semantic inference
+
+---
+
+## Stability
+
+Placeholders and patterns are stable as of `v1.x`.

@@ -1,51 +1,40 @@
-# StructureBlock
+# BasicStructureBlock
 
-The `StructureBlock` analyzes text structure and emits
-**inspectable signals** without mutating the text.
+The `BasicStructureBlock` emits **inspectable structural signals**
+without mutating text.
 
----
+This block is part of the **stable core**.
 
-## Signals emitted
-
-### Line-level signals
-
-- `is_blank`
-- `is_header`
-- `is_bullet`
-- `is_numbered_item`
-- `is_all_caps`
-- `is_short`
-- `repetition_count`
-
-### Paragraph-level signals
-
-- `is_list_block`
-- `is_boilerplate_candidate`
-- `repetition_count`
+This block is a **low-level deterministic primitive** intended for
+profile authors and library extension.
+Most users should rely on profiles rather than composing blocks directly.
 
 ---
 
-## Detection methods
+## Behavior
 
-- Regex-based pattern matching
-- Frequency-based repetition analysis
-- Conservative structural heuristics
-
----
-
-## What it does NOT do
-
-- ❌ No text modification
-- ❌ No semantic classification
-- ❌ No language detection
+- Line-level structural signals
+- Paragraph-level repetition signals
+- Deterministic, rule-based detection
 
 ---
 
-## Design rationale
+## Guarantees
 
-Structure signals intentionally separate **observation from decision**.
+- Text is never modified
+- Signal names and meanings are stable
+- No decisions are made implicitly
 
-They allow downstream blocks to make explicit,
-auditable choices without hidden logic.
+---
 
-This block is central to the library’s inspectability.
+## Explicit Non-Behavior
+
+- No filtering
+- No deduplication
+- No semantic classification
+
+---
+
+## Stability
+
+Signal definitions are stable as of `v1.x`.
