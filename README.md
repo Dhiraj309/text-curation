@@ -1,5 +1,4 @@
-<!--
-Copyright 2026 The text-curation Authors.
+<!--Copyright 2026 The text-curation Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -102,6 +101,10 @@ The intended workflow is explicit and intentional:
 This workflow is designed to prevent silent data drift and make preprocessing
 decisions inspectable.
 
+> **Profiles are the unit of behavior in text-curation.**  
+> Blocks are implementation details and are not part of the stability or
+> compatibility contract.
+
 ---
 
 ## Design principles
@@ -145,89 +148,69 @@ Once released, their semantics do not change.
 
 ## Profiles
 
-Profiles define **which blocks are applied and in what order**.
+Profiles define **what preprocessing behavior is applied and in what order**.
 
 They are:
 - Explicitly versioned
 - Registered at import time
 - Resolved via a global registry
 
-Example (conceptual):
+Conceptually, a profile defines an ordered sequence of deterministic transformations.
+The specific block composition is an implementation detail and not part of the
+public contract.
 
-```python
-web_common_v1 = [
-    RedactionBlock(),
-    NormalizationBlock(),
-    CodeSafeFormattingBlock(),
-    ParagraphFormattingBlock(),
-    BasicStructureBlock(),
-    ExactParagraphDeduplicationBlock(),
-]
-```
 Profiles may be deprecated, but are never silently modified.
-
 
 ---
 
-Core blocks (stable)
+## Implementation primitives (advanced)
 
-Blocks are low-level, deterministic primitives. Most users should rely on profiles, not compose blocks directly.
+Blocks are low-level, deterministic primitives intended for profile authors and
+library extension.
 
-Stable blocks include:
+End users should consume behavior exclusively via profiles.
 
-Normalization — Unicode, typography, whitespace normalization
+Stable primitives include:
 
-Formatting — Paragraph reconstruction and code-safe formatting
-
-Redaction — Deterministic masking of emails and explicit tokens
-
-Structure — Emission of inspectable structural signals
-
-Filtering — Conservative, signal-based removal
-
-Deduplication — Exact, normalization-safe paragraph deduplication
-
+- **Normalization** — Unicode, typography, whitespace normalization
+- **Formatting** — Paragraph reconstruction and code-safe formatting
+- **Redaction** — Deterministic masking of emails and explicit tokens
+- **Structure** — Emission of inspectable structural signals
+- **Filtering** — Conservative, signal-based removal
+- **Deduplication** — Exact, normalization-safe paragraph deduplication
 
 More aggressive or semantic behavior is intentionally out of scope by default.
 
-
 ---
 
-Non-goals
+## Non-goals
 
 text-curation intentionally does not:
 
-Perform semantic or topical classification
-
-Use machine learning or probabilistic heuristics
-
-Infer document quality or intent
-
-Apply aggressive, irreversible cleanup by default
-
+- Perform semantic or topical classification
+- Use machine learning or probabilistic heuristics
+- Infer document quality or intent
+- Apply aggressive, irreversible cleanup by default
 
 These constraints are critical to reproducibility.
 
-
 ---
 
-Installation
+## Installation
 
 Python ≥ 3.9 is required.
+
 ```bash
 pip install text-curation
-```
+
 For development:
-```bash
+
 git clone https://github.com/Dhiraj309/text-curation.git
 cd text-curation
 pip install -e .
-```
 
----
 
 Quickstart
-```python
 from datasets import load_dataset
 from text_curation import TextCurator
 
@@ -246,84 +229,57 @@ dataset = dataset.map(
     batched=True,
     num_proc=4,
 )
-```
 
----
 
 Reporting
-
 Curation reports describe what changed, not just what was produced.
-```python
+
 from text_curation.reports import summary
 summary(dataset)
-```
+
 Reports enable:
 
+
 auditing preprocessing behavior
-
 detecting dataset drift
-
 comparing profiles
-
 
 They never affect curation behavior.
 
 
----
-
 When not to use text-curation
 
 One-off regex cleanup
-
 Already-curated datasets
-
 ML-based content scoring or classification
 
 
-
----
-
 Versioning
-
 This project follows Semantic Versioning.
 
+
 1.x guarantees stable default behavior
-
 Breaking changes require a major version bump
-
 Profiles are versioned independently of library releases
 
 
-
----
-
 Contributing
-
 Contributions are welcome.
 
 Please read CONTRIBUTING.md before submitting changes.
 
 Key expectations:
 
+
 Deterministic behavior
-
 Conservative defaults
-
 Tests as specifications
-
 No silent behavior changes
 
 
-
----
-
 License
-
 Apache 2.0. See LICENSE.
 
 
----
-
 Acknowledgements
-
 Inspired by large-scale dataset curation practices in the Hugging Face ecosystem.

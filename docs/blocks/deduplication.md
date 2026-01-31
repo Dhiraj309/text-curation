@@ -7,6 +7,10 @@ Deduplication is **local, deterministic, order-preserving, and conservative**.
 
 This block is part of the **stable core**.
 
+This block is a **low-level deterministic primitive** intended for
+profile authors and library extension.
+Most users should rely on profiles rather than composing blocks directly.
+
 ---
 
 ## Scope
@@ -67,7 +71,7 @@ When this block is applied:
 This block does **not**:
 
 - Perform fuzzy or similarity-based matching
-- Use embeddings or hashing
+- Use embeddings, hashing, or ML
 - Deduplicate across documents
 - Deduplicate across datasets
 - Remove near-duplicates
@@ -88,8 +92,7 @@ This block does **not**:
 
 This block is intentionally conservative.
 
-More aggressive or cross-document deduplication must be implemented as:
+More aggressive or corpus-level deduplication must be implemented as:
 
-- a separate block
-- a dataset-level utility
-- or a profile-specific opt-in pipeline
+- a dataset-level utility, or
+- an explicitly versioned corpus operation

@@ -7,6 +7,10 @@ Filtering is **deterministic, conservative, and rule-based**.
 
 This block is part of the **stable core**.
 
+This block is a **low-level deterministic primitive** intended for
+profile authors and library extension.
+Most users should rely on profiles rather than composing blocks directly.
+
 ---
 
 ## Scope
@@ -28,7 +32,7 @@ For each paragraph, the block evaluates a fixed set of conditions.
 A paragraph is removed **if and only if** all required conditions
 are satisfied.
 
-The block performs no probabilistic scoring and no ranking.
+No probabilistic scoring or ranking is performed.
 
 ---
 
@@ -40,20 +44,19 @@ A paragraph is removed if:
    **OR**
 
 2. All of the following are true:
-   - The paragraph is marked as a boilerplate candidate
-   - The paragraph repetition count meets or exceeds the threshold
-   - The paragraph length is below the maximum length threshold
-   - The paragraph is not explicitly marked as a header
+   - Marked as a boilerplate candidate
+   - Repetition count meets or exceeds the threshold
+   - Paragraph length is below the maximum threshold
+   - Paragraph is not explicitly marked as a header
 
 All conditions must be satisfied exactly.
-No partial or heuristic removal is performed.
 
 ---
 
 ## Signal Dependencies
 
 This block consumes signals emitted by upstream structure analysis,
-including (but not limited to):
+including:
 
 - `paragraph[*].is_boilerplate_candidate`
 - `paragraph[*].repetition_count`
@@ -80,7 +83,6 @@ When this block is applied:
 This block does **not**:
 
 - Perform semantic quality filtering
-- Remove paragraphs based on language or topic
 - Rank or score paragraphs
 - Remove list blocks by default
 - Remove entire documents
@@ -91,22 +93,7 @@ This block does **not**:
 ## Stability
 
 - Behavior is stable as of `v1.x`
-- Changes to removal rules require:
+- Changes require:
   - a new block, or
   - a new profile version, or
   - a major version bump
-
----
-
-## Notes on Use
-
-This block is intentionally conservative.
-
-More aggressive filtering strategies must be implemented as:
-
-- a separate block
-- a profile-specific pipeline
-- or an explicit opt-in mechanism
-
-Filtering decisions must always remain
-explainable and auditable.
