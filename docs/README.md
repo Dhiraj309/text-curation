@@ -63,6 +63,24 @@ Once released, their documented behavior **must not change**.
 
 ---
 
+### Dataset Utilities (`docs/datasets/`)
+
+Dataset-level utilities (e.g. deduplication) define:
+
+- Operations applied to datasets as a whole
+- The scope and semantics of those operations
+- The meaning of any emitted reports or metadata
+
+Dataset utilities operate **only on the dataset as provided**.
+Reports produced by these utilities reflect the **state of the data at the time the operation is applied**.
+
+Subsequent transformations (for example, applying a curation profile)
+do not retroactively affect previously produced reports.
+
+No implicit ordering, enforcement, or automatic re-application is performed.
+
+---
+
 ### Design Documentation (`design.md`)
 
 Design documentation defines:
@@ -149,6 +167,7 @@ Documentation updates are required when:
 
 - A new block is added
 - A new profile or profile version is introduced
+- A new dataset-level utility is added
 - A hard guarantee changes
 - A non-goal is clarified or added
 
