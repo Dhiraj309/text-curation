@@ -205,12 +205,14 @@ pip install text-curation
 ```
 
 For development:
-```bashgit clone https://github.com/Dhiraj309/text-curation.git
+```bash
+git clone https://github.com/Dhiraj309/text-curation.git
 cd text-curation
 pip install -e .
 ```
 Quickstart
-```pythonfrom datasets import load_dataset
+```python
+from datasets import load_dataset
 from text_curation import TextCurator
 
 dataset = load_dataset(
@@ -231,7 +233,8 @@ dataset = dataset.map(
 ```
 Reporting
 Curation reports describe what changed, not just what was produced.
-```pythonfrom text_curation.reports import summary
+```python
+from text_curation.reports import summary
 summary(dataset)
 ```
 Reports enable:
