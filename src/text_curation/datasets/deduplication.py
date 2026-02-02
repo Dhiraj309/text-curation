@@ -62,7 +62,7 @@ def deduplicate_exact(
 
     removed_samples = total_samples - len(dedupe_dataset)
 
-    dedupe_report = {
+    report = {
         "operation": "deduplicate_exact",
         "scope": "dataset",
 
@@ -100,4 +100,4 @@ def deduplicate_exact(
         },
     }
 
-    return dedupe_dataset, dedupe_report
+    return dedupe_dataset, report

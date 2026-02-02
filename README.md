@@ -202,16 +202,15 @@ Python ≥ 3.9 is required.
 
 ```bash
 pip install text-curation
+```
 
 For development:
-
-git clone https://github.com/Dhiraj309/text-curation.git
+```bashgit clone https://github.com/Dhiraj309/text-curation.git
 cd text-curation
 pip install -e .
-
-
+```
 Quickstart
-from datasets import load_dataset
+```pythonfrom datasets import load_dataset
 from text_curation import TextCurator
 
 dataset = load_dataset(
@@ -229,14 +228,12 @@ dataset = dataset.map(
     batched=True,
     num_proc=4,
 )
-
-
+```
 Reporting
 Curation reports describe what changed, not just what was produced.
-
-from text_curation.reports import summary
+```pythonfrom text_curation.reports import summary
 summary(dataset)
-
+```
 Reports enable:
 
 

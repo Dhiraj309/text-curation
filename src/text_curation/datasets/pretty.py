@@ -1,4 +1,4 @@
-def dedupe_summary(report: dict):
+def dedupe_report(report: dict):
     """
     Pretty-print a dataset-level deduplication report.
     """
@@ -43,4 +43,36 @@ def dedupe_summary(report: dict):
     det = report["determinism"]
     print("Determinism:")
     print(f"  Order independent: {'yes' if det['order_independent'] else 'no'}")
+    print()
+
+def filter_report(report: dict):
+    """
+    Pretty-print a dataset-level filtering report.
+    """
+
+    print("Dataset Filtering Report")
+    print("=" * 26)
+    print()
+
+    print(f"Operation:   {report['operation']}")
+    print(f"Scope:       {report['scope']}")
+    print()
+    print("Description:")
+    print(f"  {report['description']}")
+    print()
+
+    inp = report["input"]["samples"]
+    out = report["output"]["samples"]
+    rem = report["removed"]["samples"]
+    frac = report["removed"]["fraction"] * 100
+
+    print("Samples:")
+    print(f"  Input:    {inp:,}")
+    print(f"  Output:   {out:,}")
+    print(f"  Removed:  {rem:,} ({frac:.1f}%)")
+    print()
+
+    det = report["determinism"]
+    print("Determinism:")
+    print(f"  Predicate pure: {'yes' if det['predicate_pure'] else 'no'}")
     print()
