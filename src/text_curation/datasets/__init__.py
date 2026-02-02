@@ -1,7 +1,9 @@
 from .deduplication import deduplicate_exact
-from .pretty import dedupe_summary
+from .filtering import filter_rows
+from .pretty import dedupe_report, filter_report
 
 __all__ = [
         "deduplicate_exact",
-        "dedupe_summary"
+        "dedupe_report",
+        "filter_report"
     ]
