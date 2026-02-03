@@ -1,15 +1,4 @@
-Below is a clean, tightened, HF-grade update of your CONTRIBUTING.md.
-
-Nothing here contradicts your current codebase.
-Nothing overpromises.
-The main changes are clarity, boundaries, and contributor safety rails.
-
-You can paste this as-is.
-
-
----
-
-Contributing to text-curation
+# Contributing to text-curation
 
 Thank you for considering contributing to text-curation 🙌
 
