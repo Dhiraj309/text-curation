@@ -74,5 +74,5 @@ def filter_report(report: dict):
 
     det = report["determinism"]
     print("Determinism:")
-    print(f"  Predicate pure: {'yes' if det['predicate_pure'] else 'no'}")
+    print(f"  Predicate assumed pure: yes")
     print()

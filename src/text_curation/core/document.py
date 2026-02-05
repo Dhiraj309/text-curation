@@ -38,6 +38,15 @@ class Document:
         """
         self.signals.append(Signal(name, value))
 
+    def summarize_signals(self) -> dict:
+        summary = {}
+
+        for sig in self.signals:
+            key = sig.name.split(".", 1)[-1]
+            summary[key] = summary.get(key, 0) + 1
+
+        return summary 
+
         
 
 def compute_basic_stats(text: str) -> dict:
@@ -59,12 +68,3 @@ def compute_basic_stats(text: str) -> dict:
         "lines": len(lines),
         "paragraphs": len(paragraphs)
     }
-
-def summarize_signals(self) -> dict:
-    summary = {}
-
-    for sig in self.signals:
-        key = sig.name.split(".", 1)[-1]
-        summary[key] = summary.get(key, 0) + 1
-
-    return summary 
