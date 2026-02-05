@@ -30,13 +30,14 @@ class Profile:
         """
         self.name = name
         self.version = version
-        self.blocks = blocks
+        # Freeze block sequence to prevent mutation
+        self.blocks = tuple(blocks)
 
         # Hard, encoded properties
-        self.guarantees = guarantees or {}
+        self.guarantees = dict(guarantees or {})
 
         # Descriptive, non-contractual properties
-        self.behavior = behavior or {}
+        self.behavior = dict(behavior or {})
 
     @property
     def id(self) -> str:
@@ -53,3 +54,25 @@ class Profile:
         Developer-friendly representation for debugging and logs.
         """
         return f"<Profile {self.id}>"
+    
+    def describe(self) -> dict:
+        """
+        Return a deterministic, insoectable description of the profile.
+
+        This description is intended for auditing and provenance tracking.
+        It does not affect execution behavior
+        """
+        return {
+            "id": self.id,
+            "name": self.name,
+            "version": self.version,
+            "blocks": [
+                {
+                    "type": block.__class__.__name__,
+                    "policy": dict(block.policy)
+                }
+                for block in self.blocks
+            ],
+            "guarantess": dict(self.guarantees),
+            "behavior": dict(self.behavior)
+        }

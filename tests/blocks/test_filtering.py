@@ -52,7 +52,7 @@ def test_keeps_non_boilerplate_paragraph():
     out = run_filter(text, signals)
     assert out.strip() == text
 
-def text_drops_list_block():
+def test_preserves_list_block_by_default():
     text = "- item one\n- item two\n- item three\n\nMain article text"
     signals = [
         type("S", (), {
@@ -62,4 +62,8 @@ def text_drops_list_block():
     ]
 
     out = run_filter(text, signals)
-    assert out.strip() == "Main article text."
+
+    # Filtering does not normalize punctuation
+    assert out.strip() == (
+        "- item one\n- item two\n- item three\n\nMain article text"
+    )

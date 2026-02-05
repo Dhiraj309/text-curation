@@ -15,7 +15,7 @@ def dedupe(text):
     ExactParagraphDeduplicationBlock().apply(doc)
     return doc.text
 
-def text_exact_duplicate_paragraph_removed():
+def test_exact_duplicate_paragraph_removed():
     text = "A paragraph.\n\nA paragraph."
     out = dedupe(text)
 
