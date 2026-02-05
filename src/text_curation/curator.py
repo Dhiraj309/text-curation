@@ -1,6 +1,6 @@
 from text_curation.core.pipeline import Pipeline
 from text_curation.registry import get_profile
-
+import copy
 
 class TextCurator:
     """
@@ -10,7 +10,11 @@ class TextCurator:
     def __init__(self, profile, collect_reports: bool = False):
         self.profile = profile
         self.collect_reports = collect_reports
-        self.pipeline = Pipeline(profile.blocks)
+
+        #Each pipeline must own its block instances
+        self.pipeline = Pipeline(
+            blocks=[copy.deepcopy(block) for block in profile.blocks]
+        )
 
     @classmethod
     def from_profile(cls, profile_id, *, collect_reports: bool = False):

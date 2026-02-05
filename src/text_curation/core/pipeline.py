@@ -1,3 +1,5 @@
+import copy
+
 class Pipeline:
     """
     Executes an ordered sequence of blocks over input text.
@@ -13,7 +15,7 @@ class Pipeline:
         Args:
             blocks: Iterable of Block instances
         """
-        self.blocks = blocks
+        self.blocks = [copy.deepcopy(block) for block in blocks]
 
     def run(self, text: str) -> str:
         """
@@ -63,7 +65,8 @@ class Pipeline:
             input_stats=input_stats,
             output_stats=output_stats,
             block_stats=block_stats or {},
-            signals_summary=document.summarize_signals() if hasattr(document, "summarize_signals") else {},
+            signals_summary=document.summarize_signals(),
+            extras={},
             )
         
         return document, report

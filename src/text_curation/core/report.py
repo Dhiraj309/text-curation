@@ -16,6 +16,9 @@ class CurationReport:
     block_stats: Dict[str, Dict[str, int]] = field(default_factory=dict)
     signals_summary: Dict[str, int] = field(default_factory=dict)
 
+    # Reserved namespace for future, non-breaking extensions
+    extras: Dict[str, Any] = field(default_factory=dict)
+
     def diff(self) -> Dict[str, int]:
         """
         Convenience elper: output minus input.

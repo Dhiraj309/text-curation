@@ -60,7 +60,7 @@ def filter_rows(
         },
 
         "determinism": {
-            "predicate_pure": True,
+            "predicate_assumed_pure": True,
         },
 
         "provenance": {

@@ -7,9 +7,14 @@ def register(profile):
     """
     Register a Profile instance globally.
 
-    Profiles are registered at import time to ensure deterministic
-    resolution and reproducibility.
+    Profile IDs must be globally unique. Duplicate registration is a fatal error
+    to preserve determinism and reproducibility.
     """
+    if profile.id in _PROFILES:
+        raise ValueError(
+            f"Profile '{profile.id}' is already registered."
+            "Profile IDs must be globally unique."
+        )
     _PROFILES[profile.id] = profile
 
 
