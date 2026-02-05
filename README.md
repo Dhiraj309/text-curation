@@ -202,15 +202,20 @@ Python ≥ 3.9 is required.
 
 ```bash
 pip install text-curation
-```
+````
 
 For development:
+
 ```bash
 git clone https://github.com/Dhiraj309/text-curation.git
 cd text-curation
 pip install -e .
 ```
-Quickstart
+
+---
+
+## Quickstart
+
 ```python
 from datasets import load_dataset
 from text_curation import TextCurator
@@ -231,55 +236,67 @@ dataset = dataset.map(
     num_proc=4,
 )
 ```
-Reporting
+
+---
+
+## Reporting
+
 Curation reports describe what changed, not just what was produced.
+
 ```python
 from text_curation.reports import summary
 summary(dataset)
 ```
+
 Reports enable:
 
-
-auditing preprocessing behavior
-detecting dataset drift
-comparing profiles
+* auditing preprocessing behavior
+* detecting dataset drift
+* comparing profiles
 
 They never affect curation behavior.
 
+---
 
-When not to use text-curation
+## When not to use text-curation
 
-One-off regex cleanup
-Already-curated datasets
-ML-based content scoring or classification
+* One-off regex cleanup
+* Already-curated datasets
+* ML-based content scoring or classification
 
+---
 
-Versioning
+## Versioning
+
 This project follows Semantic Versioning.
 
+* 1.x guarantees stable default behavior
+* Breaking changes require a major version bump
+* Profiles are versioned independently of library releases
 
-1.x guarantees stable default behavior
-Breaking changes require a major version bump
-Profiles are versioned independently of library releases
+---
 
+## Contributing
 
-Contributing
 Contributions are welcome.
 
 Please read CONTRIBUTING.md before submitting changes.
 
 Key expectations:
 
+* Deterministic behavior
+* Conservative defaults
+* Tests as specifications
+* No silent behavior changes
 
-Deterministic behavior
-Conservative defaults
-Tests as specifications
-No silent behavior changes
+---
 
+## License
 
-License
 Apache 2.0. See LICENSE.
 
+---
 
-Acknowledgements
+## Acknowledgements
+
 Inspired by large-scale dataset curation practices in the Hugging Face ecosystem.
