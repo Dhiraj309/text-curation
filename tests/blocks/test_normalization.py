@@ -15,7 +15,7 @@ def normalize(text):
     NormalizationBlock().apply(doc)
     return doc.text
 
-def text_unicode_and_whitespace():
+def test_unicode_and_whitespace():
     assert normalize("A\u00A0B") == "A B"
 
 def test_quotes_and_dashes():
