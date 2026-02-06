@@ -1,43 +1,55 @@
 from dataclasses import dataclass, field, asdict
 from typing import Dict, Any, List
 
-@dataclass
 class CurationReport:
     """
-    Immutable summary of a single curation run.
+    Immutable, fully-specified report describing how a single
+    document was transformed by a curation pipeline.
+
+    The schema is total: all fields are always present
     """
+    __slots__ = (
+        "profile_id",
+        "blocks",
+        "input_stats",
+        "output_stats",
+        "blocks_stats",
+        "signals_summary",
+        "extras"
+    )
 
-    profile_id: str
-    blocks: List[str]
+    def __init__(
+            self,
+            *,
+            profile_id: str,
+            blocks: list[str],
+            input_stats: dict,
+            output_stats: dict,
+            block_stats: dict | None = None,
+            signals_summary: dict | None = None,
+            extras: dict | None = None,
+            ):
+        
+        self.profile_id = profile_id
+        self.blocks = list(blocks)
+        self.input_stats = dict(input_stats)
+        self.output_stats = dict(output_stats)
 
-    input_stats: Dict[str, int]
-    output_stats: Dict[str, int]
-
-    block_stats: Dict[str, Dict[str, int]] | None
-    signals_summary: Dict[str, int] | None
-
-    # Reserved namespace for future, non-breaking extensions
-    extras: Dict[str, Any] = field(default_factory=dict)
-
-    def diff(self) -> Dict[str, int]:
-        """
-        Convenience elper: output minus input.
-        """
-        return {
-            k: self.output_stats.get(k, 0) - self.input_stats.get(k, 0)
-            for k in self.input_stats
-        }
+        # Always present never None
+        self.blocks_stats = dict(block_stats or {})
+        self.signals_summary = dict(signals_summary or {})
+        self.extras = dict(extras or {})
     
     def to_dict(self) -> dict:
         """
-        JSON-serializable representation (HF-compatible)
+        Return a serialization-safe representation
         """
-        data = asdict(self)
-
-        if not self.block_stats:
-            data.pop("block_stats", None)
-
-        if not self.signals_summary:
-            data.pop("signals_summary", None)
-
-        return data
+        return {
+            "profile_id": self.profile_id,
+            "blocks": list(self.blocks),
+            "input_stats": dict(self.input_stats),
+            "output_stats": dict(self.output_stats),
+            "block_stats": dict(self.blocks_stats),
+            "signals_summary": dict(self.signals_summary),
+            "extras": dict(self.extras),
+        }
