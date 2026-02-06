@@ -115,7 +115,7 @@ def summary(dataset):
     #
     # Optional section showing aggregated per-block counters,
     # if any blocks emit statistics.
-    if agg["block_stats"]:
+    if "block_stats" in agg and agg["block_stats"]:
         print("Block Activity")
         print("-" * 72)
         for block, stats in agg["block_stats"].items():
@@ -130,7 +130,7 @@ def summary(dataset):
     #
     # Optional section showing aggregated signals emitted
     # during curation (e.g., structural or heuristic markers).
-    if agg["signals_summary"]:
+    if "signals_summary" in agg and agg["signals_summary"]:
         print("Signals")
         print("-" * 72)
         for key, value in sorted(agg["signals_summary"].items()):

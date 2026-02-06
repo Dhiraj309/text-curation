@@ -18,7 +18,7 @@ class Block:
         Defaults are defined by concrete block implementations.
         """
         self.policy = policy or {}
-        self._stats = {}
+        self._stats: dict[str, int] = {}
 
     def apply(self, document):
         """
@@ -29,7 +29,16 @@ class Block:
         raise NotImplementedError
     
     def reset_stats(self):
-        self._stats = {}
+        """
+        Reset block-local statistics.
+        Called by Pipeline at the start of each run.
+        """
+        self._stats.clear()
 
     def get_stats(self) -> dict:
+        """
+        Return a copy of block-local statistics.
+
+        Stats must be a JSON-serializable and deterministic.
+        """
         return dict(self._stats)

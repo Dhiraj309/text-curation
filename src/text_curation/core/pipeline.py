@@ -43,7 +43,9 @@ class Pipeline:
         block_stats = {} if collect_report else None
 
         for block in self.blocks:
-            if collect_report and hasattr(block, "reset_stats"):
+            # block_instance = copy.deepcopy(block)
+
+            if hasattr(block, "reset_stats"):
                 block.reset_stats()
 
             block.apply(document)
