@@ -49,6 +49,12 @@ def aggregate_reports(reports):
         "signals_summary": defaultdict(int),
     }
 
+    block_stats = defaultdict(lambda: defaultdict(int))
+    signals_summary = defaultdict(int)
+
+    seen_block_stats = False
+    seen_signals = False
+
     # Iterate over each per-sample report and accumulate statistics.
     for r in reports:
         # Aggregate input text statistics.
@@ -62,25 +68,35 @@ def aggregate_reports(reports):
         # Aggregate per-block statistics, if present.
         #
         # Not all blocks emit stats, so this section is optional.
-        for block, stats in r.get("block_stats", {}).items():
-            for key, value in stats.items():
-                agg["block_stats"][block][key] += value
+        if "block_stats" in r:
+            seen_block_stats = True
+            for block, stats in r["block_stats"].items():
+                for key, value in stats.items():
+                    block_stats[block][key] += value
 
         # Aggregate emitted signals, if present.
-        for key, value in r.get("signals_summary", {}).items():
-            agg["signals_summary"][key] += value
+        if "signals_summary" in r:
+            seen_signals = True
+            for key, value in r["signals_summary"].items():
+                signals_summary[key] += value
 
     # Convert defaultdicts to plain dicts before returning.
     #
     # This ensures a stable, serialization-friendly return value and
     # avoids leaking implementation details to callers.
-    return {
+    result = {
         "samples": agg["samples"],
         "input_stats": dict(agg["input_stats"]),
         "output_stats": dict(agg["output_stats"]),
-        "block_stats": {
+        }
+    
+    if seen_block_stats:
+        result["block_stats"] = {
             block: dict(stats)
-            for block, stats in agg["block_stats"].items()
-        },
-        "signals_summary": dict(agg["signals_summary"]),
-    }
+            for block, stats in block_stats.items()
+        }
+
+    if seen_signals:
+        result["signals_summary"] = dict(signals_summary)
+
+    return result

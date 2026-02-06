@@ -13,8 +13,8 @@ class CurationReport:
     input_stats: Dict[str, int]
     output_stats: Dict[str, int]
 
-    block_stats: Dict[str, Dict[str, int]] = field(default_factory=dict)
-    signals_summary: Dict[str, int] = field(default_factory=dict)
+    block_stats: Dict[str, Dict[str, int]] | None
+    signals_summary: Dict[str, int] | None
 
     # Reserved namespace for future, non-breaking extensions
     extras: Dict[str, Any] = field(default_factory=dict)
@@ -32,4 +32,12 @@ class CurationReport:
         """
         JSON-serializable representation (HF-compatible)
         """
-        return asdict(self)
+        data = asdict(self)
+
+        if not self.block_stats:
+            data.pop("block_stats", None)
+
+        if not self.signals_summary:
+            data.pop("signals_summary", None)
+
+        return data

@@ -1,6 +1,5 @@
 from text_curation.core.signals import Signal
 
-
 class Document:
     """
     Container for text and associated processing artifacts.
@@ -8,7 +7,13 @@ class Document:
     A Document holds the mutable text being processed along with
     emitted signals and annotations. It is the shared state passed
     through all blocks in a pipeline.
+
+    Mutation rules:
+    - Text may only be modified via set_text()
+    - Signals are append-only
     """
+
+    __slots__ = ("_text", "annotations", "signals")
 
     def __init__(self, text: str):
         """
@@ -17,9 +22,13 @@ class Document:
         Args:
             text: Raw input text to be curated
         """
-        self.text = text
+        self._text = text
         self.annotations = {}
         self.signals: list[Signal] = []
+
+    @property
+    def text(self) -> str:
+        return self._text
 
     def set_text(self, text: str):
         """
@@ -28,7 +37,7 @@ class Document:
         Blocks that mutate content must use this method to ensure
         changes are explicit and centralized.
         """
-        self.text = text
+        self._text = text
 
     def add_signal(self, name: str, value):
         """
