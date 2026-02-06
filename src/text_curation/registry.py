@@ -22,10 +22,20 @@ def get_profile(profile_id: str):
     """
     Retrieve a registered profile by its canonical ID.
 
-    Raises:
-        KeyError: if the profile is unknown or not registered
+    Profile resolution is trict:
+    - IDs must match exactly
+    - No fallbacks
+    - No aliases
+    - No defaults
     """
+
+    if not isinstance(profile_id, str) or not profile_id.strip():
+        raise TypeError("profile_id must br a non-empty string")
+
     try:
         return _PROFILES[profile_id]
     except KeyError:
-        raise KeyError(f"Unknown profile: {profile_id}")
+        raise KeyError(
+            f"Unknown profile: '{profile_id}'."
+            "Profile IDs must be registered explicitly"
+            )

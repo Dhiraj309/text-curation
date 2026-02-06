@@ -1,13 +1,12 @@
-from importlib.metadata import version
+from importlib.metadata import version as _version
 
-# Import profiles eagerly so they self-register with the global registry.
-# This ensures profile resolution works without requiring manual imports.
+# Ensure profiles are registered att import
 import text_curation.profiles  # noqa: F401
 
-from .curator import TextCurator
+from text_curation._api import TextCurator
 
 # Package version as published on PyPI
-__version__ = version("text_curation")
+__version__ = _version("text_curation")
 
 # Public API surface
 __all__ = ["TextCurator", "__version__"]
