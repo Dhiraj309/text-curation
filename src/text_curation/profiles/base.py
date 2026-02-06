@@ -11,6 +11,8 @@ class Profile:
     Once released, their semantics must not change.
     """
 
+    _FROZEN_FIELDS = {"name", "version", "blocks"}
+
     def __init__(
         self,
         name: str,
@@ -39,6 +41,17 @@ class Profile:
         # Descriptive, non-contractual properties
         self.behavior = dict(behavior or {})
 
+        object.__setattr__(self, "_frozen", True)
+
+
+
+    def __setattr__(self, key, value):
+        if getattr(self, "_frozen", False) and key in self._FROZEN_FIELDS:
+            raise TypeError(f"Profile attribute '{key}' is immutable")
+        
+        super().__setattr__(key, value)
+
+
     @property
     def id(self) -> str:
         """
@@ -48,12 +61,14 @@ class Profile:
         (e.g. "web_common_v1").
         """
         return f"{self.name}_{self.version}"
+    
 
     def __repr__(self) -> str:
         """
         Developer-friendly representation for debugging and logs.
         """
         return f"<Profile {self.id}>"
+    
     
     def describe(self) -> dict:
         """
@@ -73,6 +88,6 @@ class Profile:
                 }
                 for block in self.blocks
             ],
-            "guarantess": dict(self.guarantees),
-            "behavior": dict(self.behavior)
+            "guarantess": dict(sorted(self.guarantees.items())),
+            "behavior": dict(sorted(self.behavior.items()))
         }
