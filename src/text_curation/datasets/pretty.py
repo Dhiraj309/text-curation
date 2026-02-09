@@ -31,7 +31,7 @@ def dedupe_report(report: dict):
     print("Samples:")
     print(f"  Input:          {inp:,}")
     print(f"  Output:         {out:,}")
-    print(f"  Removed:        {rem:,} ({frac:.1f}%)")
+    print(f"  Removed:        {rem:,} ({frac:.4f}%)")
     print()
 
     dup = report["duplicates"]
