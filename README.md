@@ -207,18 +207,18 @@ Python ≥ 3.9 is required.
 
 ```bash
 pip install text-curation
-
+```
 For development:
-
+```bash
 git clone https://github.com/Dhiraj309/text-curation.git
 cd text-curation
 pip install -e .
-
+```
 
 ---
 
 Quickstart
-
+```python
 from datasets import load_dataset
 from text_curation import TextCurator
 
@@ -237,17 +237,17 @@ dataset = dataset.map(
     batched=True,
     num_proc=4,
 )
-
+```
 
 ---
 
 Reporting
 
 Curation reports describe what changed, not just what was produced.
-
+```python
 from text_curation.reports import summary
 summary(dataset)
-
+```
 Reports enable:
 
 auditing preprocessing behavior
