@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "text-curation"
-version = "1.4.0"
-description = "Profile-based text curation pipelines for Hugging Face Datasets"
+version = "1.5.0"
+description = "Deterministic, profile-based text curation pipelines for Hugging Face Datasets"
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.9"
@@ -19,16 +19,14 @@ keywords = [
     "datasets",
     "nlp",
     "text-preprocessing",
-    "text-cleaning",
-    "llm",
     "data-curation",
-    "cleantext",
-    "textcleaning",
+    "llm",
+    "text-cleaning",
     "curation"
 ]
 
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: Apache Software License",

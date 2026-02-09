@@ -9,11 +9,35 @@ Only features explicitly documented as **stable** are guaranteed across minor re
 
 ## Unreleased
 
+- (reserved)
+
+---
+
+## 1.5.0 — Stability & Contract Hardening
+
+This release focuses on **trust, determinism, and long-term reproducibility**.
+No default behavior was changed. All improvements harden existing guarantees.
+
 ### Added
 - Dataset-level exact deduplication (`deduplicate_exact`)
 - Deterministic corpus-level deduplication reports
 - `dedupe_summary` helper for inspecting deduplication effects
 - `text_curation.datasets` namespace for dataset-scale operations
+
+### Changed
+- Enforced global uniqueness of profile IDs (duplicate registration is fatal)
+- Profiles are now strictly immutable (name, version, blocks)
+- Pipeline execution guarantees block isolation across runs
+- Reporting schema finalized:
+  - All reports have a total, stable schema
+  - Optional sections are never conditionally omitted
+- Aggregation and summary utilities simplified by schema guarantees
+
+### Stability
+- No breaking changes
+- Existing profiles unchanged
+- Existing block behavior unchanged
+- All changes are additive or contract-hardening
 
 ---
 

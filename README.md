@@ -1,4 +1,5 @@
-<!--Copyright 2026 The text-curation Authors.
+<!--
+Copyright 2026 The text-curation Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -70,6 +71,7 @@ making dataset preparation **reproducible, auditable, and stable over time**.
 Text preprocessing is one of the least reproducible stages of modern ML pipelines.
 
 In practice, it is often implemented as:
+
 - evolving regex scripts
 - undocumented heuristics
 - silent cleanup steps
@@ -110,7 +112,7 @@ decisions inspectable.
 ## Design principles
 
 - **Profile-driven pipelines**  
-  Reusable, declarative profiles define *what* happens, not hidden heuristics.
+  Reusable, declarative profiles define behavior explicitly.
 
 - **Deterministic and conservative**  
   Given the same input and profile, output is identical across runs.
@@ -132,11 +134,13 @@ Only features **explicitly documented as stable** are guaranteed not to change
 across minor releases.
 
 ### Stable
+
 - Built-in profiles and their behavior
 - `TextCurator` public API
 - Curation report formats
 
 ### Experimental
+
 - New blocks
 - Dataset-level utilities
 - New profiles until documented as stable
@@ -151,13 +155,14 @@ Once released, their semantics do not change.
 Profiles define **what preprocessing behavior is applied and in what order**.
 
 They are:
+
 - Explicitly versioned
 - Registered at import time
 - Resolved via a global registry
 
-Conceptually, a profile defines an ordered sequence of deterministic transformations.
+A profile defines an ordered sequence of deterministic transformations.
 The specific block composition is an implementation detail and not part of the
-public contract.
+public compatibility contract.
 
 Profiles may be deprecated, but are never silently modified.
 
@@ -202,21 +207,18 @@ Python ≥ 3.9 is required.
 
 ```bash
 pip install text-curation
-````
 
 For development:
 
-```bash
 git clone https://github.com/Dhiraj309/text-curation.git
 cd text-curation
 pip install -e .
-```
+
 
 ---
 
-## Quickstart
+Quickstart
 
-```python
 from datasets import load_dataset
 from text_curation import TextCurator
 
@@ -235,48 +237,58 @@ dataset = dataset.map(
     batched=True,
     num_proc=4,
 )
-```
+
 
 ---
 
-## Reporting
+Reporting
 
 Curation reports describe what changed, not just what was produced.
 
-```python
 from text_curation.reports import summary
 summary(dataset)
-```
 
 Reports enable:
 
-* auditing preprocessing behavior
-* detecting dataset drift
-* comparing profiles
+auditing preprocessing behavior
+
+detecting dataset drift
+
+comparing profiles
+
 
 They never affect curation behavior.
 
----
-
-## When not to use text-curation
-
-* One-off regex cleanup
-* Already-curated datasets
-* ML-based content scoring or classification
 
 ---
 
-## Versioning
+When not to use text-curation
+
+One-off regex cleanup
+
+Already-curated datasets
+
+ML-based content scoring or classification
+
+
+
+---
+
+Versioning
 
 This project follows Semantic Versioning.
 
-* 1.x guarantees stable default behavior
-* Breaking changes require a major version bump
-* Profiles are versioned independently of library releases
+1.x guarantees stable default behavior
+
+Breaking changes require a major version bump
+
+Profiles are versioned independently of library releases
+
+
 
 ---
 
-## Contributing
+Contributing
 
 Contributions are welcome.
 
@@ -284,19 +296,25 @@ Please read CONTRIBUTING.md before submitting changes.
 
 Key expectations:
 
-* Deterministic behavior
-* Conservative defaults
-* Tests as specifications
-* No silent behavior changes
+Deterministic behavior
+
+Conservative defaults
+
+Tests as specifications
+
+No silent behavior changes
+
+
 
 ---
 
-## License
+License
 
 Apache 2.0. See LICENSE.
 
+
 ---
 
-## Acknowledgements
+Acknowledgements
 
 Inspired by large-scale dataset curation practices in the Hugging Face ecosystem.
