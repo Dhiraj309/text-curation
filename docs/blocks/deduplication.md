@@ -50,7 +50,7 @@ Paragraphs are compared using a **non-semantic normalization key**:
 - Exact string equality is used
 
 The normalized key is used **only for comparison**.
-The original paragraph content is retained.
+The original paragraph content is retained verbatim.
 
 ---
 
@@ -59,7 +59,7 @@ The original paragraph content is retained.
 When this block is applied:
 
 - Deduplication is deterministic
-- Only exact duplicates are removed
+- Only exact duplicates (under the comparison key) are removed
 - Paragraph order is preserved
 - Paragraph content is not rewritten
 - No semantic inference is performed
@@ -71,18 +71,19 @@ When this block is applied:
 This block does **not**:
 
 - Perform fuzzy or similarity-based matching
-- Use embeddings, hashing, or ML
+- Use embeddings, hashing, or machine learning
 - Deduplicate across documents
 - Deduplicate across datasets
 - Remove near-duplicates
 - Perform semantic comparison
+- Emit or consume dataset-level signals
 
 ---
 
 ## Stability
 
 - Behavior is stable as of `v1.x`
-- Any change requires:
+- Any behavioral change requires:
   - a new block, or
   - a major version bump
 
@@ -95,4 +96,4 @@ This block is intentionally conservative.
 More aggressive or corpus-level deduplication must be implemented as:
 
 - a dataset-level utility, or
-- an explicitly versioned corpus operation
+- an explicitly versioned corpus-level operation

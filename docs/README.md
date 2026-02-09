@@ -19,7 +19,7 @@ The documentation in this directory exists to:
 - Make preprocessing behavior **auditable and reproducible**
 - Prevent silent semantic or structural drift over time
 
-**Hard guarantees are explicitly identified and mechanically enforced.**  
+**Hard guarantees are explicitly identified and mechanically enforced.**
 All other documented behavior describes **intended outcomes**, not enforceable guarantees.
 
 If something is documented here, it is treated as part of the
@@ -59,13 +59,14 @@ Profile documentation defines:
 - Intended and non-intended use cases
 
 Profiles are treated as **versioned artifacts**.
-Once released, their documented behavior **must not change**.
+Once released, their documented behavior **must not change**
+within the same major version.
 
 ---
 
 ### Dataset Utilities (`docs/datasets/`)
 
-Dataset-level utilities (e.g. deduplication) define:
+Dataset-level utilities (e.g. deduplication, filtering) define:
 
 - Operations applied to datasets as a whole
 - The scope and semantics of those operations
@@ -90,7 +91,9 @@ Design documentation defines:
 - Explicit non-goals
 - Extension rules
 
-These invariants apply to **all blocks, profiles, and utilities**.
+These invariants apply to **all blocks, profiles, pipelines, and utilities**.
+
+Violations of documented invariants are considered **bugs or breaking changes**.
 
 ---
 
@@ -104,6 +107,8 @@ The roadmap documents:
 
 The roadmap is **non-binding** and does not constitute a commitment.
 
+Nothing in the roadmap alters current guarantees or behavior.
+
 ---
 
 ### Reports Documentation (`docs/reports/`)
@@ -116,6 +121,9 @@ Reporting documentation defines:
 
 Reporting utilities are **descriptive only** and
 **never affect curation behavior**.
+
+All reporting schemas are **structurally total**:
+every documented field is always present, even when semantically empty.
 
 ---
 
@@ -139,7 +147,9 @@ Implementation details are not authoritative.
 All **hard guarantees** are enforced by:
 
 - Block-level unit tests
+- Pipeline and isolation tests
 - Profile-level golden tests
+- Report schema and aggregation tests
 
 Documentation describes **what must hold**.
 Tests enforce **what actually holds**.
@@ -170,6 +180,7 @@ Documentation updates are required when:
 - A new dataset-level utility is added
 - A hard guarantee changes
 - A non-goal is clarified or added
+- A reporting schema changes
 
 Documentation must describe **behavioral contracts** and **intentional limits**,
 not implementation details or future intentions.

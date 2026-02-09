@@ -21,8 +21,8 @@ Filtering is applied:
 - **Within a single document**
 - **Based exclusively on emitted structural signals**
 
-This block does not inspect document-level context
-or external information.
+This block does not inspect document-level context,
+external metadata, or dataset-level information.
 
 ---
 
@@ -32,7 +32,7 @@ For each paragraph, the block evaluates a fixed set of conditions.
 A paragraph is removed **if and only if** all required conditions
 are satisfied.
 
-No probabilistic scoring or ranking is performed.
+No probabilistic scoring, ranking, or threshold inference is performed.
 
 ---
 
@@ -45,9 +45,10 @@ A paragraph is removed if:
 
 2. All of the following are true:
    - Marked as a boilerplate candidate
-   - Repetition count meets or exceeds the threshold
-   - Paragraph length is below the maximum threshold
+   - Repetition count meets or exceeds the configured threshold
+   - Paragraph length is below the configured maximum
    - Paragraph is not explicitly marked as a header
+   - Paragraph is not identified as a list block
 
 All conditions must be satisfied exactly.
 
@@ -56,13 +57,15 @@ All conditions must be satisfied exactly.
 ## Signal Dependencies
 
 This block consumes signals emitted by upstream structure analysis,
-including:
+including (but not limited to):
 
 - `paragraph[*].is_boilerplate_candidate`
 - `paragraph[*].repetition_count`
 - `paragraph[*].starts_with_header` (if present)
+- `paragraph[*].is_list_block` (if present)
 
 Signals are treated as **inputs**, not interpretations.
+No signal is inferred or synthesized by this block.
 
 ---
 
@@ -73,7 +76,8 @@ When this block is applied:
 - Filtering decisions are deterministic
 - Only explicitly signaled paragraphs are removed
 - Paragraph order is preserved
-- No paragraph content is rewritten
+- Paragraph content is not rewritten
+- List blocks are preserved by default
 - No semantic inference is performed
 
 ---
@@ -87,13 +91,14 @@ This block does **not**:
 - Remove list blocks by default
 - Remove entire documents
 - Apply document-level thresholds
+- Emit or consume dataset-level signals
 
 ---
 
 ## Stability
 
 - Behavior is stable as of `v1.x`
-- Changes require:
+- Any behavioral change requires:
   - a new block, or
   - a new profile version, or
   - a major version bump

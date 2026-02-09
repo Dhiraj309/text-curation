@@ -11,35 +11,72 @@ Most users should rely on profiles rather than composing blocks directly.
 
 ---
 
+## Scope
+
+Normalization operates at the **character and token boundary level only**.
+
+It is intended to make text **mechanically comparable and processable**
+without changing meaning, structure, or intent.
+
+---
+
 ## Behavior (Stable)
 
-Normalization includes:
+Normalization includes the following deterministic transformations:
 
-- Unicode normalization (NFKC)
-- Removal of zero-width and control characters
-- Canonicalization of quotes, dashes, ellipses
-- Conservative whitespace normalization
+- Unicode normalization using **NFKC**
+- Removal of zero-width characters
+- Removal of non-printable control characters
+- Canonicalization of:
+  - quotation marks
+  - dashes
+  - ellipses
+- Conservative whitespace normalization that does **not** alter structure
+
+All transformations are applied uniformly and without context.
 
 ---
 
 ## Guarantees
 
-- Deterministic behavior
-- No semantic rewriting
-- Indentation preserved
-- Safe for code and logs
+When this block is applied:
+
+- Behavior is fully deterministic
+- No semantic rewriting is performed
+- No structural rewriting is performed
+- Indentation is preserved
+- Line boundaries are preserved
+- Safe for:
+  - source code
+  - logs
+  - configuration files
+  - mixed prose/code documents
 
 ---
 
 ## Explicit Non-Behavior
 
-- No casing normalization
-- No spelling or grammar fixes
-- No paragraph restructuring
+This block does **not**:
+
+- Normalize casing
+- Perform spelling correction
+- Perform grammar correction
+- Rewrite words or tokens
+- Reflow or merge lines
+- Reconstruct paragraphs
+- Interpret language, markup, or syntax
+- Perform locale- or language-specific normalization
 
 ---
 
 ## Stability
 
-Stable as of `v1.x`.
-Changes require a major version bump.
+Normalization behavior is **stable as of `v1.x`**.
+
+Normalization changes are considered **high-risk**.
+
+Any behavioral change requires:
+
+- a **major version bump**, and
+- updated unit tests locking the new behavior, and
+- explicit documentation of the change
