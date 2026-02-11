@@ -1,4 +1,6 @@
 from datasets import Dataset
+
+
 def filter_rows(
         dataset: Dataset,
         *,
@@ -18,7 +20,7 @@ def filter_rows(
         dataset: Hugging Face Dataset
         predicate: Callable taking a row dict -> bool
         description: Human-readable description of the filtering intent
-        collect_report: Whether to return a filtering report
+        collect_reports: Whether to return a filtering report
 
     Returns:
         Filtered Dataset, and optionally a filtering report.
@@ -28,11 +30,12 @@ def filter_rows(
         raise TypeError("predicate must be callable")
 
     if not isinstance(description, str) or not description.strip():
-        raise ValueError("description must be non empty string")
+        raise ValueError("description must be non-empty string")
 
     total_samples = len(dataset)
 
-    filtered = dataset.filter(predicate)
+    # 🔒 Enforce determinism explicitly
+    filtered = dataset.filter(predicate, num_proc=1)
 
     if not collect_reports:
         return filtered
@@ -60,6 +63,8 @@ def filter_rows(
         },
 
         "determinism": {
+            "order_preserving": True,
+            "num_proc": 1,
             "predicate_assumed_pure": True,
         },
 

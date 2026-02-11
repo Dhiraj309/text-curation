@@ -3,6 +3,7 @@ import copy
 
 from text_curation import TextCurator
 
+
 def test_textcurator_is_immutable():
     curator = TextCurator.from_profile("web_common_v1")
 
@@ -15,6 +16,7 @@ def test_textcurator_is_immutable():
     with pytest.raises(TypeError):
         curator.collect_reports = True
 
+
 def test_textcurator_does_not_mutate_input_batch():
     curator = TextCurator.from_profile("web_common_v1")
 
@@ -25,12 +27,14 @@ def test_textcurator_does_not_mutate_input_batch():
 
     assert batch == original
 
-def test_textcurator_output_schema_with_reports():
+
+def test_textcurator_output_schema_without_reports():
     curator = TextCurator.from_profile("web_common_v1")
 
     out = curator({"text": ["Hello"]})
 
     assert set(out.keys()) == {"text"}
+
 
 def test_textcurator_output_schema_with_reports():
     curator = TextCurator.from_profile("web_common_v1", collect_reports=True)
@@ -49,3 +53,25 @@ def test_textcurator_is_deterministic():
     out2 = curator({"text": ["Hello\n\nHello"]})
 
     assert out1 == out2
+
+
+def test_pipeline_run_document_return_shape():
+    curator = TextCurator.from_profile("web_common_v1")
+
+    doc, report = curator.pipeline.run_document("Hello world")
+
+    assert doc.text == "Hello world"
+    assert report is None
+
+
+def test_pipeline_run_document_return_shape_with_report():
+    curator = TextCurator.from_profile("web_common_v1", collect_reports=True)
+
+    doc, report = curator.pipeline.run_document(
+        "Hello world",
+        collect_report=True,
+        profile_id=curator.profile.id,
+    )
+
+    assert doc.text
+    assert report is not None

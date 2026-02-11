@@ -1,6 +1,7 @@
 from collections import defaultdict
 from datasets import Dataset
 
+
 def deduplicate_exact(
         dataset: Dataset,
         *,
@@ -19,25 +20,30 @@ def deduplicate_exact(
 
     Args:
         dataset: Hugging Face Dataset
-        column: Column name to deduplicate on
+        column: Column name to deduplicate on (must contain strings)
         keep: Which duplicate to retain ("first" or "last")
-        collect_report: Whether to return a deduplication report
+        collect_reports: Whether to return a deduplication report
 
     Returns:
         Deduplicated Dataset, and optionally a deduplication report.
     """
 
     if keep not in {"first", "last"}:
-        raise ValueError("Keep must be either 'first' or 'last'")
+        raise ValueError("keep must be either 'first' or 'last'")
 
     if column not in dataset.column_names:
-        raise ValueError(f"Column {column} not found in dataset")
+        raise ValueError(f"Column '{column}' not found in dataset")
 
     texts = dataset[column]
     total_samples = len(texts)
 
     grouped = defaultdict(list)
+
     for idx, value in enumerate(texts):
+        if not isinstance(value, str):
+            raise TypeError(
+                f"deduplicate_exact expects string values in column '{column}'"
+            )
         grouped[value].append(idx)
 
     keep_indices = []
@@ -58,7 +64,6 @@ def deduplicate_exact(
 
     if not collect_reports:
         return dedupe_dataset
-
 
     removed_samples = total_samples - len(dedupe_dataset)
 
