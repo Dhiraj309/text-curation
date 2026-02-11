@@ -57,6 +57,8 @@ class NormalizationBlock(Block):
 
         document.set_text(text)
 
+        return document
+
     def _normalize_unicode(self, text):
         return unicodedata.normalize("NFKC", text)
 

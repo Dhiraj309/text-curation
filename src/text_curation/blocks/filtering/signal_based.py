@@ -61,7 +61,7 @@ class SignalBasedBoilerplateFilteringBlock(Block):
         stripped = paragraph.strip()
 
         if not stripped:
-            return True
+            return self.policy.get("drop_empty", True)
 
         # Preserve header-led sections explicitly
         if sigs.get("starts_with_header"):
@@ -69,13 +69,12 @@ class SignalBasedBoilerplateFilteringBlock(Block):
 
         # Drop only short, repeated boilerplate candidates
         if (
-            sigs.get("is_boilerplate_candidate")
-            and sigs.get("repetition_count", 0) >= 2
-            and len(stripped) < 200
+            self.policy.get("drop_repeated_boilerplate", True)
+            and sigs.get("is_boilerplate_candidate")
+            and sigs.get("repetition_count", 0) >= self.policy["min_repetition"]
+            and len(stripped) < self.policy["max_boilerplate_length"]
         ):
             return True
-
-        return False
 
     def _group_paragraph_signals(self, signals):
         """

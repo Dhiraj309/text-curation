@@ -24,7 +24,7 @@ class Pipeline:
         This method is a thin orchestration layer and intentionally
         hides Document internals from callers.
         """
-        document = self.run_document(text)
+        document, _ = self.run_document(text)
         return document.text
     
     def run_document(self, text: str, *, collect_report: bool = False, profile_id: str | None = None):
@@ -57,18 +57,18 @@ class Pipeline:
                     block_stats[block.__class__.__name__] = stats
 
         if not collect_report:
-            return document
-        
+            return document, None
+
         output_stats = compute_basic_stats(document.text)
 
         report = CurationReport(
-            profile_id=profile_id or "<unknown>",
-            blocks=[b.__class__.__name__ for b in self.blocks],
-            input_stats=input_stats,
-            output_stats=output_stats,
-            block_stats=block_stats or {},
-            signals_summary=document.summarize_signals(),
-            extras={},
+                profile_id=profile_id or "<unknown>",
+                blocks=[b.__class__.__name__ for b in self.blocks],
+                input_stats=input_stats,
+                output_stats=output_stats,
+                block_stats=block_stats or {},
+                signals_summary=document.summarize_signals(),
+                extras={},
             )
-        
+
         return document, report

@@ -10,12 +10,7 @@ class ExactParagraphDeduplicationBlock(Block):
     conservative normalization rules to avoid false positives.
     """
 
-    DEFAULT_POLICY = {
-        "scope": "paragraph",
-        "normalize_case": True,
-        "collapse_whitespace": True,
-        "drop_empty": True,
-    }
+    DEFAULT_POLICY = {}
 
     def __init__(self, policy=None):
         # Merge caller policy with stable defaults

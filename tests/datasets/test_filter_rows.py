@@ -44,3 +44,17 @@ def test_filter_rows_min_len():
     assert report["output"]["samples"] == 3
     assert report["removed"]["samples"] == 3
     assert report["removed"]["fraction"] == 0.5
+
+def test_filter_rows_is_deterministic():
+    from datasets import Dataset
+    from text_curation.datasets.filtering import filter_rows
+
+    ds = Dataset.from_dict({"x": list(range(10))})
+
+    def pred(row):
+        return row["x"] % 2 == 0
+
+    out1, _ = filter_rows(ds, predicate=pred, description="even")
+    out2, _ = filter_rows(ds, predicate=pred, description="even")
+
+    assert out1["x"] == out2["x"]

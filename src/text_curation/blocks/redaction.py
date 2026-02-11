@@ -58,12 +58,14 @@ class RedactionBlock(Block):
         text = self._redact_api_tokens(text)
 
         document.set_text(text)
-    
+
+        return document
+
     def _redact_emails(self, text):
         return _EMAIL.sub("<EMAIL>", text)
-    
+
     def _redact_api_tokens(self, text):
         return _API_TOKEN.sub("<TOKEN>", text)
-    
+
     def _redact_url_credentials(self, text):
         return _URL_CREDENTIAL.sub(r"\1<REDACTED>@", text)
