@@ -7,7 +7,7 @@ class Region:
     They are purely descriptive and do not mutate document text.
     """
 
-    def __init__(self, kind: str, start: str, end: str, data=None):
+    def __init__(self, kind: str, start: int, end: int, data=None):
         """
         Create a new annotated region.
 

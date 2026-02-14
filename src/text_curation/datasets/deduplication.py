@@ -101,7 +101,8 @@ def deduplicate_exact(
         },
 
         "determinism": {
-            "order_independent": True,
+            "order_independent": False,
+            "selection_strategy": keep,
         },
     }
 

@@ -88,6 +88,6 @@ class Profile:
                 }
                 for block in self.blocks
             ],
-            "guarantess": dict(sorted(self.guarantees.items())),
+            "guarantees": dict(sorted(self.guarantees.items())),
             "behavior": dict(sorted(self.behavior.items()))
         }
