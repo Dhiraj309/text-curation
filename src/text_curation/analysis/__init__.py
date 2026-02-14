@@ -6,7 +6,9 @@ that emit signals but do not modify document text.
 """
 
 from .base import AnalysisBlock
+from .quality import QualitySignalBlock
 
 __all__ = [
-    "AnalysisBlock"
+    "AnalysisBlock",
+    "QualitySignalBlock",
 ]
