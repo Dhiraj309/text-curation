@@ -12,7 +12,7 @@ def test_hash_dedup_basic():
     )
 
     assert len(dedup) == 3
-    assert report["deduplicates"]["groups"] == 1
+    assert report["duplicates"]["groups"] == 1
 
 def test_hash_dedup_keep_last():
     ds = Dataset.from_dict({

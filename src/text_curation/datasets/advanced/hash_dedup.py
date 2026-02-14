@@ -51,7 +51,7 @@ def deduplicate_by_hash(
 
     for indices in grouped.values():
         if len(indices) > 1:
-            duplicate_groups += 1
+            deduplicate_groups += 1
             max_group_size = max(max_group_size, len(indices))
 
         keep_idx = indices[0] if keep == "first" else indices[-1]
@@ -87,8 +87,8 @@ def deduplicate_by_hash(
             "samples": removed_samples,
             "fration": removed_samples / total_samples if total_samples else 0.0,
         },
-        "duplicate": {
-            "groups": duplicate_groups,
+        "duplicates": {
+            "groups": deduplicate_groups,
             "max_group_size": max_group_size,
         },
         "determinism": {
