@@ -9,7 +9,7 @@ class TextCurator:
     Once constructed, a TextCurator instance is fully frozen
     """
 
-    __slot__ = ("_profile", "_collect_reports", "_pipeline")
+    __slots__ = ("_profile", "_collect_reports", "_pipeline")
 
     def __init__(self, profile, collect_reports: bool = False):
         object.__setattr__(self, "_profile", profile)
