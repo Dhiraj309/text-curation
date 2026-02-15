@@ -26,7 +26,7 @@ def deduplicate_by_hash(
     """
 
     if keep not in {"first", "last"}:
-        raise ValueError("keep mus be eihter 'first' or 'last'")
+        raise ValueError("keep must be eihter 'first' or 'last'")
     
     if column not in dataset.column_names:
         raise ValueError(f"Column '{column}' not found in dataset")
@@ -39,7 +39,7 @@ def deduplicate_by_hash(
     for idx, value in enumerate(texts):
         if not isinstance(value, str):
             raise TypeError(
-                f"deduplicated_by_hash expects string values in column '{column}"
+                f"deduplicated_by_hash expects string values in column '{column}'"
             )
         
         digest = _sha256(value)
@@ -80,12 +80,12 @@ def deduplicate_by_hash(
         "input": {
             "samples": total_samples,
         },
-        "outputs": {
+        "output": {
             "samples": len(keep_indices),
         },
         "removed": {
             "samples": removed_samples,
-            "fration": removed_samples / total_samples if total_samples else 0.0,
+            "fraction": removed_samples / total_samples if total_samples else 0.0,
         },
         "duplicates": {
             "groups": deduplicate_groups,
