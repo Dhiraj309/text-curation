@@ -14,7 +14,7 @@ from .summary import summary
 # This function aggregates per-sample curation reports into a single
 # dictionary of corpus-level statistics.
 from .aggregate import aggregate_reports
-
+from .manifest import DatasetManifest
 
 # Public API of the reports package.
 #
@@ -23,4 +23,5 @@ from .aggregate import aggregate_reports
 __all__ = [
     "summary",
     "aggregate_reports",
+    "DatasetManifest"
 ]
