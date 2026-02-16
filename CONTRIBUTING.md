@@ -100,49 +100,65 @@ These invariants are enforced by tests and must not be weakened.
 
 ```text
 src
-└── text_curation
-    ├── _api.py
-    ├── blocks
-    │ ├── base.py
-    │ ├── deduplication
-    │ │ ├── exact_paragraph.py
-    │ │ └── __init__.py
-    │ ├── filtering
-    │ │ ├── __init__.py
-    │ │ └── signal_based.py
-    │ ├── formatting
-    │ │ ├── code_safe.py
-    │ │ ├── __init__.py
-    │ │ └── paragraph.py
-    │ ├── __init__.py
-    │ ├── normalization.py
-    │ ├── redaction.py
-    │ └── structure
-    │ ├── basic.py
-    │ └── __init__.py
-    ├── core
-    │ ├── annotations.py
-    │ ├── document.py
-    │ ├── pipeline.py
-    │ ├── report.py
-    │ └── signals.py
-    ├── curator.py
-    ├── datasets
-    │ ├── deduplication.py
-    │ ├── filtering.py
-    │ ├── __init__.py
-    │ └── pretty.py
-    ├── __init__.py
-    ├── profiles
-    │ ├── base.py
-    │ ├── __init__.py
-    │ ├── llm_pretrain_v1.py
-    │ └── web_common_v1.py
-    ├── registry.py
-    └── reports
-        ├── aggregate.py
-        ├── __init__.py
-        └── summary.py
+├── text_curation
+│   ├── analysis
+│   │   ├── base.py
+│   │   ├── fingerprint.py
+│   │   ├── __init__.py
+│   │   ├── quality.py
+│   │   └── token_stats.py
+│   ├── _api.py
+│   ├── blocks
+│   │   ├── base.py
+│   │   ├── deduplication
+│   │   │   ├── exact_paragraph.py
+│   │   │   └── __init__.py
+│   │   ├── filtering
+│   │   │   ├── __init__.py
+│   │   │   └── signal_based.py
+│   │   ├── formatting
+│   │   │   ├── code_safe.py
+│   │   │   ├── __init__.py
+│   │   │   └── paragraph.py
+│   │   ├── __init__.py
+│   │   ├── normalization.py
+│   │   ├── redaction.py
+│   │   └── structure
+│   │       ├── basic.py
+│   │       └── __init__.py
+│   ├── core
+│   │   ├── annotations.py
+│   │   ├── document.py
+│   │   ├── pipeline.py
+│   │   ├── report.py
+│   │   ├── reproducibility.py
+│   │   └── signals.py
+│   ├── curator.py
+│   ├── datasets
+│   │   ├── advanced
+│   │   │   ├── decontamination.py
+│   │   │   ├── hash_dedup.py
+│   │   │   ├── __init__.py
+│   │   │   └── minhash.py
+│   │   ├── deduplication.py
+│   │   ├── filtering.py
+│   │   ├── __init__.py
+│   │   └── pretty.py
+│   ├── __init__.py
+│   ├── profiles
+│   │   ├── base.py
+│   │   ├── __init__.py
+│   │   ├── llm_pretrain_v1.py
+│   │   ├── pretraining
+│   │   │   ├── __init__.py
+│   │   │   └── web_pretrain_v1.py
+│   │   └── web_common_v1.py
+│   ├── registry.py
+│   └── reports
+│       ├── aggregate.py
+│       ├── __init__.py
+│       ├── manifest.py
+│       └── summary.py
 ```
 Documentation lives under docs/ and mirrors this structure.
 

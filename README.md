@@ -3,9 +3,6 @@ Copyright 2026 The text-curation Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
 -->
 
 <p align="center">
@@ -24,7 +21,7 @@ You may obtain a copy of the License at
 </p>
 
 <p align="center">
-  <i>Reproducible, auditable text preprocessing as a first-class artifact</i>
+  <i>Deterministic corpus compilation for reproducible NLP datasets</i>
 </p>
 
 <p align="center">
@@ -52,163 +49,350 @@ You may obtain a copy of the License at
 
 ---
 
-## Overview
+# Overview
 
-**text-curation** is a Python library for building **profile-driven, deterministic text curation pipelines**
-for **large-scale NLP datasets**, with first-class integration into the
+**text-curation** is a Python library for building **profile-driven, deterministic corpus compilation pipelines**
+for large-scale NLP datasets, with first-class integration into the
 **Hugging Face Datasets** ecosystem.
 
-It treats text preprocessing as a **versioned, inspectable artifact** rather than
-an ad-hoc collection of cleanup scripts.
+As of **v1.6.0**, text-curation is no longer just a text cleaning library.
 
-All transformations are **explicit, deterministic, and conservative by default**,
-making dataset preparation **reproducible, auditable, and stable over time**.
+It is a **deterministic corpus compilation foundation**.
+
+It treats preprocessing as a:
+
+- versioned artifact  
+- inspectable transformation graph  
+- reproducible build step  
+- dataset-level identity boundary  
+
+All transformations and analysis are **explicit, deterministic, and conservative by default**.
 
 ---
 
-## Why text-curation exists
+# What 1.6.0 Introduces
+
+Version 1.6.0 extends document-level cleaning into corpus-level infrastructure:
+
+- Signal-only analysis namespace
+- Deterministic document fingerprinting (SHA-256)
+- Deterministic dataset-level hash deduplication
+- Deterministic reference MinHash deduplication
+- Exact n-gram decontamination (signal-only)
+- Dataset lineage manifests
+- Pipeline configuration hashing
+- Pretraining-oriented profile (`web_pretrain_v1`)
+- Deterministic replay enforcement
+
+All changes are additive.  
+No public API was removed or renamed.
+
+---
+
+# Why text-curation exists
 
 Text preprocessing is one of the least reproducible stages of modern ML pipelines.
 
-In practice, it is often implemented as:
+In practice it is often implemented as:
 
-- evolving regex scripts
-- undocumented heuristics
-- silent cleanup steps
+- evolving regex scripts  
+- undocumented heuristics  
+- silent cleanup steps  
 
-Small changes can significantly alter data distributions, yet are rarely tracked,
-audited, or reproducible.
+Small changes alter dataset distributions yet go untracked.
 
-**text-curation** enforces the same rigor on data preprocessing that modern ML
-systems apply to models, tokenizers, and datasets.
+text-curation enforces the same rigor on preprocessing that modern ML systems apply to:
+
+- model checkpoints  
+- tokenizer versions  
+- dataset artifacts  
+
+Preprocessing becomes:
+
+- explicit  
+- inspectable  
+- versioned  
+- reproducible  
 
 ---
 
-## Canonical workflow
-
-The intended workflow is explicit and intentional:
+# Canonical workflow
 
 1. **Select a curation profile**  
-   A versioned, immutable description of preprocessing behavior.
+   A versioned, immutable description of behavior.
 
 2. **Apply it to a dataset**  
-   Using Hugging Face Datasets at scale.
+   Using Hugging Face Datasets.
 
-3. **Inspect what changed**  
-   Via structured, dataset-level curation reports.
+3. **Inspect emitted signals and reports**  
+   Signals never mutate behavior.
 
-4. **Freeze and publish the artifact**  
-   With the profile version as part of the dataset identity.
+4. **Freeze dataset identity**  
+   With profile version + pipeline hash + dataset hash.
 
-This workflow is designed to prevent silent data drift and make preprocessing
-decisions inspectable.
-
-> **Profiles are the unit of behavior in text-curation.**  
-> Blocks are implementation details and are not part of the stability or
-> compatibility contract.
+> Profiles are the unit of behavior.  
+> Blocks are implementation details and not part of the public stability contract.
 
 ---
 
-## Design principles
+# Deterministic Corpus Compilation Model
 
-- **Profile-driven pipelines**  
-  Reusable, declarative profiles define behavior explicitly.
+text-curation now separates:
 
-- **Deterministic and conservative**  
-  Given the same input and profile, output is identical across runs.
+### 1. Transformation (blocks/)
+Mutate or structure text deterministically.
 
-- **Structure-aware processing**  
-  Text is treated as structured content (paragraphs, lists, headers), not raw strings.
+### 2. Observation (analysis/)
+Emit signals only.
+Never mutate text.
+Never filter implicitly.
 
-- **Dataset-scale friendly**  
-  Designed for efficient use with large Hugging Face Datasets.
+### 3. Dataset Operations
+Explicit, order-preserving, deterministic dataset-level utilities.
 
-- **Explicit over clever**  
-  No probabilistic inference, no semantic guessing, no silent behavior.
+### 4. Identity & Lineage
+Pipeline hash + document fingerprints + dataset hash + manifest.
 
----
-
-## Stability & scope
-
-Only features **explicitly documented as stable** are guaranteed not to change
-across minor releases.
-
-### Stable
-
-- Built-in profiles and their behavior
-- `TextCurator` public API
-- Curation report formats
-
-### Experimental
-
-- New blocks
-- Dataset-level utilities
-- New profiles until documented as stable
-
-Profiles are treated as **behavioral contracts**.
-Once released, their semantics do not change.
+This separation prevents silent data drift.
 
 ---
 
-## Profiles
+# Analysis Namespace (Signal-Only)
 
-Profiles define **what preprocessing behavior is applied and in what order**.
+`src/text_curation/analysis/`
+
+Analysis blocks:
+
+- Subclass `AnalysisBlock`
+- Must not modify text
+- Must not mutate annotations
+- Must emit deterministic signals
+
+Included in 1.6.0:
+
+### QualitySignalBlock
+Emits:
+- `char_entropy`
+- `stopword_ratio`
+- `url_density`
+- `repetition_score`
+- `avg_sentence_length`
+
+Whitespace tokenization.  
+Float rounding for stability.  
+No ML. No external dependencies.
+
+### TokenStatsBlock
+Emits:
+- `token_count`
+- `unique_token_count`
+- `rare_token_ratio`
+- `max_token_length`
+
+Whitespace tokenization.  
+Rare token = frequency == 1 within document.  
+No tokenizer dependency.
+
+### FingerprintBlock
+Emits:
+- `sha256` (UTF-8, deterministic)
+
+Provides stable document identity.
+
+---
+
+# Dataset-Level Operations (Advanced)
+
+Located under:
+
+`src/text_curation/datasets/advanced/`
+
+All operations:
+
+- Preserve order
+- Are deterministic
+- Require explicit configuration
+- Avoid Python’s built-in `hash()`
+
+### SHA-256 Deduplication
+
+`deduplicate_by_hash()`
+
+- Groups identical hashes
+- Keeps first or last (explicit)
+- Emits deterministic report
+- Order preserved
+
+### Exact n-gram Decontamination (Signal-Only)
+
+`decontaminate()`
+
+- Accepts precomputed benchmark n-grams
+- Explicit ngram_size
+- Whitespace tokenization
+- Emits overlap_score
+- Does not filter by default
+
+Detection is separated from filtering.
+
+### Deterministic Reference MinHash
+
+`minhash_deduplicate()`
+
+- Seed-controlled
+- Explicit num_hashes
+- Explicit ngram_size
+- Explicit threshold
+- SHA1-based stable hashing
+- Canonical representative = lowest index
+- O(n²) reference semantics
+
+Semantics are frozen before scaling.
+
+---
+
+# Dataset Lineage & Reproducibility
+
+## DatasetManifest
+
+Captures:
+
+- profile_ids
+- library_version
+- block_order
+- dataset_hash
+- total_token_count
+- explicit timestamp
+- metadata
+
+Immutable dataclass.  
+No implicit timestamps.  
+No environment reads.
+
+## Pipeline Configuration Hash
+
+`compute_pipeline_hash(profile)`
+
+Hashes:
+
+- profile.id
+- block order
+- block class names
+- block policy dictionaries (sorted)
+
+Excludes:
+
+- runtime stats
+- dataset content
+- emitted signals
+
+Purpose: detect semantic drift in configuration.
+
+---
+
+# Deterministic Replay Guarantee
+
+Given:
+
+- Same input
+- Same profile
+- Same settings
+- Same library version
+
+text-curation guarantees:
+
+- Byte-identical output text
+- Identical emitted signals
+- Identical reports
+- Identical pipeline hash
+- Identical dataset hash (same ordering)
+
+Deterministic replay is treated as sacred.
+
+---
+
+# Profiles
+
+Profiles define ordered deterministic behavior.
 
 They are:
 
 - Explicitly versioned
-- Registered at import time
-- Resolved via a global registry
+- Immutable once released
+- Resolved via global registry
 
-A profile defines an ordered sequence of deterministic transformations.
-The specific block composition is an implementation detail and not part of the
-public compatibility contract.
+New in 1.6.0:
 
-Profiles may be deprecated, but are never silently modified.
+`web_pretrain_v1`
 
----
+Includes:
 
-## Implementation primitives (advanced)
+- Redaction
+- Normalization
+- Code-safe formatting
+- Paragraph formatting
+- Basic structure emission
+- Quality signals
+- Token statistics
+- Fingerprinting
 
-Blocks are low-level, deterministic primitives intended for profile authors and
-library extension.
+It does not:
 
-End users should consume behavior exclusively via profiles.
+- Perform dataset-level deduplication
+- Perform filtering by default
+- Use ML models
+- Introduce nondeterminism
 
-Stable primitives include:
-
-- **Normalization** — Unicode, typography, whitespace normalization
-- **Formatting** — Paragraph reconstruction and code-safe formatting
-- **Redaction** — Deterministic masking of emails and explicit tokens
-- **Structure** — Emission of inspectable structural signals
-- **Filtering** — Conservative, signal-based removal
-- **Deduplication** — Exact, normalization-safe paragraph deduplication
-
-More aggressive or semantic behavior is intentionally out of scope by default.
+Profiles are behavioral contracts.
 
 ---
 
-## Non-goals
+# Stability & Scope
+
+### Stable
+
+- `TextCurator` public API
+- Released profiles and their semantics
+- Deterministic replay invariant
+- Pipeline hash semantics
+- Dataset manifest structure
+
+### Experimental
+
+- New blocks
+- Advanced dataset utilities
+- New profiles until marked stable
+
+Breaking behavior requires a major version bump.
+
+---
+
+# Non-Goals
 
 text-curation intentionally does not:
 
-- Perform semantic or topical classification
-- Use machine learning or probabilistic heuristics
-- Infer document quality or intent
-- Apply aggressive, irreversible cleanup by default
+- Use machine learning
+- Perform semantic classification
+- Infer document intent
+- Apply aggressive irreversible cleanup
+- Introduce probabilistic scoring
+- Manage model artifacts
 
-These constraints are critical to reproducibility.
+ML scoring, perplexity, language detection, and distributed deduplication
+are intentionally out of scope for 1.x.
 
 ---
 
-## Installation
+# Installation
 
-Python ≥ 3.9 is required.
+Python ≥ 3.9 required.
 
 ```bash
 pip install text-curation
-```
-For development:
+````
+
+Development:
+
 ```bash
 git clone https://github.com/Dhiraj309/text-curation.git
 cd text-curation
@@ -217,7 +401,8 @@ pip install -e .
 
 ---
 
-Quickstart
+# Quickstart
+
 ```python
 from datasets import load_dataset
 from text_curation import TextCurator
@@ -228,7 +413,7 @@ dataset = load_dataset(
 )
 
 curator = TextCurator.from_profile(
-    "web_common_v1",
+    "web_pretrain_v1",
     collect_reports=True,
 )
 
@@ -241,80 +426,69 @@ dataset = dataset.map(
 
 ---
 
-Reporting
+# Reporting
 
-Curation reports describe what changed, not just what was produced.
+Reports describe what changed and what was observed.
+
 ```python
 from text_curation.reports import summary
 summary(dataset)
 ```
+
 Reports enable:
 
-auditing preprocessing behavior
+* Auditing preprocessing behavior
+* Detecting dataset drift
+* Comparing profiles
+* Inspecting quality signals
 
-detecting dataset drift
-
-comparing profiles
-
-
-They never affect curation behavior.
-
+Reports never affect behavior.
 
 ---
 
-When not to use text-curation
+# When not to use text-curation
 
-One-off regex cleanup
-
-Already-curated datasets
-
-ML-based content scoring or classification
-
-
+* One-off regex cleanup
+* Already fully curated datasets
+* ML-based content scoring
+* Distributed approximate deduplication at massive scale
 
 ---
 
-Versioning
+# Versioning
 
-This project follows Semantic Versioning.
+Semantic Versioning is followed.
 
-1.x guarantees stable default behavior
+1.x guarantees:
 
-Breaking changes require a major version bump
+* Deterministic replay stability
+* Profile semantic stability
+* Public API stability
 
-Profiles are versioned independently of library releases
-
-
-
----
-
-Contributing
-
-Contributions are welcome.
-
-Please read CONTRIBUTING.md before submitting changes.
-
-Key expectations:
-
-Deterministic behavior
-
-Conservative defaults
-
-Tests as specifications
-
-No silent behavior changes
-
-
+Profiles are versioned independently.
 
 ---
 
-License
+# Contributing
+
+Expectations:
+
+* Deterministic behavior
+* Conservative defaults
+* Tests as specifications
+* No silent semantic changes
+* No nondeterminism
+
+Reproducibility is a first-class constraint.
+
+---
+
+# License
 
 Apache 2.0. See LICENSE.
 
-
 ---
 
-Acknowledgements
+# Acknowledgements
 
 Inspired by large-scale dataset curation practices in the Hugging Face ecosystem.
