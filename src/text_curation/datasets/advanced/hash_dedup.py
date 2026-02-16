@@ -13,7 +13,7 @@ def deduplicate_by_hash(
         collect_reports: bool = True,
         ):
     """
-    Deterministic dataset-level deduplication using SHA-256 hasing.
+    Deterministic dataset-level deduplication using SHA-256 hashing.
 
     Args:
         dataset: Hugging Face Dataset
@@ -46,12 +46,12 @@ def deduplicate_by_hash(
         grouped[digest].append(idx)
 
     keep_indices = []
-    deduplicate_groups = 0
+    duplicate_groups = 0
     max_group_size = 1
 
     for indices in grouped.values():
         if len(indices) > 1:
-            deduplicate_groups += 1
+            duplicate_groups += 1
             max_group_size = max(max_group_size, len(indices))
 
         keep_idx = indices[0] if keep == "first" else indices[-1]
@@ -88,7 +88,7 @@ def deduplicate_by_hash(
             "fraction": removed_samples / total_samples if total_samples else 0.0,
         },
         "duplicates": {
-            "groups": deduplicate_groups,
+            "groups": duplicate_groups,
             "max_group_size": max_group_size,
         },
         "determinism": {

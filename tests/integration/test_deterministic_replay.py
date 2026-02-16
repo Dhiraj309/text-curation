@@ -22,3 +22,18 @@ def test_deterministic_replay_with_reports():
     out2 = curator(copy.deepcopy(sample))
 
     assert out1 == out2
+
+def test_full_pipeline_replay_is_identical():
+    curator = TextCurator.from_profile("web_pretrain_v1", collect_reports=True)
+
+    batch = {
+        "text": [
+            "This is a test.",
+            "Another example text."
+        ]
+    }
+
+    run1 = curator(batch)
+    run2 = curator(batch)
+
+    assert run1 == run2
