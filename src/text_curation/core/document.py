@@ -13,7 +13,13 @@ class Document:
     - Signals are append-only
     """
 
-    __slots__ = ("_text", "annotations", "signals")
+    __slots__ = (
+        "_text", 
+        "annotations",
+        "signals",
+        "_dropped",
+        "_drop_reason"
+        )
 
     def __init__(self, text: str):
         """
@@ -25,6 +31,8 @@ class Document:
         self._text = text
         self.annotations = {}
         self.signals: list[Signal] = []
+        self._dropped = False
+        self._drop_reason = None
 
     @property
     def text(self) -> str:
@@ -54,9 +62,31 @@ class Document:
             key = sig.name.split(".", 1)[-1]
             summary[key] = summary.get(key, 0) + 1
 
-        return summary 
+        return summary
+    
+    @property
+    def is_dropped(self) -> bool:
+        return self._dropped
+    
+    @property
+    def drop_reason(self):
+        return self._drop_reason
+    
+    def drop(self, reason: str):
+        """
+        Mark document as dropped.
 
-        
+        Dropping is idempotent.
+        Reason must be explicit.
+        """
+
+        if not self._dropped:
+            self._dropped = True
+            self._drop_reason = str(reason)
+
+            # Emit explicit signals for auditability
+            self.add_signal("document.dropped", True)
+            self.add_signal("document.drop_reason", str(reason))
 
 def compute_basic_stats(text: str) -> dict:
     if not text:
