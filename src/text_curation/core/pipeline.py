@@ -43,6 +43,8 @@ class Pipeline:
         block_stats = {} if collect_report else None
 
         for block in self.blocks:
+            if document.is_dropped:
+                break
             # block_instance = copy.deepcopy(block)
 
             if hasattr(block, "reset_stats"):
@@ -69,6 +71,8 @@ class Pipeline:
                 block_stats=block_stats or {},
                 signals_summary=document.summarize_signals(),
                 extras={},
+                dropped=document._dropped,
+                drop_reason=document._drop_reason,
             )
 
         return document, report
