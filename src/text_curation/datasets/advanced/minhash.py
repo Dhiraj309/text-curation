@@ -55,15 +55,19 @@ def minhash_deduplicate(
     if column not in dataset.column_names:
         raise ValueError(f"Column '{column}' not found in dataset")
 
+    if "document_id" not in dataset.column_names:
+        raise ValueError(
+            "minhash_deduplicate requires 'document_id' column "
+            "for canonical representative selection"
+        )
+
     if not (0.0 <= threshold <= 1.0):
         raise ValueError("threshold must be between 0 and 1")
 
     texts = dataset[column]
-    total_samples = len(texts)
+    document_ids = dataset["document_id"]
 
-    # Backward-compatible optional canonical mode
-    has_document_id = "document_id" in dataset.column_names
-    document_ids = dataset["document_id"] if has_document_id else None
+    total_samples = len(texts)
 
     signatures = []
 
@@ -95,15 +99,11 @@ def minhash_deduplicate(
                 cluster.append(j)
 
         if len(cluster) > 1:
-            if has_document_id:
-                # Canonical representative: lowest document_id
-                cluster_sorted = sorted(
-                    cluster,
-                    key=lambda idx: document_ids[idx]
-                )
-            else:
-                # Backward-compatible representative: lowest index
-                cluster_sorted = sorted(cluster)
+            # Canonical representative: lowest document_id
+            cluster_sorted = sorted(
+                cluster,
+                key=lambda idx: document_ids[idx]
+            )
 
             clusters.append(cluster_sorted)
 
@@ -137,11 +137,7 @@ def minhash_deduplicate(
         "determinism": {
             "seed_controlled": True,
             "order_preserving": True,
-            "canonical_representative": (
-                "lowest_document_id"
-                if has_document_id
-                else "lowest_index"
-            ),
+            "canonical_representative": "lowest_document_id",
         },
     }
 
