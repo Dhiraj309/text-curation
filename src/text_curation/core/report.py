@@ -18,6 +18,7 @@ class CurationReport:
         "extras",
         "dropped",
         "drop_reason",
+        "document_id"
     )
 
     def __init__(
@@ -32,6 +33,7 @@ class CurationReport:
             extras: dict | None = None,
             dropped: bool = False,
             drop_reason: str | None = None,
+            document_id: str | None = None,
             ):
         
         self.profile_id = profile_id
@@ -40,6 +42,7 @@ class CurationReport:
         self.output_stats = dict(output_stats)
         self.dropped = bool(dropped)
         self.drop_reason = drop_reason
+        self.document_id = document_id
 
         # Always present never None
         self.blocks_stats = dict(block_stats or {})
@@ -60,4 +63,5 @@ class CurationReport:
             "extras": dict(self.extras),
             "dropped": self.dropped,
             "drop_reason": self.drop_reason,
+            "document_id": self.document_id,
         }
