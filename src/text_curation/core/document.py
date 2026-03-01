@@ -18,7 +18,8 @@ class Document:
         "annotations",
         "signals",
         "_dropped",
-        "_drop_reason"
+        "_drop_reason",
+        "_document_id",
         )
 
     def __init__(self, text: str):
@@ -33,6 +34,7 @@ class Document:
         self.signals: list[Signal] = []
         self._dropped = False
         self._drop_reason = None
+        self._document_id = None
 
     @property
     def text(self) -> str:
@@ -87,6 +89,15 @@ class Document:
             # Emit explicit signals for auditability
             self.add_signal("document.dropped", True)
             self.add_signal("document.drop_reason", str(reason))
+    @property
+    def document_id(self) -> str | None:
+        """
+        Canonical immutable identity of this document.
+
+        This value is write-once and must be explicitly set
+        by a deterministic identity block (e.g. FingerprintBlock).
+        """
+        return self._document_id
 
 def compute_basic_stats(text: str) -> dict:
     if not text:
@@ -107,3 +118,17 @@ def compute_basic_stats(text: str) -> dict:
         "lines": len(lines),
         "paragraphs": len(paragraphs)
     }
+
+def set_document_id(self, value: str):
+    """
+    Set the canonical document identity.
+
+    This operation is write-once and immutable.
+    """
+    if self._document_id is not None:
+        raise RuntimeError("document_id is immutable once set")
+
+    if not isinstance(value, str) or not value:
+        raise TypeError("document_id must be a non-empty string")
+
+    self._document_id = value
