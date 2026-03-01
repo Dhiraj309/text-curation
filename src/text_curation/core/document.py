@@ -1,5 +1,6 @@
 from text_curation.core.signals import Signal
 
+
 class Document:
     """
     Container for text and associated processing artifacts.
@@ -14,13 +15,13 @@ class Document:
     """
 
     __slots__ = (
-        "_text", 
+        "_text",
         "annotations",
         "signals",
         "_dropped",
         "_drop_reason",
         "_document_id",
-        )
+    )
 
     def __init__(self, text: str):
         """
@@ -65,15 +66,15 @@ class Document:
             summary[key] = summary.get(key, 0) + 1
 
         return summary
-    
+
     @property
     def is_dropped(self) -> bool:
         return self._dropped
-    
+
     @property
     def drop_reason(self):
         return self._drop_reason
-    
+
     def drop(self, reason: str):
         """
         Mark document as dropped.
@@ -81,7 +82,6 @@ class Document:
         Dropping is idempotent.
         Reason must be explicit.
         """
-
         if not self._dropped:
             self._dropped = True
             self._drop_reason = str(reason)
@@ -89,6 +89,7 @@ class Document:
             # Emit explicit signals for auditability
             self.add_signal("document.dropped", True)
             self.add_signal("document.drop_reason", str(reason))
+
     @property
     def document_id(self) -> str | None:
         """
@@ -99,15 +100,30 @@ class Document:
         """
         return self._document_id
 
+    def set_document_id(self, value: str):
+        """
+        Set the canonical document identity.
+
+        This operation is write-once and immutable.
+        """
+        if self._document_id is not None:
+            raise RuntimeError("document_id is immutable once set")
+
+        if not isinstance(value, str) or not value:
+            raise TypeError("document_id must be a non-empty string")
+
+        self._document_id = value
+
+
 def compute_basic_stats(text: str) -> dict:
     if not text:
         return {
             "chars": 0,
             "words": 0,
             "lines": 0,
-            "paragraphs": 0
+            "paragraphs": 0,
         }
-    
+
     words = text.split()
     lines = text.split("\n")
     paragraphs = [p for p in text.split("\n\n") if p.strip()]
@@ -116,19 +132,5 @@ def compute_basic_stats(text: str) -> dict:
         "chars": len(text),
         "words": len(words),
         "lines": len(lines),
-        "paragraphs": len(paragraphs)
+        "paragraphs": len(paragraphs),
     }
-
-def set_document_id(self, value: str):
-    """
-    Set the canonical document identity.
-
-    This operation is write-once and immutable.
-    """
-    if self._document_id is not None:
-        raise RuntimeError("document_id is immutable once set")
-
-    if not isinstance(value, str) or not value:
-        raise TypeError("document_id must be a non-empty string")
-
-    self._document_id = value

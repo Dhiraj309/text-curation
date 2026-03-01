@@ -32,6 +32,8 @@ class FingerprintBlock(AnalysisBlock):
             text = " ".join(text.split())
 
         digest = hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+        document.set_document_id(digest)
         document.add_signal("document.sha256", digest)
 
         return document
