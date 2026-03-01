@@ -2,7 +2,8 @@ import hashlib
 from dataclasses import dataclass, asdict
 from typing import List, Dict, Any
 
-def _stable_dataset_hash(values: List[str])-> str:
+
+def _stable_dataset_hash(values: List[str]) -> str:
     """
     Deterministic dataset hash computed from ordered text values.
     """
@@ -11,14 +12,17 @@ def _stable_dataset_hash(values: List[str])-> str:
         hasher.update(value.encode("utf-8"))
     return hasher.hexdigest()
 
+
 @dataclass(frozen=True)
 class DatasetManifest:
     """
     Immutable dataset lineage manifest.
 
-    All fields must be explicitely provided.
+    Default behavior remains unchanged.
+    Strict mode is opt-in and enforces required reproducibility fields.
     """
 
+    # Required fields (no defaults)
     profile_ids: List[str]
     library_version: str
     block_order: List[str]
@@ -26,12 +30,31 @@ class DatasetManifest:
     timestamp: str
     metadata: Dict[str, Any]
 
+    # Optional canonical identity fields
     dataset_hash: str | None = None
     document_count: int | None = None
 
+    # Strict enforcement flag (must be last)
+    strict: bool = False
+
+    def __post_init__(self):
+        if self.strict:
+            if not self.dataset_hash:
+                raise ValueError(
+                    "Strict manifest requires dataset_hash"
+                )
+            if not self.profile_ids:
+                raise ValueError(
+                    "Strict manifest requires profile_ids"
+                )
+            if not self.block_order:
+                raise ValueError(
+                    "Strict manifest requires block_order"
+                )
+
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
-    
+
     @classmethod
     def from_dataset(
         cls,
@@ -44,24 +67,26 @@ class DatasetManifest:
         total_token_count: int,
         timestamp: str,
         metadata: Dict[str, Any] | None = None,
+        strict: bool = False,
     ):
         if text_column not in dataset.column_names:
             raise ValueError(f"Column '{text_column}' not found in dataset")
-        
+
         texts = dataset[text_column]
 
         if not all(isinstance(t, str) for t in texts):
             raise TypeError("Dataset must contain string text values")
-        
+
         dataset_hash = _stable_dataset_hash(texts)
 
         return cls(
             profile_ids=list(profile_ids),
             library_version=library_version,
             block_order=list(block_order),
-            dataset_hash=dataset_hash,
-            document_count=len(texts),
             total_token_count=int(total_token_count),
             timestamp=str(timestamp),
             metadata=dict(metadata or {}),
+            dataset_hash=dataset_hash,
+            document_count=len(texts),
+            strict=strict,
         )
