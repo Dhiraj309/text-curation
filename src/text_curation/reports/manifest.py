@@ -22,10 +22,12 @@ class DatasetManifest:
     profile_ids: List[str]
     library_version: str
     block_order: List[str]
-    dataset_hash: str
     total_token_count: int
     timestamp: str
     metadata: Dict[str, Any]
+
+    dataset_hash: str | None = None
+    document_count: int | None = None
 
     def to_dict(self) -> Dict[str, Any]:
         return asdict(self)
@@ -58,6 +60,7 @@ class DatasetManifest:
             library_version=library_version,
             block_order=list(block_order),
             dataset_hash=dataset_hash,
+            document_count=len(texts),
             total_token_count=int(total_token_count),
             timestamp=str(timestamp),
             metadata=dict(metadata or {}),
