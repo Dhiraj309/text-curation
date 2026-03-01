@@ -73,6 +73,7 @@ class Pipeline:
                 extras={},
                 dropped=document._dropped,
                 drop_reason=document._drop_reason,
+                document_id=document.document_id,
             )
 
         return document, report
