@@ -125,6 +125,7 @@ class CorpusPipeline:
             total_token_count=0,
             timestamp="runtime",
             metadata={},
+            strict=self.strict_manifest,
         )
 
         return dataset, manifest
