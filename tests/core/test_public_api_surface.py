@@ -5,6 +5,7 @@ def test_public_api_is_explicit_and_minimal():
 
     assert public == {
         "TextCurator",
+        "CorpusPipeline",
         "__version__"
     }
 
