@@ -1,14 +1,8 @@
 from text_curation.core.pipeline import Pipeline
 from text_curation.registry import get_profile
-import copy
+
 
 class TextCurator:
-    """
-    Immutable, profile-driven entry point for text curation.
-
-    Once constructed, a TextCurator instance is fully frozen
-    """
-
     __slots__ = ("_profile", "_collect_reports", "_pipeline")
 
     def __init__(self, profile, collect_reports: bool = False):
@@ -20,18 +14,18 @@ class TextCurator:
     def from_profile(cls, profile_id, *, collect_reports: bool = False):
         profile = get_profile(profile_id)
         return cls(profile, collect_reports=collect_reports)
-    
+
     def __setattr__(self, key, value):
         raise TypeError("TextCurator instances are immutable")
-    
+
     @property
     def profile(self):
         return self._profile
-    
+
     @property
     def collect_reports(self):
         return self._collect_reports
-    
+
     @property
     def pipeline(self):
         return self._pipeline
@@ -55,7 +49,6 @@ class TextCurator:
             cleaned.append(doc.text)
             reports.append(report.to_dict())
 
-        # ✅ RETURN AFTER LOOP
         return {
             "text": cleaned,
             "curation_report": reports,
