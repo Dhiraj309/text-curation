@@ -13,6 +13,10 @@ from text_curation.datasets.advanced.hash_dedup_streaming import (
 )
 from text_curation.datasets.advanced.minhash import minhash_deduplicate
 
+# 🔹 NEW IMPORTS (identity attachment)
+from text_curation.analysis.fingerprint import FingerprintBlock
+from text_curation.core.document import Document
+
 
 class CorpusPipeline:
     """
@@ -53,6 +57,9 @@ class CorpusPipeline:
             collect_reports=False,
         )
 
+        # Deterministic fingerprint block (compiler-level identity)
+        self._fingerprint_block = FingerprintBlock()
+
     def __call__(self, dataset: Dataset):
 
         # -------------------------------------------------
@@ -62,6 +69,19 @@ class CorpusPipeline:
             self._curator,
             batched=True,
         )
+
+        # -------------------------------------------------
+        # 1.5 Attach Canonical document_id
+        # -------------------------------------------------
+        def _attach_document_id(batch):
+            ids = []
+            for text in batch["text"]:
+                doc = Document(text)
+                self._fingerprint_block.apply(doc)
+                ids.append(doc.document_id)
+            return {"document_id": ids}
+
+        dataset = dataset.map(_attach_document_id, batched=True)
 
         # -------------------------------------------------
         # 2. Optional Filtering
@@ -109,7 +129,7 @@ class CorpusPipeline:
                 "to compute canonical dataset identity"
             )
 
-        document_ids = dataset["document_id"]
+        document_ids = list(dataset["document_id"])
         pipeline_hash = compute_pipeline_hash(self.profile)
         dataset_hash = compute_dataset_hash(document_ids, pipeline_hash)
 
