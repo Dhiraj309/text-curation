@@ -15,8 +15,28 @@ class TextCurator:
         profile = get_profile(profile_id)
         return cls(profile, collect_reports=collect_reports)
 
+    # 🔒 Runtime immutability
     def __setattr__(self, key, value):
         raise TypeError("TextCurator instances are immutable")
+
+    # 🔁 Multiprocessing / pickle support
+    def __getstate__(self):
+        """
+        Return minimal deterministic state for multiprocessing.
+        """
+        return {
+            "profile_id": self._profile.id,
+            "collect_reports": self._collect_reports,
+        }
+
+    def __setstate__(self, state):
+        """
+        Reconstruct instance safely during unpickling.
+        """
+        profile = get_profile(state["profile_id"])
+        object.__setattr__(self, "_profile", profile)
+        object.__setattr__(self, "_collect_reports", state["collect_reports"])
+        object.__setattr__(self, "_pipeline", Pipeline(profile.blocks))
 
     @property
     def profile(self):
