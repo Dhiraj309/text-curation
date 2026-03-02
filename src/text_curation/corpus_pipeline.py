@@ -13,16 +13,12 @@ from text_curation.datasets.advanced.hash_dedup_streaming import (
 )
 from text_curation.datasets.advanced.minhash import minhash_deduplicate
 
-# 🔹 NEW IMPORTS (identity attachment)
-from text_curation.analysis.fingerprint import FingerprintBlock
-from text_curation.core.document import Document
-
 
 class CorpusPipeline:
     """
     Deterministic corpus-level orchestration layer.
 
-    This class composes:
+    Composes:
     - Text curation
     - Optional filtering
     - Optional deduplication
@@ -52,36 +48,39 @@ class CorpusPipeline:
         self.shard_config = shard_config or {}
         self.strict_manifest = strict_manifest
 
+        # IMPORTANT:
+        # We enable collect_reports=True so we can extract document_id
         self._curator = TextCurator(
             profile_obj,
-            collect_reports=False,
+            collect_reports=True,
         )
-
-        # Deterministic fingerprint block (compiler-level identity)
-        self._fingerprint_block = FingerprintBlock()
 
     def __call__(self, dataset: Dataset):
 
         # -------------------------------------------------
-        # 1. Apply TextCurator
+        # 1. Apply TextCurator (collect reports to extract identity)
         # -------------------------------------------------
         dataset = dataset.map(
             self._curator,
             batched=True,
         )
 
-        # -------------------------------------------------
-        # 1.5 Attach Canonical document_id
-        # -------------------------------------------------
-        def _attach_document_id(batch):
-            ids = []
-            for text in batch["text"]:
-                doc = Document(text)
-                self._fingerprint_block.apply(doc)
-                ids.append(doc.document_id)
-            return {"document_id": ids}
+        if "curation_report" not in dataset.column_names:
+            raise RuntimeError(
+                "CorpusPipeline requires curation_report to extract document_id"
+            )
 
-        dataset = dataset.map(_attach_document_id, batched=True)
+        # -------------------------------------------------
+        # 1.5 Extract canonical document_id
+        # -------------------------------------------------
+        document_ids = [
+            r["document_id"] for r in dataset["curation_report"]
+        ]
+
+        dataset = dataset.add_column("document_id", document_ids)
+
+        # Drop reports after identity extraction (compiler mode)
+        dataset = dataset.remove_columns(["curation_report"])
 
         # -------------------------------------------------
         # 2. Optional Filtering
