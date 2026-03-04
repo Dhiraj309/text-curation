@@ -1,24 +1,29 @@
 import pytest
 
-from text_curation.registry import register
+from text_curation.registry import register, get_profile
 from text_curation.profiles.base import Profile
-from text_curation.registry import get_profile
+
 
 def test_duplicate_profile_registration_raises():
     """
-    Profile IDs must be globally unique.
+    Profile canonical IDs must be globally unique.
 
-    Registering two profiles with the same (name, version)
-    must be immediately to prevent silent overrides.
+    Registering two profiles with the same
+    (domain, task, philosophy, version) must fail.
     """
+
     profile1 = Profile(
-        name="test_profile",
+        domain="test",
+        task="pretrain",
+        philosophy="minimal",
         version="v1",
         blocks=[],
     )
 
     profile2 = Profile(
-        name="test_profile",
+        domain="test",
+        task="pretrain",
+        philosophy="minimal",
         version="v1",
         blocks=[],
     )
@@ -30,19 +35,43 @@ def test_duplicate_profile_registration_raises():
 
 
 def test_profile_blocks_are_immutable():
-    profile = Profile("test", "v1", [])
+    profile = Profile(
+        domain="test",
+        task="test",
+        philosophy="test",
+        version="v1",
+        blocks=[],
+    )
 
     with pytest.raises((TypeError, AttributeError)):
         profile.blocks.append("illegal")
 
+
 def test_profile_name_is_immutable():
-    profile = Profile("test", "v1", [])
+    """
+    Canonical identifier components must be immutable.
+    """
+
+    profile = Profile(
+        domain="test",
+        task="test",
+        philosophy="test",
+        version="v1",
+        blocks=[],
+    )
 
     with pytest.raises(TypeError):
-        profile.name = "evil"
+        profile.domain = "evil"
+
 
 def test_profile_version_is_immutable():
-    profile = Profile("test", "v1", [])
+    profile = Profile(
+        domain="test",
+        task="test",
+        philosophy="test",
+        version="v1",
+        blocks=[],
+    )
 
     with pytest.raises(TypeError):
         profile.version = "v999"

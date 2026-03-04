@@ -6,15 +6,24 @@ from text_curation.blocks import (
     BasicStructureBlock,
     ExactParagraphDeduplicationBlock,
 )
+
 from text_curation.profiles.base import Profile
 from text_curation.registry import register
 
 
 # Stable, general-purpose profile for heterogeneous web-derived text.
 # This profile prioritizes determinism, safety, and semantic preservation.
+
 PROFILE = Profile(
-    name="web_common",
+    domain="web",
+    task="pretrain",
+    philosophy="structure",
     version="v1",
+
+    description="Structure-aware preprocessing pipeline for heterogeneous web text",
+
+    legacy_names=["web_common_v1"],
+
     blocks=[
         # Redact sensitive information early to avoid downstream leakage
         RedactionBlock(),
@@ -22,9 +31,9 @@ PROFILE = Profile(
         # Normalize Unicode and remove low-level encoding artifacts
         NormalizationBlock(),
 
-        # Maintains the code indenatation format
+        # Maintain code indentation formatting
         CodeSafeFormattingBlock(),
-        
+
         # Reconstruct readable paragraph and line structure
         ParagraphFormattingBlock(),
 
@@ -43,14 +52,15 @@ PROFILE = Profile(
         # Conservatively drop empty or repeated short boilerplate paragraphs
         ExactParagraphDeduplicationBlock(
             policy={
-        "scope": "paragraph",
-        "normalize_case": True,
-        "collapse_whitespace": True,
-        "drop_empty": True,
-    }
+                "scope": "paragraph",
+                "normalize_case": True,
+                "collapse_whitespace": True,
+                "drop_empty": True,
+            }
         ),
     ],
-    guarantees = {
+
+    guarantees={
         "deterministic": True,
         "explicit_block_order": True,
         "profile_id_fully_specifies_behavior": True,
@@ -58,7 +68,7 @@ PROFILE = Profile(
         "document_local_transforms_only": True,
     },
 
-    behavior = {
+    behavior={
         "secrets_redacted": True,
         "structure_preserved": True,
         "layout_preserved": False,
@@ -70,5 +80,4 @@ PROFILE = Profile(
 )
 
 # Register the profile at import time.
-# This allows resolution via the global profile registry.
 register(PROFILE)
