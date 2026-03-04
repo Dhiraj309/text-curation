@@ -3,17 +3,27 @@ from text_curation.blocks import (
     CodeSafeFormattingBlock,
     RedactionBlock,
 )
+
 from text_curation.profiles.base import Profile
 from text_curation.registry import register
 
+
 PROFILE = Profile(
-    name="llm_pretrain",
+    domain="llm",
+    task="pretrain",
+    philosophy="minimal",
     version="v1",
+
+    description="Minimal preprocessing profile for LLM pretraining pipelines",
+
+    legacy_names=["llm_pretrain_v1"],
+
     blocks=[
         RedactionBlock(),
         NormalizationBlock(),
         CodeSafeFormattingBlock(),
     ],
+
     guarantees={
         "deterministic": True,
         "explicit_block_order": True,
@@ -21,7 +31,8 @@ PROFILE = Profile(
         "no_hidden_global_state": True,
         "document_local_transforms_only": True,
     },
-    behavior = {
+
+    behavior={
         "secrets_redacted": True,
         "structure_preserved": True,
         "layout_preserved": True,
@@ -33,5 +44,4 @@ PROFILE = Profile(
 )
 
 # Register the profile at import time.
-# This allows resolution via the global profile registry.
 register(PROFILE)
