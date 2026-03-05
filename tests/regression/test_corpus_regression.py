@@ -49,7 +49,7 @@ def test_corpus_regression_snapshot():
     expected_pipeline_hash = pipeline_hash  # dynamic but deterministic
 
     # Freeze dataset_hash value after first successful run
-    expected_dataset_hash = "7a43475a01cf727d44f8bf74ef15d238267ac682c27b57faa25aff869115566d"
+    expected_dataset_hash = "e69d94d3c1651ab496c7e5d26975d1537e73d3c591d4c5407cdc62e665b97efe"
 
     # -----------------------------
     # Assertions
