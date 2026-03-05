@@ -40,20 +40,33 @@ PROFILE = Profile(
     ),
 
     blocks=[
+
         # ------------------------------------------------------------------
-        # Unicode safety layer
+        # 1. Text integrity layer
         # ------------------------------------------------------------------
         UnicodeIntegrityBlock(),
         EncodingRepairBlock(),
 
         # ------------------------------------------------------------------
-        # OCR artifact repair
+        # 2. OCR artifact repair
         # ------------------------------------------------------------------
         OCRDigitRepairBlock(),
         OCRSpacingRepairBlock(),
 
         # ------------------------------------------------------------------
-        # Security redaction
+        # 3. Safe normalization
+        # ------------------------------------------------------------------
+        NormalizationBlockV2(),
+
+        # ------------------------------------------------------------------
+        # 4. Structural cleanup
+        # HTML must be cleaned BEFORE redaction so placeholders
+        # like <EMAIL> are not interpreted as HTML tags.
+        # ------------------------------------------------------------------
+        HTMLStructureBlock(),
+
+        # ------------------------------------------------------------------
+        # 5. Sensitive information redaction
         # ------------------------------------------------------------------
         RedactionBlock(
             policy={
@@ -62,46 +75,37 @@ PROFILE = Profile(
         ),
 
         # ------------------------------------------------------------------
-        # Safe normalization layer
-        # ------------------------------------------------------------------
-        NormalizationBlockV2(),
-
-        # ------------------------------------------------------------------
-        # HTML cleanup
-        # ------------------------------------------------------------------
-        HTMLStructureBlock(),
-
-        # ------------------------------------------------------------------
-        # Protect code formatting before paragraph logic
+        # 6. Code-safe formatting protection
         # ------------------------------------------------------------------
         CodeSafeFormattingBlock(),
 
         # ------------------------------------------------------------------
-        # Formatting repairs
+        # 7. Formatting repairs
         # ------------------------------------------------------------------
         ColonSpacingRepairBlock(),
         ParagraphFormattingBlockV2(),
         PunctuationQuoteRepairBlock(),
 
         # ------------------------------------------------------------------
-        # Structural analysis
+        # 8. Structural analysis
         # ------------------------------------------------------------------
         BasicStructureBlock(),
 
         # ------------------------------------------------------------------
-        # Boilerplate detection (signal only)
+        # 9. Boilerplate detection (signals only)
         # ------------------------------------------------------------------
         BoilerplateDetectionBlock(),
 
         # ------------------------------------------------------------------
-        # Quality analysis
+        # 10. Quality analysis
         # ------------------------------------------------------------------
         QualitySignalBlock(),
         ExtendedQualityBlock(),
         TokenStatsBlock(),
 
         # ------------------------------------------------------------------
-        # Deterministic document identity
+        # 11. Deterministic fingerprinting
+        # Must run last to guarantee reproducibility.
         # ------------------------------------------------------------------
         FingerprintBlock(
             policy={
