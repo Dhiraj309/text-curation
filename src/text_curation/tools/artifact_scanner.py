@@ -1,59 +1,69 @@
 import re
-import re
 from collections import Counter
 
-from datasets import Dataset
+
+# Existing artifact detectors
+SPACE_BEFORE_PUNCT = re.compile(r"\s+[,.!?;:]")
+BROKEN_NUMBER = re.compile(r"\d+\s+,\s+\d+")
+
+# Extended detectors
+MERGED_QUOTE = re.compile(r'[.!?]"[A-Za-z]')
+COLON_SPACING = re.compile(r"\d+:\s+\d+")
+UNICODE_DASH_LOSS = re.compile(r" - ")
+ELLIPSIS_OVERFLOW = re.compile(r"\.{4,}")
+NEWLINE_COLLAPSE = re.compile(r'[.!?]"?\n"[A-Za-z]')
 
 
-# Common formatting artifacts introduced by cleaning systems
-ARTIFACT_PATTERNS = {
-    "space_before_punctuation": re.compile(r"\s+[.,!?;:]"),
-    "space_inside_quotes": re.compile(r"\"\s+|\s+\""),
-    "broken_number_format": re.compile(r"\d+\s+,\s+\d+"),
-    "double_space": re.compile(r" {2,}"),
-    "space_before_closing_paren": re.compile(r"\s+\)"),
-}
-
-
-def artifact_scan(dataset: Dataset, *, column: str = "text"):
+def _extract_texts(data):
     """
-    Scan dataset for common formatting artifacts.
-
-    This tool detects artifacts typically introduced by
-    preprocessing pipelines.
-
-    Examples detected:
-
-        "Hello , world"
-        "word ."
-        "10 , 000"
-        "space )"
-
-    The function returns counts of each artifact type.
+    Normalize supported inputs into iterable[str].
+    Supports HuggingFace Dataset or iterable[str].
     """
 
-    if column not in dataset.column_names:
-        raise ValueError(f"Column '{column}' not found in dataset")
+    if hasattr(data, "column_names") and "text" in data.column_names:
+        return data["text"]
 
-    texts = dataset[column]
+    return data
 
-    artifact_counts = Counter()
-    total_documents = 0
+
+def scan_artifacts(data):
+    """
+    Return flat artifact metrics.
+    Used by internal tools and extended tests.
+    """
+
+    texts = _extract_texts(data)
+
+    counts = Counter()
 
     for text in texts:
 
         if not isinstance(text, str):
-            raise TypeError("Dataset must contain string text")
+            continue
 
-        total_documents += 1
+        counts["space_before_punctuation"] += len(SPACE_BEFORE_PUNCT.findall(text))
+        counts["broken_number_format"] += len(BROKEN_NUMBER.findall(text))
+        counts["merged_quotes"] += len(MERGED_QUOTE.findall(text))
+        counts["colon_spacing_changes"] += len(COLON_SPACING.findall(text))
+        counts["unicode_dash_replacement"] += len(UNICODE_DASH_LOSS.findall(text))
+        counts["ellipsis_overflow"] += len(ELLIPSIS_OVERFLOW.findall(text))
+        counts["newline_quote_pattern"] += len(NEWLINE_COLLAPSE.findall(text))
 
-        for name, pattern in ARTIFACT_PATTERNS.items():
-            matches = pattern.findall(text)
+    return dict(counts)
 
-            if matches:
-                artifact_counts[name] += len(matches)
 
-    return {
-        "documents_scanned": total_documents,
-        "artifact_counts": dict(artifact_counts),
-    }
+# ------------------------------------------------
+# Backward compatibility API
+# ------------------------------------------------
+
+def artifact_scan(data):
+    """
+    Legacy API expected by existing tests.
+    """
+
+    counts = scan_artifacts(data)
+
+    # remove zero entries
+    counts = {k: v for k, v in counts.items() if v > 0}
+
+    return {"artifact_counts": counts}
