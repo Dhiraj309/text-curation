@@ -1,6 +1,8 @@
+
 from text_curation.blocks import (
     UnicodeIntegrityBlock,
     EncodingRepairBlock,
+    OCRDigitRepairBlock,
     OCRSpacingRepairBlock,
     ColonSpacingRepairBlock,
     RedactionBlock,
@@ -33,9 +35,8 @@ PROFILE = Profile(
 
     description=(
         "Production-grade web preprocessing pipeline. "
-        "Preserves unicode punctuation, avoids stylistic punctuation "
-        "rewriting, repairs OCR spacing artifacts, and uses safer "
-        "paragraph reconstruction."
+        "Repairs encoding corruption, OCR artifacts, and structural noise "
+        "while preserving natural language formatting and unicode punctuation."
     ),
 
     blocks=[
@@ -45,7 +46,10 @@ PROFILE = Profile(
         UnicodeIntegrityBlock(),
         EncodingRepairBlock(),
 
-        # OCR repair BEFORE whitespace normalization
+        # ------------------------------------------------------------------
+        # OCR artifact repair
+        # ------------------------------------------------------------------
+        OCRDigitRepairBlock(),
         OCRSpacingRepairBlock(),
 
         # ------------------------------------------------------------------
@@ -58,7 +62,7 @@ PROFILE = Profile(
         ),
 
         # ------------------------------------------------------------------
-        # Safer normalization
+        # Safe normalization layer
         # ------------------------------------------------------------------
         NormalizationBlockV2(),
 
@@ -90,7 +94,7 @@ PROFILE = Profile(
         BoilerplateDetectionBlock(),
 
         # ------------------------------------------------------------------
-        # Quality signals
+        # Quality analysis
         # ------------------------------------------------------------------
         QualitySignalBlock(),
         ExtendedQualityBlock(),
@@ -119,6 +123,7 @@ PROFILE = Profile(
     behavior={
         "unicode_integrity_enforced": True,
         "encoding_repair": True,
+        "ocr_digit_repair": True,
         "ocr_spacing_repaired": True,
         "secrets_redacted": True,
         "html_layout_removed": True,

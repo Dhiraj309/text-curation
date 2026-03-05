@@ -6,7 +6,7 @@ the canonical import surface for block composition in profiles.
 """
 
 from .base import Block
-from .normalization import (NormalizationBlock, EncodingRepairBlock, UnicodeIntegrityBlock, NormalizationBlockV2, OCRSpacingRepairBlock)
+from .normalization import (NormalizationBlock, EncodingRepairBlock, UnicodeIntegrityBlock, NormalizationBlockV2, OCRSpacingRepairBlock, OCRDigitRepairBlock)
 from .formatting import (CodeSafeFormattingBlock, ParagraphFormattingBlock, HTMLStructureBlock, PunctuationQuoteRepairBlock, ParagraphFormattingBlockV2, ColonSpacingRepairBlock)
 from .redaction import RedactionBlock
 from .structure import (BasicStructureBlock, CodeFenceDetector, HtmlCodeDetector)
@@ -16,7 +16,7 @@ from .deduplication import ExactParagraphDeduplicationBlock
 # Explicit export list to keep the public API stable
 __all__ = [
     "Block",
-    "NormalizationBlock", "EncodingRepairBlock", "UnicodeIntegrityBlock", "NormalizationBlockV2", "OCRSpacingRepairBlock",
+    "NormalizationBlock", "EncodingRepairBlock", "UnicodeIntegrityBlock", "NormalizationBlockV2", "OCRSpacingRepairBlock", "OCRDigitRepairBlock",
     "CodeSafeFormattingBlock", "ParagraphFormattingBlock", "HTMLStructureBlock", "ParagraphFormattingBlockV2", "ColonSpacingRepairBlock",
     "RedactionBlock",
     "BasicStructureBlock", "CodeFenceDetector", "HtmlCodeDetector",
