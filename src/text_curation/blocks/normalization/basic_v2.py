@@ -17,6 +17,20 @@ _QUOTES = {
     "‚": "'",
 }
 
+# Protect superscripts from Unicode normalization
+_SUPERSCRIPTS = {
+    "⁰": "__SUP0__",
+    "¹": "__SUP1__",
+    "²": "__SUP2__",
+    "³": "__SUP3__",
+    "⁴": "__SUP4__",
+    "⁵": "__SUP5__",
+    "⁶": "__SUP6__",
+    "⁷": "__SUP7__",
+    "⁸": "__SUP8__",
+    "⁹": "__SUP9__",
+}
+
 
 class NormalizationBlockV2(Block):
     """
@@ -24,6 +38,7 @@ class NormalizationBlockV2(Block):
 
     Philosophy:
     - Preserve Unicode punctuation (— – − …)
+    - Preserve superscripts (² ³ ⁴ ...)
     - Repair encoding corruption only
     - Remove invisible/control characters
     - Avoid stylistic rewriting
@@ -36,7 +51,14 @@ class NormalizationBlockV2(Block):
 
         text = document.text
 
+        # Protect superscripts before Unicode normalization
+        text = self._protect_superscripts(text)
+
         text = self._normalize_unicode(text)
+
+        # Restore superscripts after normalization
+        text = self._restore_superscripts(text)
+
         text = self._replace_zero_width(text)
         text = self._remove_control_char(text)
         text = self._normalize_line_endings(text)
@@ -52,6 +74,16 @@ class NormalizationBlockV2(Block):
         document.set_text(text.strip())
 
         return document
+
+    def _protect_superscripts(self, text):
+        for k, v in _SUPERSCRIPTS.items():
+            text = text.replace(k, v)
+        return text
+
+    def _restore_superscripts(self, text):
+        for k, v in _SUPERSCRIPTS.items():
+            text = text.replace(v, k)
+        return text
 
     def _normalize_unicode(self, text):
         return unicodedata.normalize("NFKC", text)
