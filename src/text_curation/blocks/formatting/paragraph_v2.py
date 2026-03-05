@@ -15,6 +15,7 @@ class ParagraphFormattingBlockV2(Block):
     - Preserve natural paragraph boundaries
     - Only merge lines likely caused by PDF line wrapping
     - Avoid stylistic punctuation rewriting
+    - Never modify fenced code blocks
     """
 
     DEFAULT_POLICY = {
@@ -43,6 +44,8 @@ class ParagraphFormattingBlockV2(Block):
         out = []
         buffer = []
 
+        in_fence = False
+
         def flush():
             nonlocal buffer
             if not buffer:
@@ -57,22 +60,41 @@ class ParagraphFormattingBlockV2(Block):
 
         for line in lines:
 
-            # Preserve code indentation
+            stripped = line.strip()
+
+            # --------------------------------------------------
+            # Markdown code fence detection
+            # --------------------------------------------------
+            if stripped.startswith("```") or stripped.startswith("~~~"):
+                flush()
+                out.append(line)
+                in_fence = not in_fence
+                continue
+
+            # --------------------------------------------------
+            # Preserve lines inside fenced code blocks exactly
+            # --------------------------------------------------
+            if in_fence:
+                flush()
+                out.append(line)
+                continue
+
+            # Preserve indented code blocks
             if _CODE_INDENT.match(line):
                 flush()
                 out.append(line)
                 continue
 
             # Blank line = paragraph boundary
-            if not line.strip():
+            if not stripped:
                 flush()
                 out.append("")
                 continue
 
-            stripped = line.strip()
+            stripped_line = stripped
 
             if not buffer:
-                buffer.append(stripped)
+                buffer.append(stripped_line)
                 continue
 
             prev = buffer[-1]
@@ -80,17 +102,17 @@ class ParagraphFormattingBlockV2(Block):
             # Conditions for safe merge (PDF-style wrapping)
             if (
                 not _SENTENCE_END.search(prev)
-                and stripped
-                and stripped[0].islower()
+                and stripped_line
+                and stripped_line[0].islower()
                 and len(prev) < 120
-                and len(stripped) < 120
-                and not stripped.startswith(_QUOTE_START)
+                and len(stripped_line) < 120
+                and not stripped_line.startswith(_QUOTE_START)
             ):
-                buffer.append(stripped)
+                buffer.append(stripped_line)
                 continue
 
             flush()
-            buffer.append(stripped)
+            buffer.append(stripped_line)
 
         flush()
 
