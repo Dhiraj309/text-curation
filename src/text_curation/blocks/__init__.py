@@ -7,7 +7,7 @@ the canonical import surface for block composition in profiles.
 
 from .base import Block
 from .normalization import (NormalizationBlock, EncodingRepairBlock, UnicodeIntegrityBlock)
-from .formatting import (CodeSafeFormattingBlock, ParagraphFormattingBlock, HTMLStructureBlock, PunctuationQuoteRepairBlock)
+from .formatting import (CodeSafeFormattingBlock, ParagraphFormattingBlock, HTMLStructureBlock, PunctuationQuoteRepairBlock, ParagraphFormattingBlockV2)
 from .redaction import RedactionBlock
 from .structure import (BasicStructureBlock, CodeFenceDetector, HtmlCodeDetector)
 from .filtering import (SignalBasedBoilerplateFilteringBlock, BoilerplateDetectionBlock, NavigationDetectionBlock)
@@ -17,7 +17,7 @@ from .deduplication import ExactParagraphDeduplicationBlock
 __all__ = [
     "Block",
     "NormalizationBlock", "EncodingRepairBlock", "UnicodeIntegrityBlock",
-    "CodeSafeFormattingBlock", "ParagraphFormattingBlock", "HTMLStructureBlock",
+    "CodeSafeFormattingBlock", "ParagraphFormattingBlock", "HTMLStructureBlock", "ParagraphFormattingBlockV2",
     "RedactionBlock",
     "BasicStructureBlock", "CodeFenceDetector", "HtmlCodeDetector",
     "SignalBasedBoilerplateFilteringBlock", "BoilerplateDetectionBlock", "NavigationDetectionBlock",

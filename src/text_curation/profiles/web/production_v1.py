@@ -4,7 +4,7 @@ from text_curation.blocks import (
     RedactionBlock,
     NormalizationBlock,
     CodeSafeFormattingBlock,
-    ParagraphFormattingBlock,
+    ParagraphFormattingBlockV2,
     PunctuationQuoteRepairBlock,
     HTMLStructureBlock,
     BasicStructureBlock,
@@ -49,7 +49,7 @@ PROFILE = Profile(
         HTMLStructureBlock(),
 
         # --- Formatting preservation ---
-        ParagraphFormattingBlock(),
+        ParagraphFormattingBlockV2(),
         CodeSafeFormattingBlock(),
 
         # --- Repair formatting artifacts introduced by normalization ---
