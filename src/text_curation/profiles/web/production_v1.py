@@ -49,7 +49,12 @@ PROFILE = Profile(
         # ------------------------------------------------------------------
         # Security redaction
         # ------------------------------------------------------------------
-        RedactionBlock(),
+        RedactionBlock(
+            policy={
+                "redact_ip_addresses": True
+            }
+
+        ),
 
         # ------------------------------------------------------------------
         # Safer normalization
