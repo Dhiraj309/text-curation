@@ -3,6 +3,7 @@ from .dedup_clusters import analyze_duplicate_clusters
 from .hash_dedup_streaming import deduplicate_by_document_id
 from .hash_dedup import deduplicate_by_hash
 from .minhash import minhash_deduplicate
+from .boilerplate_filter import filter_boilerplate_documents
 
 __all__ = [
     "decontaminate",
@@ -10,4 +11,5 @@ __all__ = [
     "deduplicate_by_document_id",
     "deduplicate_by_hash",
     "minhash_deduplicate",
+    "filter_boilerplate_documents",
 ]
