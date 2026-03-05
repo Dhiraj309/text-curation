@@ -12,6 +12,8 @@ from text_curation.blocks import (
     BasicStructureBlock,
 )
 
+from text_curation.blocks.filtering import BoilerplateDetectionBlock
+
 from text_curation.analysis import (
     QualitySignalBlock,
     ExtendedQualityBlock,
@@ -53,7 +55,6 @@ PROFILE = Profile(
             policy={
                 "redact_ip_addresses": True
             }
-
         ),
 
         # ------------------------------------------------------------------
@@ -82,6 +83,11 @@ PROFILE = Profile(
         # Structural analysis
         # ------------------------------------------------------------------
         BasicStructureBlock(),
+
+        # ------------------------------------------------------------------
+        # Boilerplate detection (signal only)
+        # ------------------------------------------------------------------
+        BoilerplateDetectionBlock(),
 
         # ------------------------------------------------------------------
         # Quality signals
@@ -121,6 +127,7 @@ PROFILE = Profile(
         "analysis_signals_emitted": True,
         "dataset_level_filtering": False,
         "unicode_punctuation_preserved": True,
+        "boilerplate_detection": True,
     },
 )
 
