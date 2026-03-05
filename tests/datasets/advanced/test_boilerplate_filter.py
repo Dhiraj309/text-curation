@@ -1,27 +1,17 @@
 from datasets import Dataset
-from text_curation.datasets.advanced.boilerplate_filter import (
-    filter_boilerplate_documents,
-)
+from text_curation.datasets.advanced.boilerplate_filter import boilerplate_filter
 
 
-def test_boilerplate_filter():
+def test_pipe_navigation_removed():
 
-    data = {
+    ds = Dataset.from_dict({
         "text": [
-            "Real article text.",
             "Home | About | Contact | Privacy Policy",
-        ],
-        "document.boilerplate_lines": [0, 1],
-        "document.boilerplate_ratio": [0.0, 1.0],
-    }
+            "This is a real article sentence."
+        ]
+    })
 
-    ds = Dataset.from_dict(data)
+    cleaned, report = boilerplate_filter(ds, column="text")
 
-    filtered, report = filter_boilerplate_documents(
-        ds,
-        ratio_threshold=0.5,
-        min_boilerplate_lines=1,
-    )
-
-    assert len(filtered) == 1
-    assert report["removed"]["samples"] == 1
+    assert len(cleaned) == 1
+    assert "article sentence" in cleaned["text"][0]
