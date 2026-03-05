@@ -1,79 +1,92 @@
+import re
 from datasets import Dataset
 
 
-def filter_boilerplate_documents(
+_PIPE_SPLIT = re.compile(r"\s*\|\s*")
+
+
+def _is_pipe_navigation(line: str) -> bool:
+    """
+    Detect navigation menus like:
+
+    Home | About | Contact | Privacy Policy
+    """
+
+    if "|" not in line:
+        return False
+
+    segments = _PIPE_SPLIT.split(line.strip())
+
+    if len(segments) < 3:
+        return False
+
+    # each segment should be short
+    for seg in segments:
+        if len(seg.split()) > 4:
+            return False
+
+    return True
+
+
+def boilerplate_filter(
     dataset: Dataset,
     *,
-    ratio_threshold: float = 0.5,
-    min_boilerplate_lines: int = 2,
+    column: str,
     collect_reports: bool = True,
 ):
     """
-    Remove documents dominated by boilerplate content.
+    Remove common web boilerplate lines.
 
-    Requires signals produced by BoilerplateDetectionBlock:
+    Currently handles:
+    - pipe navigation menus
 
-        document.boilerplate_lines
-        document.boilerplate_ratio
-
-    Args
-    ----
-    dataset : Dataset
-    ratio_threshold : float
-        Fraction of lines that may be boilerplate before dropping document.
-    min_boilerplate_lines : int
-        Minimum boilerplate lines required before filtering triggers.
-    collect_reports : bool
-        Whether to return filtering report.
-
-    Returns
-    -------
-    Filtered Dataset (+ optional report)
+    This is intentionally conservative.
     """
 
-    required = {"document.boilerplate_lines", "document.boilerplate_ratio"}
+    if column not in dataset.column_names:
+        raise ValueError(f"Column '{column}' not found in dataset")
 
-    missing = required - set(dataset.column_names)
-    if missing:
-        raise ValueError(
-            "Dataset missing required boilerplate signals: "
-            + ", ".join(sorted(missing))
-        )
+    texts = dataset[column]
 
-    total = len(dataset)
+    total_samples = len(texts)
 
     keep_indices = []
 
-    for idx, row in enumerate(dataset):
+    removed = 0
 
-        lines = row["document.boilerplate_lines"]
-        ratio = row["document.boilerplate_ratio"]
+    for idx, text in enumerate(texts):
 
-        if lines >= min_boilerplate_lines and ratio >= ratio_threshold:
-            continue
+        if not isinstance(text, str):
+            raise TypeError("boilerplate_filter expects string values")
 
-        keep_indices.append(idx)
+        lines = text.split("\n")
+
+        cleaned_lines = []
+
+        for line in lines:
+
+            if _is_pipe_navigation(line):
+                removed += 1
+                continue
+
+            cleaned_lines.append(line)
+
+        cleaned = "\n".join(cleaned_lines)
+
+        if cleaned.strip():
+            keep_indices.append(idx)
 
     filtered = dataset.select(keep_indices)
 
     if not collect_reports:
         return filtered
 
-    removed = total - len(filtered)
-
     report = {
-        "operation": "filter_boilerplate_documents",
-        "scope": "dataset",
-        "policy": {
-            "ratio_threshold": ratio_threshold,
-            "min_boilerplate_lines": min_boilerplate_lines,
-        },
-        "input": {"samples": total},
-        "output": {"samples": len(filtered)},
-        "removed": {
-            "samples": removed,
-            "fraction": removed / total if total else 0.0,
-        },
+        "operation": "boilerplate_filter",
+        "input_samples": total_samples,
+        "output_samples": len(keep_indices),
+        "lines_removed": removed,
+        "patterns": ["pipe_navigation"],
         "determinism": {
             "order_preserving": True,
             "no_randomness": True,
