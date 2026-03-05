@@ -6,20 +6,20 @@ the canonical import surface for block composition in profiles.
 """
 
 from .base import Block
-from .normalization import NormalizationBlock
-from .formatting import (CodeSafeFormattingBlock, ParagraphFormattingBlock)
+from .normalization import (NormalizationBlock, EncodingRepairBlock, UnicodeIntegrityBlock)
+from .formatting import (CodeSafeFormattingBlock, ParagraphFormattingBlock, HTMLStructureBlock)
 from .redaction import RedactionBlock
-from .structure.basic import BasicStructureBlock
-from .filtering.signal_based import SignalBasedBoilerplateFilteringBlock
+from .structure import (BasicStructureBlock, CodeFenceDetector, HtmlCodeDetector)
+from .filtering import (SignalBasedBoilerplateFilteringBlock, BoilerplateDetectionBlock, NavigationDetectionBlock)
 from .deduplication import ExactParagraphDeduplicationBlock
 
 # Explicit export list to keep the public API stable
 __all__ = [
     "Block",
-    "NormalizationBlock",
-    "CodeSafeFormattingBlock", "ParagraphFormattingBlock",
+    "NormalizationBlock", "EncodingRepairBlock", "UnicodeIntegrityBlock",
+    "CodeSafeFormattingBlock", "ParagraphFormattingBlock", "HTMLStructureBlock",
     "RedactionBlock",
-    "BasicStructureBlock",
-    "SignalBasedBoilerplateFilteringBlock",
+    "BasicStructureBlock", "CodeFenceDetector", "HtmlCodeDetector",
+    "SignalBasedBoilerplateFilteringBlock", "BoilerplateDetectionBlock", "NavigationDetectionBlock",
     "ExactParagraphDeduplicationBlock",
 ]
