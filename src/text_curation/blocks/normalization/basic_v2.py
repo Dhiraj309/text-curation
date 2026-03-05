@@ -1,6 +1,8 @@
+
 import re
 import unicodedata
 from text_curation.blocks.base import Block
+
 
 _ZERO_WIDTH = re.compile(r"[\u200B\u200C\u200D\uFEFF]")
 _CONTROL_CHARS = re.compile(r"[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]")
@@ -35,7 +37,7 @@ class NormalizationBlockV2(Block):
         text = document.text
 
         text = self._normalize_unicode(text)
-        text = self._remove_zero_width(text)
+        text = self._replace_zero_width(text)
         text = self._remove_control_char(text)
         text = self._normalize_line_endings(text)
         text = self._normalize_quotes(text)
@@ -54,8 +56,17 @@ class NormalizationBlockV2(Block):
     def _normalize_unicode(self, text):
         return unicodedata.normalize("NFKC", text)
 
-    def _remove_zero_width(self, text):
-        return _ZERO_WIDTH.sub("", text)
+    def _replace_zero_width(self, text):
+        """
+        Replace zero-width characters with a space.
+
+        Deleting them can merge tokens:
+            "text\u200Bcontains" → "textcontains"
+
+        Correct behavior:
+            "text\u200Bcontains" → "text contains"
+        """
+        return _ZERO_WIDTH.sub(" ", text)
 
     def _remove_control_char(self, text):
         return _CONTROL_CHARS.sub("", text)
@@ -69,6 +80,7 @@ class NormalizationBlockV2(Block):
         return text
 
     def _collapse_whitespace(self, text):
+
         lines = text.split("\n")
         out = []
 
