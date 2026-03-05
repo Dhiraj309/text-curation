@@ -1,6 +1,7 @@
 from text_curation.blocks import (
     UnicodeIntegrityBlock,
     EncodingRepairBlock,
+    OCRSpacingRepairBlock,   # ← NEW
     RedactionBlock,
     NormalizationBlockV2,
     CodeSafeFormattingBlock,
@@ -28,15 +29,19 @@ PROFILE = Profile(
     version="v1",
 
     description=(
-        "Production-grade web preprocessing pipeline (v2). "
+        "Production-grade web preprocessing pipeline. "
         "Preserves unicode punctuation, avoids stylistic punctuation "
-        "rewriting, and uses safer paragraph reconstruction."
+        "rewriting, repairs OCR spacing artifacts, and uses safer "
+        "paragraph reconstruction."
     ),
 
     blocks=[
         # Unicode safety
         UnicodeIntegrityBlock(),
         EncodingRepairBlock(),
+
+        # OCR repair must occur BEFORE whitespace normalization
+        OCRSpacingRepairBlock(),
 
         # Security
         RedactionBlock(),
@@ -81,6 +86,7 @@ PROFILE = Profile(
     behavior={
         "unicode_integrity_enforced": True,
         "encoding_repair": True,
+        "ocr_spacing_repaired": True,   # ← added behavior flag
         "secrets_redacted": True,
         "html_layout_removed": True,
         "structure_preserved": True,
