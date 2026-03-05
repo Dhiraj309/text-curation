@@ -2,7 +2,7 @@ from text_curation.blocks import (
     UnicodeIntegrityBlock,
     EncodingRepairBlock,
     RedactionBlock,
-    NormalizationBlock,
+    NormalizationBlockV2,
     CodeSafeFormattingBlock,
     ParagraphFormattingBlockV2,
     PunctuationQuoteRepairBlock,
@@ -28,42 +28,39 @@ PROFILE = Profile(
     version="v1",
 
     description=(
-        "Production-grade web corpus preprocessing pipeline designed "
-        "for large-scale LLM pretraining. Emphasizes unicode integrity, "
-        "encoding repair, layout cleanup, structural preservation, and "
-        "rich analysis signals."
+        "Production-grade web preprocessing pipeline (v2). "
+        "Preserves unicode punctuation, avoids stylistic punctuation "
+        "rewriting, and uses safer paragraph reconstruction."
     ),
 
     blocks=[
-        # --- Unicode and encoding integrity ---
+        # Unicode safety
         UnicodeIntegrityBlock(),
         EncodingRepairBlock(),
 
-        # --- Safety ---
+        # Security
         RedactionBlock(),
 
-        # --- Low-level normalization ---
-        NormalizationBlock(),
+        # Safer normalization
+        NormalizationBlockV2(),
 
-        # --- HTML artifact removal ---
+        # HTML cleanup
         HTMLStructureBlock(),
 
-        # --- Formatting preservation ---
+        # Safer paragraph handling
         ParagraphFormattingBlockV2(),
         CodeSafeFormattingBlock(),
-
-        # --- Repair formatting artifacts introduced by normalization ---
         PunctuationQuoteRepairBlock(),
 
-        # --- Structural signals ---
+        # Structural analysis
         BasicStructureBlock(),
 
-        # --- Quality analysis ---
+        # Quality signals
         QualitySignalBlock(),
         ExtendedQualityBlock(),
         TokenStatsBlock(),
 
-        # --- Deterministic document identity ---
+        # Deterministic identity
         FingerprintBlock(
             policy={
                 "normalize_whitespace": False,
@@ -90,8 +87,8 @@ PROFILE = Profile(
         "code_safe": True,
         "analysis_signals_emitted": True,
         "dataset_level_filtering": False,
+        "unicode_punctuation_preserved": True,
     },
 )
 
-# Register the profile at import time
 register(PROFILE)
