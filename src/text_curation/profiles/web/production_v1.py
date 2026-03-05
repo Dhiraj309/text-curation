@@ -1,7 +1,8 @@
 from text_curation.blocks import (
     UnicodeIntegrityBlock,
     EncodingRepairBlock,
-    OCRSpacingRepairBlock,   # ← NEW
+    OCRSpacingRepairBlock,
+    ColonSpacingRepairBlock,
     RedactionBlock,
     NormalizationBlockV2,
     CodeSafeFormattingBlock,
@@ -36,36 +37,57 @@ PROFILE = Profile(
     ),
 
     blocks=[
-        # Unicode safety
+        # ------------------------------------------------------------------
+        # Unicode safety layer
+        # ------------------------------------------------------------------
         UnicodeIntegrityBlock(),
         EncodingRepairBlock(),
 
-        # OCR repair must occur BEFORE whitespace normalization
+        # OCR repair BEFORE whitespace normalization
         OCRSpacingRepairBlock(),
 
-        # Security
+        # ------------------------------------------------------------------
+        # Security redaction
+        # ------------------------------------------------------------------
         RedactionBlock(),
 
+        # ------------------------------------------------------------------
         # Safer normalization
+        # ------------------------------------------------------------------
         NormalizationBlockV2(),
 
+        # ------------------------------------------------------------------
         # HTML cleanup
+        # ------------------------------------------------------------------
         HTMLStructureBlock(),
 
-        # Safer paragraph handling
-        ParagraphFormattingBlockV2(),
+        # ------------------------------------------------------------------
+        # Protect code formatting before paragraph logic
+        # ------------------------------------------------------------------
         CodeSafeFormattingBlock(),
+
+        # ------------------------------------------------------------------
+        # Formatting repairs
+        # ------------------------------------------------------------------
+        ColonSpacingRepairBlock(),
+        ParagraphFormattingBlockV2(),
         PunctuationQuoteRepairBlock(),
 
+        # ------------------------------------------------------------------
         # Structural analysis
+        # ------------------------------------------------------------------
         BasicStructureBlock(),
 
+        # ------------------------------------------------------------------
         # Quality signals
+        # ------------------------------------------------------------------
         QualitySignalBlock(),
         ExtendedQualityBlock(),
         TokenStatsBlock(),
 
-        # Deterministic identity
+        # ------------------------------------------------------------------
+        # Deterministic document identity
+        # ------------------------------------------------------------------
         FingerprintBlock(
             policy={
                 "normalize_whitespace": False,
@@ -86,7 +108,7 @@ PROFILE = Profile(
     behavior={
         "unicode_integrity_enforced": True,
         "encoding_repair": True,
-        "ocr_spacing_repaired": True,   # ← added behavior flag
+        "ocr_spacing_repaired": True,
         "secrets_redacted": True,
         "html_layout_removed": True,
         "structure_preserved": True,

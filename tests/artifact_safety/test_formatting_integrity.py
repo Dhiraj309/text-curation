@@ -11,11 +11,11 @@ def run(text):
     return result["text"][0]
 
 
-def test_colon_spacing_preserved():
+def test_colon_spacing_repair():
     text = "Matthew 25:23More text follows."
     cleaned = run(text)
 
-    assert "25:23More" in cleaned
+    assert "25:23 More" in cleaned
 
 
 def test_paragraph_boundary_preserved():
