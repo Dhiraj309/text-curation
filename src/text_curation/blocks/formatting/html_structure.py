@@ -3,11 +3,14 @@ import re
 from text_curation.blocks.base import Block
 
 
-# Tags that typically contain layout or scripting rather than natural language.
+# Tags that typically contain layout or scripting rather than natural language
 REMOVE_TAG_PATTERN = re.compile(
     r"<(script|style|nav|footer|aside)[^>]*>.*?</\1>",
     re.IGNORECASE | re.DOTALL
 )
+
+# Generic HTML tag pattern
+_TAG = re.compile(r"<[^>]+>")
 
 
 class HTMLStructureBlock(Block):
@@ -27,8 +30,9 @@ class HTMLStructureBlock(Block):
         <pre>
         <code>
 
-    This block performs minimal structural cleanup and does not attempt
-    to render or fully parse HTML.
+    Also strips malformed HTML fragments such as:
+
+        <div><span>Broken html without closing
 
     Signals emitted:
         document.html_tags_removed
@@ -50,7 +54,11 @@ class HTMLStructureBlock(Block):
             removed += 1
             return ""
 
+        # Remove layout/script tags
         cleaned = REMOVE_TAG_PATTERN.sub(_replacement, text)
+
+        # Strip malformed HTML fragments
+        cleaned = self._strip_broken_html(cleaned)
 
         if cleaned != text:
             document.set_text(cleaned)
@@ -61,3 +69,36 @@ class HTMLStructureBlock(Block):
         )
 
         return document
+
+    def _strip_broken_html(self, text):
+        """
+        Remove malformed HTML fragments such as:
+
+            <div><span>Broken html without closing
+
+        while preserving the underlying text.
+        """
+
+        lines = text.split("\n")
+        out = []
+
+        for line in lines:
+
+            tags = re.findall(r"<[^>]+>", line)
+
+            if not tags:
+                out.append(line)
+                continue
+
+            # Detect if any closing tags exist
+            has_closing = any(tag.startswith("</") for tag in tags)
+
+            # If only opening tags exist → likely broken fragment
+            if not has_closing:
+                cleaned = _TAG.sub("", line)
+                out.append(cleaned.strip())
+                continue
+
+            out.append(line)
+
+        return "\n".join(out)
