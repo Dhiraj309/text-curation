@@ -5,6 +5,7 @@ from text_curation.blocks import (
     NormalizationBlock,
     CodeSafeFormattingBlock,
     ParagraphFormattingBlock,
+    PunctuationQuoteRepairBlock,
     HTMLStructureBlock,
     BasicStructureBlock,
 )
@@ -19,6 +20,7 @@ from text_curation.analysis import (
 from text_curation.profiles.base import Profile
 from text_curation.registry import register
 
+
 PROFILE = Profile(
     domain="web",
     task="pretrain",
@@ -28,28 +30,40 @@ PROFILE = Profile(
     description=(
         "Production-grade web corpus preprocessing pipeline designed "
         "for large-scale LLM pretraining. Emphasizes unicode integrity, "
-        "layout cleanup, structural preservation, and rich analysis signals."
+        "encoding repair, layout cleanup, structural preservation, and "
+        "rich analysis signals."
     ),
 
     blocks=[
+        # --- Unicode and encoding integrity ---
         UnicodeIntegrityBlock(),
-        ExtendedQualityBlock(),
+        EncodingRepairBlock(),
 
+        # --- Safety ---
         RedactionBlock(),
 
+        # --- Low-level normalization ---
         NormalizationBlock(),
 
+        # --- HTML artifact removal ---
         HTMLStructureBlock(),
 
+        # --- Formatting preservation ---
         ParagraphFormattingBlock(),
         CodeSafeFormattingBlock(),
 
+        # --- Repair formatting artifacts introduced by normalization ---
+        PunctuationQuoteRepairBlock(),
+
+        # --- Structural signals ---
         BasicStructureBlock(),
 
+        # --- Quality analysis ---
         QualitySignalBlock(),
         ExtendedQualityBlock(),
         TokenStatsBlock(),
 
+        # --- Deterministic document identity ---
         FingerprintBlock(
             policy={
                 "normalize_whitespace": False,
@@ -79,4 +93,5 @@ PROFILE = Profile(
     },
 )
 
+# Register the profile at import time
 register(PROFILE)

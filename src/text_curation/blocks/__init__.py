@@ -7,7 +7,7 @@ the canonical import surface for block composition in profiles.
 
 from .base import Block
 from .normalization import (NormalizationBlock, EncodingRepairBlock, UnicodeIntegrityBlock)
-from .formatting import (CodeSafeFormattingBlock, ParagraphFormattingBlock, HTMLStructureBlock)
+from .formatting import (CodeSafeFormattingBlock, ParagraphFormattingBlock, HTMLStructureBlock, PunctuationQuoteRepairBlock)
 from .redaction import RedactionBlock
 from .structure import (BasicStructureBlock, CodeFenceDetector, HtmlCodeDetector)
 from .filtering import (SignalBasedBoilerplateFilteringBlock, BoilerplateDetectionBlock, NavigationDetectionBlock)
