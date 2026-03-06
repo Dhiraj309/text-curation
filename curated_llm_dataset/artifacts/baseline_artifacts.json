@@ -1,9 +1,0 @@
-{
-  "artifact_counts": {
-    "space_before_punctuation": 33,
-    "merged_quotes": 1,
-    "unicode_dash_replacement": 108,
-    "ellipsis_overflow": 4,
-    "newline_quote_pattern": 12
-  }
-}
