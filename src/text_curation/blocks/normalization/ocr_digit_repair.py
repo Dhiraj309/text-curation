@@ -21,24 +21,76 @@ _MENTION = re.compile(r"@\w+")
 _HASHTAG = re.compile(r"#\w+")
 
 
+# ---------------------------------------------------------
+# OCR corruption detector
+# ---------------------------------------------------------
+
+def _ocr_candidate_count(text: str) -> int:
+    """
+    Count likely OCR digit substitutions.
+
+    We look for digits embedded inside alphabetic tokens,
+    which is a common OCR corruption pattern.
+
+    Example:
+        Th1s, t3xt, m1stake
+
+    Isolated identifiers like GS1 or ISO9001 should not
+    trigger the repair rule unless multiple occurrences
+    appear in the same document.
+    """
+
+    count = 0
+
+    for i, c in enumerate(text):
+
+        if c not in _OCR_MAP:
+            continue
+
+        left = text[i - 1] if i > 0 else ""
+        right = text[i + 1] if i + 1 < len(text) else ""
+
+        if left.isalpha() or right.isalpha():
+            count += 1
+
+    return count
+
+
 class OCRDigitRepairBlock(Block):
     """
     Repairs OCR digit-to-letter substitutions such as:
 
-    Th1s -> This
-    t3xt -> text
+        Th1s -> This
+        t3xt -> text
 
     Safety rules:
     - Only repair tokens starting with letters
     - Token must contain both letters and digits
     - Do NOT modify URLs, emails, mentions, or hashtags
+    - Repair only if document shows OCR corruption density
     """
+
+    # Minimum OCR artifacts required before repair activates
+    _OCR_ACTIVATION_THRESHOLD = 3
 
     def apply(self, document):
 
         text = document.text
 
-        # Collect protected spans
+        # -------------------------------------------------
+        # Corruption density gate
+        # -------------------------------------------------
+
+        candidate_count = _ocr_candidate_count(text)
+
+        # If corruption density is low, skip repair entirely
+        if candidate_count < self._OCR_ACTIVATION_THRESHOLD:
+            return document
+
+        # -------------------------------------------------
+        # Protected spans
+        # -------------------------------------------------
+
         protected_spans = []
 
         for pattern in (_URL, _EMAIL, _MENTION, _HASHTAG):
