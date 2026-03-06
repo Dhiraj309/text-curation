@@ -1,3 +1,4 @@
+import json
 import math
 import string
 import unicodedata
@@ -77,9 +78,10 @@ class ExtendedQualityBlock(AnalysisBlock):
             round(punctuation_density, 6),
         )
 
+        # Serialize dictionary to avoid Arrow schema drift during multiprocessing
         document.add_signal(
             "document.script_distribution",
-            dict(script_counts),
+            json.dumps(dict(script_counts), sort_keys=True),
         )
 
         document.add_signal(
