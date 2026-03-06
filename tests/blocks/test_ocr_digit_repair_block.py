@@ -52,8 +52,8 @@ def test_does_not_modify_hashtags():
 
 def test_signal_emitted():
 
-    doc = run_block("Th1s t3xt")
+    doc = run_block("Th1s t3xt w1th")
 
     signals = {s.name: s.value for s in doc.signals}
 
-    assert signals["document.ocr_digit_repairs"] == 2
+    assert signals["document.ocr_digit_repairs"] == 3
