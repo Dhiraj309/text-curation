@@ -17,7 +17,8 @@ class Block:
         Policy contains explicit configuration knobs.
         Defaults are defined by concrete block implementations.
         """
-        self.policy = policy or {}
+        # Copy policy to prevent external mutation
+        self.policy = dict(policy or {})
         self._stats: dict[str, int] = {}
 
     def apply(self, document):
@@ -27,7 +28,7 @@ class Block:
         Subclasses must implement this method.
         """
         raise NotImplementedError
-    
+
     def reset_stats(self):
         """
         Reset block-local statistics.
@@ -35,10 +36,20 @@ class Block:
         """
         self._stats.clear()
 
+    def inc(self, key: str, value: int = 1):
+        """
+        Increment a statistic deterministically.
+
+        This helper avoids inconsistent stat update patterns
+        across blocks.
+        """
+        self._stats[key] = self._stats.get(key, 0) + value
+
     def get_stats(self) -> dict:
         """
-        Return a copy of block-local statistics.
+        Return deterministic, JSON-safe block statistics.
 
-        Stats must be a JSON-serializable and deterministic.
+        Keys are sorted to ensure stable ordering across
+        multiprocessing workers.
         """
-        return dict(self._stats)
+        return {k: int(v) for k, v in sorted(self._stats.items())}
