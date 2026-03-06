@@ -1,3 +1,4 @@
+import json
 from text_curation import TextCurator
 
 
@@ -8,7 +9,7 @@ def test_report_basic_stats():
         "text": ["Hello\n\nhello"]
     })
 
-    report = out["curation_report"][0]
+    report = json.loads(out["curation_report"][0])
 
     # Two identical paragraphs in input
     assert report["input_stats"]["paragraphs"] == 2

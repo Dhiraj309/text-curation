@@ -13,6 +13,8 @@ from text_curation.datasets.advanced.hash_dedup_streaming import (
 )
 from text_curation.datasets.advanced.minhash import minhash_deduplicate
 
+import json
+
 
 class CorpusPipeline:
     """
@@ -87,10 +89,10 @@ class CorpusPipeline:
         # -------------------------------------------------
         # 1.5 Extract canonical document_id
         # -------------------------------------------------
-        document_ids = [
-            r["document_id"] for r in dataset["curation_report"]
-        ]
 
+        document_ids = [
+            json.loads(r)["document_id"] for r in dataset["curation_report"]
+        ]
         dataset = dataset.add_column("document_id", document_ids)
 
         # Drop reports after identity extraction

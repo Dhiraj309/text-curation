@@ -1,3 +1,5 @@
+import json
+
 from text_curation.core.pipeline import Pipeline
 from text_curation.registry import get_profile
 
@@ -66,8 +68,11 @@ class TextCurator:
                 collect_report=True,
                 profile_id=self._profile.id,
             )
+
             cleaned.append(doc.text)
-            reports.append(report.to_dict())
+
+            # Serialize report to deterministic JSON to avoid Arrow schema drift
+            reports.append(json.dumps(report.to_dict(), sort_keys=True))
 
         return {
             "text": cleaned,
