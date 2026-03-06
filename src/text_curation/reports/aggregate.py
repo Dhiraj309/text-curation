@@ -1,4 +1,5 @@
 from collections import defaultdict
+import json
 
 
 def aggregate_reports(reports):
@@ -6,7 +7,9 @@ def aggregate_reports(reports):
     Aggregate a list of per-sample curation reports into a single
     dataset-level summary.
 
-    Assumes TOTAL schema: all expected keys are always present.
+    Supports both:
+        - dict reports (legacy single-process mode)
+        - JSON string reports (multiprocessing-safe mode)
     """
 
     agg_input = defaultdict(int)
@@ -15,6 +18,11 @@ def aggregate_reports(reports):
     agg_signals = defaultdict(int)
 
     for r in reports:
+
+        # --- multiprocessing-safe decode ---
+        if isinstance(r, str):
+            r = json.loads(r)
+
         # Input stats
         for key, value in r["input_stats"].items():
             agg_input[key] += value

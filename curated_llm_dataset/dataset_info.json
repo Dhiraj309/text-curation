@@ -1,0 +1,84 @@
+{
+  "builder_name": "parquet",
+  "citation": "",
+  "config_name": "default",
+  "dataset_name": "parquet",
+  "dataset_size": 3598651393,
+  "description": "",
+  "download_checksums": {
+    "hf://datasets/HuggingFaceFW/fineweb@main/sample/350BT/000_00000.parquet": {
+      "num_bytes": 2148532268,
+      "checksum": null
+    }
+  },
+  "download_size": 2148532268,
+  "features": {
+    "text": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "id": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "dump": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "url": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "date": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "file_path": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "language": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "language_score": {
+      "dtype": "float64",
+      "_type": "Value"
+    },
+    "token_count": {
+      "dtype": "int64",
+      "_type": "Value"
+    },
+    "document_id": {
+      "dtype": "string",
+      "_type": "Value"
+    }
+  },
+  "homepage": "",
+  "license": "",
+  "size_in_bytes": 5747183661,
+  "splits": {
+    "train": {
+      "name": "train",
+      "num_bytes": 3598651393,
+      "num_examples": 1058636,
+      "shard_lengths": [
+        148948,
+        146952,
+        148957,
+        146953,
+        147947,
+        148949,
+        144940,
+        24990
+      ],
+      "dataset_name": "parquet"
+    }
+  },
+  "version": {
+    "version_str": "0.0.0",
+    "major": 0,
+    "minor": 0,
+    "patch": 0
+  }
+}

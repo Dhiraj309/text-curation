@@ -1,4 +1,7 @@
+
 from typing import Callable, Optional, Union
+import json
+import hashlib
 
 from datasets import Dataset
 
@@ -12,8 +15,6 @@ from text_curation.datasets.advanced.hash_dedup_streaming import (
     deduplicate_by_document_id,
 )
 from text_curation.datasets.advanced.minhash import minhash_deduplicate
-
-import json
 
 
 class CorpusPipeline:
@@ -36,7 +37,7 @@ class CorpusPipeline:
         self,
         *,
         profile: Union[str, object],
-        dedup: Optional[str] = None,  # "hash" | "minhash" | None
+        dedup: Optional[str] = None,
         filter_fn: Optional[Callable] = None,
         shard_config: Optional[dict] = None,
         strict_manifest: bool = False,
@@ -58,7 +59,6 @@ class CorpusPipeline:
         self.strict_manifest = strict_manifest
         self._num_proc = num_proc
 
-        # Collect reports to extract canonical document_id
         self._curator = TextCurator(
             profile_obj,
             collect_reports=True,
@@ -67,41 +67,67 @@ class CorpusPipeline:
     def __call__(self, dataset: Dataset):
 
         # -------------------------------------------------
-        # 1. Apply TextCurator (parallelizable stage)
+        # 1. Run TextCurator if dataset not already curated
         # -------------------------------------------------
-        if self._num_proc is not None:
-            dataset = dataset.map(
-                self._curator,
-                batched=True,
-                num_proc=self._num_proc,
-            )
-        else:
-            dataset = dataset.map(
-                self._curator,
-                batched=True,
-            )
-
         if "curation_report" not in dataset.column_names:
-            raise RuntimeError(
-                "CorpusPipeline requires curation_report to extract document_id"
-            )
+
+            if self._num_proc is not None:
+                dataset = dataset.map(
+                    self._curator,
+                    batched=True,
+                    num_proc=self._num_proc,
+                )
+            else:
+                dataset = dataset.map(
+                    self._curator,
+                    batched=True,
+                )
 
         # -------------------------------------------------
-        # 1.5 Extract canonical document_id
+        # 2. Resolve document identity
         # -------------------------------------------------
 
-        document_ids = [
-            json.loads(r)["document_id"] for r in dataset["curation_report"]
-        ]
-        dataset = dataset.add_column("document_id", document_ids)
+        if "document_id" in dataset.column_names:
 
-        # Drop reports after identity extraction
-        dataset = dataset.remove_columns(["curation_report"])
+            # Use existing IDs
+            document_ids = [str(x) for x in dataset["document_id"]]
+
+        else:
+
+            reports = dataset["curation_report"]
+            texts = dataset["text"]
+
+            document_ids = []
+
+            for r, text in zip(reports, texts):
+
+                if isinstance(r, str):
+                    r = json.loads(r)
+
+                doc_id = None
+
+                if isinstance(r, dict):
+                    doc_id = r.get("document_id")
+
+                if not doc_id:
+                    # deterministic fallback
+                    doc_id = hashlib.sha256(
+                        text.encode("utf-8")
+                    ).hexdigest()
+
+                document_ids.append(str(doc_id))
+
+            dataset = dataset.add_column("document_id", document_ids)
+
+        # Remove report column if present
+        if "curation_report" in dataset.column_names:
+            dataset = dataset.remove_columns(["curation_report"])
 
         # -------------------------------------------------
-        # 2. Optional Filtering
+        # 3. Optional filtering
         # -------------------------------------------------
         if self.filter_fn is not None:
+
             dataset, _ = filter_rows(
                 dataset,
                 predicate=self.filter_fn,
@@ -110,12 +136,14 @@ class CorpusPipeline:
             )
 
         # -------------------------------------------------
-        # 3. Optional Deduplication
+        # 4. Optional deduplication
         # -------------------------------------------------
         if self.dedup == "hash":
+
             dataset, _ = deduplicate_by_document_id(dataset)
 
         elif self.dedup == "minhash":
+
             if "minhash_config" not in self.shard_config:
                 raise ValueError(
                     "minhash dedup requires shard_config['minhash_config']"
@@ -133,23 +161,30 @@ class CorpusPipeline:
             )
 
         elif self.dedup is not None:
+
             raise ValueError("dedup must be 'hash', 'minhash', or None")
 
         # -------------------------------------------------
-        # 4. Compute Canonical Dataset Hash (single-threaded)
+        # 5. Compute canonical dataset hash
         # -------------------------------------------------
         if "document_id" not in dataset.column_names:
+
             raise ValueError(
                 "CorpusPipeline requires 'document_id' column "
                 "to compute canonical dataset identity"
             )
 
         document_ids = list(dataset["document_id"])
+
         pipeline_hash = compute_pipeline_hash(self.profile)
-        dataset_hash = compute_dataset_hash(document_ids, pipeline_hash)
+
+        dataset_hash = compute_dataset_hash(
+            document_ids,
+            pipeline_hash,
+        )
 
         # -------------------------------------------------
-        # 5. Manifest Generation
+        # 6. Manifest generation
         # -------------------------------------------------
         manifest = DatasetManifest(
             profile_ids=[self.profile.id],

@@ -1,0 +1,24 @@
+{
+  "operation": "filter_rows",
+  "scope": "dataset",
+  "description": "Remove extremely short samples",
+  "input": {
+    "samples": 100
+  },
+  "output": {
+    "samples": 100
+  },
+  "removed": {
+    "samples": 0,
+    "fraction": 0.0
+  },
+  "determinism": {
+    "order_preserving": true,
+    "num_proc": 1,
+    "predicate_assumed_pure": true
+  },
+  "provenance": {
+    "library": "text-curation",
+    "operation_version": "filter_rows_v1"
+  }
+}

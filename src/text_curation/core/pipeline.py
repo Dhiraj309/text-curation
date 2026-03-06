@@ -1,4 +1,6 @@
 import copy
+import hashlib
+
 
 class Pipeline:
     """
@@ -26,8 +28,14 @@ class Pipeline:
         """
         document, _ = self.run_document(text)
         return document.text
-    
-    def run_document(self, text: str, *, collect_report: bool = False, profile_id: str | None = None):
+
+    def run_document(
+        self,
+        text: str,
+        *,
+        collect_report: bool = False,
+        profile_id: str | None = None,
+    ):
         """
         Run the pipeline and return the Document.
 
@@ -45,7 +53,6 @@ class Pipeline:
         for block in self.blocks:
             if document.is_dropped:
                 break
-            # block_instance = copy.deepcopy(block)
 
             if hasattr(block, "reset_stats"):
                 block.reset_stats()
@@ -61,19 +68,29 @@ class Pipeline:
         if not collect_report:
             return document, None
 
+        # -------------------------------------------------
+        # Guarantee deterministic document identity
+        # -------------------------------------------------
+        if document.document_id is None:
+            fallback_id = hashlib.sha256(
+                (document.text or "").encode("utf-8")
+            ).hexdigest()
+
+            document.set_document_id(fallback_id)
+
         output_stats = compute_basic_stats(document.text)
 
         report = CurationReport(
-                profile_id=profile_id or "<unknown>",
-                blocks=[b.__class__.__name__ for b in self.blocks],
-                input_stats=input_stats,
-                output_stats=output_stats,
-                block_stats=block_stats or {},
-                signals_summary=document.summarize_signals(),
-                extras={},
-                dropped=document._dropped,
-                drop_reason=document._drop_reason,
-                document_id=document.document_id,
-            )
+            profile_id=profile_id or "<unknown>",
+            blocks=[b.__class__.__name__ for b in self.blocks],
+            input_stats=input_stats,
+            output_stats=output_stats,
+            block_stats=block_stats or {},
+            signals_summary=document.summarize_signals(),
+            extras={},
+            dropped=document._dropped,
+            drop_reason=document._drop_reason,
+            document_id=document.document_id,
+        )
 
         return document, report

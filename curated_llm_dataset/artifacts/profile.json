@@ -1,0 +1,121 @@
+{
+  "id": "web.pretrain.production_v1",
+  "domain": "web",
+  "task": "pretrain",
+  "philosophy": "production",
+  "version": "v1",
+  "description": "Production-grade web preprocessing pipeline. Repairs encoding corruption, OCR artifacts, and structural noise while preserving natural language formatting and unicode punctuation.",
+  "blocks": [
+    {
+      "type": "UnicodeIntegrityBlock",
+      "policy": {
+        "normalization": "NFC"
+      }
+    },
+    {
+      "type": "EncodingRepairBlock",
+      "policy": {
+        "use_ftfy": true
+      }
+    },
+    {
+      "type": "OCRDigitRepairBlock",
+      "policy": {}
+    },
+    {
+      "type": "OCRSpacingRepairBlock",
+      "policy": {}
+    },
+    {
+      "type": "NormalizationBlockV2",
+      "policy": {}
+    },
+    {
+      "type": "HTMLStructureBlock",
+      "policy": {}
+    },
+    {
+      "type": "RedactionBlock",
+      "policy": {
+        "redact_emails": true,
+        "redact_api_tokens": true,
+        "redact_url_credentials": true,
+        "redact_ip_addresses": true
+      }
+    },
+    {
+      "type": "CodeSafeFormattingBlock",
+      "policy": {}
+    },
+    {
+      "type": "ColonSpacingRepairBlock",
+      "policy": {}
+    },
+    {
+      "type": "ParagraphFormattingBlockV2",
+      "policy": {
+        "repair_punctuation": true
+      }
+    },
+    {
+      "type": "PunctuationQuoteRepairBlock",
+      "policy": {}
+    },
+    {
+      "type": "BasicStructureBlock",
+      "policy": {
+        "detect_headers": true,
+        "detect_lists": true,
+        "detect_all_caps": true,
+        "short_line_threshold": 20,
+        "list_block_threshold": 0.5,
+        "min_repetition_for_boilerplate": 2
+      }
+    },
+    {
+      "type": "BoilerplateDetectionBlock",
+      "policy": {}
+    },
+    {
+      "type": "QualitySignalBlock",
+      "policy": {}
+    },
+    {
+      "type": "ExtendedQualityBlock",
+      "policy": {}
+    },
+    {
+      "type": "TokenStatsBlock",
+      "policy": {}
+    },
+    {
+      "type": "FingerprintBlock",
+      "policy": {
+        "normalize_whitespace": false,
+        "strip": false
+      }
+    }
+  ],
+  "guarantees": {
+    "analysis_signal_only": true,
+    "deterministic": true,
+    "document_local_transforms_only": true,
+    "explicit_block_order": true,
+    "no_hidden_global_state": true,
+    "profile_id_fully_specifies_behavior": true
+  },
+  "behavior": {
+    "analysis_signals_emitted": true,
+    "boilerplate_detection": true,
+    "code_safe": true,
+    "dataset_level_filtering": false,
+    "encoding_repair": true,
+    "html_layout_removed": true,
+    "ocr_digit_repair": true,
+    "ocr_spacing_repaired": true,
+    "secrets_redacted": true,
+    "structure_preserved": true,
+    "unicode_integrity_enforced": true,
+    "unicode_punctuation_preserved": true
+  }
+}
