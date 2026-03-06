@@ -12,7 +12,7 @@ class TokenStatsBlock(AnalysisBlock):
         document.max_token_length
     """
 
-    def apply(selg, document):
+    def apply(self, document):
         text = document.text
 
         tokens = text.split()
