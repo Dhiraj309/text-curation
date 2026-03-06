@@ -1,0 +1,30 @@
+{
+  "operation": "deduplicate_by_hash",
+  "scope": "dataset",
+  "column": "text",
+  "strategy": {
+    "type": "sha256",
+    "normalization": null
+  },
+  "policy": {
+    "keep": "first"
+  },
+  "input": {
+    "samples": 100
+  },
+  "output": {
+    "samples": 100
+  },
+  "removed": {
+    "samples": 0,
+    "fraction": 0.0
+  },
+  "duplicates": {
+    "groups": 0,
+    "max_group_size": 1
+  },
+  "determinism": {
+    "order_independent_grouping": true,
+    "selection_order_dependent": true
+  }
+}

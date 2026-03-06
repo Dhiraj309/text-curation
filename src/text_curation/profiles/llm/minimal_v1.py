@@ -4,6 +4,8 @@ from text_curation.blocks import (
     RedactionBlock,
 )
 
+from text_curation.analysis import FingerprintBlock
+
 from text_curation.profiles.base import Profile
 from text_curation.registry import register
 
@@ -22,6 +24,9 @@ PROFILE = Profile(
         RedactionBlock(),
         NormalizationBlock(),
         CodeSafeFormattingBlock(),
+
+        # Deterministic identity for corpus pipelines
+        FingerprintBlock(),
     ],
 
     guarantees={
@@ -43,5 +48,4 @@ PROFILE = Profile(
     },
 )
 
-# Register the profile at import time.
 register(PROFILE)
